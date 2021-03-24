@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  club-portal:
+    build: .
+    image: club-portal
+    container_name: club-portal
+    ports:
+      - 8080:8080
+    networks:
+      - redis-network
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - redis-network
+
+networks:
+  redis-network:
+    driver: bridge
