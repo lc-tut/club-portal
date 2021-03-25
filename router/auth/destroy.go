@@ -15,7 +15,7 @@ func (h *AuthHandler) Destroy() gin.HandlerFunc {
 		if err := sess.Save(); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }
