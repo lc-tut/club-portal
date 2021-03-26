@@ -7,8 +7,10 @@ import (
 	"net/http"
 )
 
-func (h *AuthHandler) Destroy() gin.HandlerFunc {
+func (h *Handler) Destroy() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		defer deleteCookie(ctx, consts.SessionCookieName)
+
 		sess := sessions.Default(ctx)
 		sess.Set(consts.SessionKey, nil)
 

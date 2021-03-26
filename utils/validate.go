@@ -2,11 +2,11 @@ package utils
 
 import (
 	"github.com/goccy/go-json"
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/router/data"
 )
 
-func ByteSliceToAuthState(b []byte) (*models.AuthState, error) {
-	model := &models.AuthState{}
+func ByteSliceToSessionData(b []byte) (*data.SessionData, error) {
+	model := &data.SessionData{}
 	if err := json.Unmarshal(b, model); err != nil {
 		return nil, err
 	}

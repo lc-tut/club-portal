@@ -1,15 +1,15 @@
-package models
+package data
 
 import "github.com/google/uuid"
 
-type AuthState struct {
+type SessionData struct {
 	UUID  string
 	Email string
 }
 
-func NewAuthState(uuid uuid.UUID, email string) *AuthState {
+func NewSessionData(uuid uuid.UUID, email string) *SessionData {
 	u := uuid.String()
-	s := &AuthState{
+	s := &SessionData{
 		UUID:  u,
 		Email: email,
 	}

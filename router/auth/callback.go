@@ -8,15 +8,16 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/models"
-	"github.com/lc-tut/club-portal/utils"
+	"github.com/lc-tut/club-portal/router/data"
 	"net/http"
 	"strings"
 )
 
-func (h *AuthHandler) Callback() gin.HandlerFunc {
+func (h *Handler) Callback() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		email, err := checkValidState(ctx)
+		defer deleteCookie(ctx, consts.AuthCSRFCookieName)
+
+		email, err := h.checkValidState(ctx)
 
 		if err != nil || !checkValidEmail(email) {
 			ctx.Status(http.StatusBadRequest)
@@ -30,9 +31,9 @@ func (h *AuthHandler) Callback() gin.HandlerFunc {
 			return
 		}
 
-		authState := models.NewAuthState(newUUID, email)
+		sessionData := data.NewSessionData(newUUID, email)
 
-		b, err := json.Marshal(authState)
+		b, err := json.Marshal(sessionData)
 
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
@@ -51,7 +52,7 @@ func (h *AuthHandler) Callback() gin.HandlerFunc {
 	}
 }
 
-func checkValidState(ctx *gin.Context) (string, error) {
+func (h *Handler) checkValidState(ctx *gin.Context) (string, error) {
 	queries := ctx.Request.URL.Query()
 
 	queryState, ok := queries["state"]
@@ -76,7 +77,7 @@ func checkValidState(ctx *gin.Context) (string, error) {
 		return "", errors.New("invalid query")
 	}
 
-	token, err := utils.AuthConfig.Exchange(ctx, code[0])
+	token, err := h.config.GoogleOAuthConfig.Exchange(ctx, code[0])
 
 	if err != nil {
 		return "", err

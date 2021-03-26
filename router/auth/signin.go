@@ -8,12 +8,12 @@ import (
 	"net/http"
 )
 
-func (h *AuthHandler) SignIn() gin.HandlerFunc {
+func (h *Handler) SignIn() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		sess := sessions.Default(ctx)
-		authState := sess.Get(consts.SessionKey)
+		sessionData := sess.Get(consts.SessionKey)
 
-		if authState != nil {
+		if sessionData != nil {
 			ctx.Status(http.StatusNoContent)
 			return
 		}
@@ -25,10 +25,11 @@ func (h *AuthHandler) SignIn() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
-		ctx.SetCookie(consts.AuthCSRFCookieName, state, 60*15, "/", "localhost", false, true)
+		csrfCookie := h.config.CSRFCookieOptions
+		ctx.SetSameSite(csrfCookie.SameSite)
+		ctx.SetCookie(consts.AuthCSRFCookieName, state, csrfCookie.MaxAge, csrfCookie.Path, csrfCookie.Domain, csrfCookie.Secure, csrfCookie.HttpOnly)
 
-		url := utils.AuthConfig.AuthCodeURL(state)
+		url := h.config.GoogleOAuthConfig.AuthCodeURL(state)
 
 		ctx.Redirect(http.StatusFound, url)
 	}
