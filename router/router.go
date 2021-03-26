@@ -13,11 +13,7 @@ type IRouter interface {
 }
 
 func Init(engine *gin.Engine) {
-	config, err := data.NewConfig(true)
-
-	if err != nil {
-		panic(err)
-	}
+	config := data.NewConfig(true)
 
 	store, err := data.NewRedisServer()
 

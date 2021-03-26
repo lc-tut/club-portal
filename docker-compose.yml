@@ -9,6 +9,8 @@ services:
       - 8080:8080
     networks:
       - redis-network
+    secrets:
+      - config
     depends_on:
       - redis
 
@@ -23,3 +25,7 @@ services:
 networks:
   redis-network:
     driver: bridge
+
+secrets:
+  config:
+    file: cfg/config.toml

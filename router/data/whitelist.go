@@ -1,10 +1,7 @@
 package data
 
 import (
-	"fmt"
-	"github.com/lc-tut/club-portal/consts"
 	"github.com/spf13/viper"
-	"os"
 	"strings"
 )
 
@@ -82,23 +79,7 @@ func (w *Whitelist) IsGeneralUser(email string) bool {
 	return false
 }
 
-func NewWhitelist() (WhitelistInfo, error) {
-	configFn := os.Getenv("CONFIG_FILE")
-
-	if !strings.HasSuffix(configFn, consts.ConfigFileName) {
-		return nil, fmt.Errorf("filename must be `%s`", consts.ConfigFileName)
-	}
-
-	path := strings.ReplaceAll(configFn, consts.ConfigFileName, "")
-
-	viper.SetConfigName("config")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath(path)
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
+func NewWhitelist() WhitelistInfo {
 	ed := viper.GetStringSlice("email_domains")
 	ae := viper.GetStringSlice("admin_emails")
 	ge := viper.GetStringSlice("general_emails")
@@ -112,5 +93,5 @@ func NewWhitelist() (WhitelistInfo, error) {
 		generalEmails: ge,
 	}
 
-	return w, nil
+	return w
 }

@@ -13,7 +13,6 @@ FROM gcr.io/distroless/base
 
 WORKDIR /root/
 COPY --from=build /root/app/dist .
-COPY --from=build /root/app/.env .
 
 EXPOSE 8080
 
