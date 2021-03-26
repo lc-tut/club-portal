@@ -19,7 +19,7 @@ func (h *Handler) Callback() gin.HandlerFunc {
 
 		email, err := h.checkValidState(ctx)
 
-		if err != nil || !checkValidEmail(email) {
+		if err != nil || !h.config.WhitelistUsers.IsUser(email) {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
@@ -114,9 +114,4 @@ func parseJWT(token string) (string, error) {
 	}
 
 	return jd.Email, nil
-}
-
-func checkValidEmail(email string) bool {
-	// TODO: check email is valid
-	return true
 }
