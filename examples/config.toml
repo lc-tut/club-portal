@@ -3,8 +3,7 @@ client_secret=""
 
 mariadb_user=""
 mariadb_password=""
-mariadb_address=""
-mariadb_db=""
+mariadb_dbname=""
 
 redis_password=""
 redis_secret=""

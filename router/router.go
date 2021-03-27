@@ -11,6 +11,7 @@ import (
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -22,8 +23,8 @@ type Server struct {
 	*gin.Engine
 }
 
-func NewServer(logger *zap.Logger) (*Server, error) {
-	server, err := newServer(logger)
+func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
+	server, err := newServer(logger, db)
 
 	if err != nil {
 		return nil, err
@@ -42,9 +43,9 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 	return engine
 }
 
-func registerRouters(engine *gin.Engine, config *data.Config, logger *zap.Logger) *Server {
+func registerRouters(engine *gin.Engine, config *data.Config, logger *zap.Logger, db *gorm.DB) *Server {
 	apiGroup := engine.Group("/api")
-	authRouter := auth.NewAuthRouter(apiGroup, config, logger)
+	authRouter := auth.NewAuthRouter(apiGroup, config, logger, db)
 	addRouter(authRouter)
 
 	return &Server{engine}
@@ -54,7 +55,7 @@ func addRouter(r IRouter) {
 	r.AddRouter()
 }
 
-func newRedisServer() (redis.Store, error) {
+func newRedisStore() (redis.Store, error) {
 	secretKey := viper.GetString("redis_secret")
 	store, err := redis.NewStore(10, "tcp", "redis:6379", viper.GetString("redis_password"), []byte(secretKey))
 

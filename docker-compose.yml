@@ -9,10 +9,12 @@ services:
       - 8080:8080
     networks:
       - redis-network
+      - mariadb-network
     secrets:
       - config
     depends_on:
       - redis
+      - mariadb
 
   redis:
     image: redis:alpine
@@ -22,10 +24,30 @@ services:
     networks:
       - redis-network
 
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    ports:
+      - 3306:3306
+    volumes:
+      - cfg/mariadb/conf:/etc/mysql/conf.d
+      - cfg/mariadb/sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_pass
+      MYSQL_DATABASE: club_portal
+    networks:
+      - mariadb-network
+    secrets:
+      - dbpass
+
 networks:
   redis-network:
+    driver: bridge
+  mariadb-network:
     driver: bridge
 
 secrets:
   config:
     file: cfg/config.toml
+  dbpass:
+    file: cfg/db_pass

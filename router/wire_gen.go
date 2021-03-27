@@ -8,12 +8,13 @@ package router
 import (
 	"github.com/lc-tut/club-portal/router/data"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // Injectors from router_wire.go:
 
-func newServer(logger *zap.Logger) (*Server, error) {
-	store, err := newRedisServer()
+func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
+	store, err := newRedisStore()
 	if err != nil {
 		return nil, err
 	}
@@ -28,6 +29,6 @@ func newServer(logger *zap.Logger) (*Server, error) {
 		GoogleOAuthConfig:    config,
 		WhitelistUsers:       whitelistInfo,
 	}
-	server := registerRouters(engine, dataConfig, logger)
+	server := registerRouters(engine, dataConfig, logger, db)
 	return server, nil
 }

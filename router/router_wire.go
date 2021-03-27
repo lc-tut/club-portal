@@ -6,13 +6,14 @@ import (
 	"github.com/google/wire"
 	"github.com/lc-tut/club-portal/router/data"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
-func newServer(logger *zap.Logger) (*Server, error) {
+func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 	wire.Build(
 		newGinEngine,
 		registerRouters,
-		newRedisServer,
+		newRedisStore,
 		data.NewWhitelist,
 		data.NewCSRFCookieOption,
 		data.NewSessionCookieOption,
