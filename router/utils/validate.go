@@ -7,6 +7,7 @@ import (
 
 func ByteSliceToSessionData(b []byte) (*data.SessionData, error) {
 	model := &data.SessionData{}
+
 	if err := json.Unmarshal(b, model); err != nil {
 		return nil, err
 	}

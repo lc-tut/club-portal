@@ -4,7 +4,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/utils"
+	utils2 "github.com/lc-tut/club-portal/router/utils"
 	"net/http"
 )
 
@@ -14,7 +14,7 @@ func (h *Handler) Auth() gin.HandlerFunc {
 		sessionData := sess.Get(consts.SessionKey)
 
 		if sessionData != nil {
-			s, err := utils.ByteSliceToSessionData(sessionData.([]byte))
+			s, err := utils2.ByteSliceToSessionData(sessionData.([]byte))
 			if err != nil {
 				ctx.Status(http.StatusInternalServerError)
 				return

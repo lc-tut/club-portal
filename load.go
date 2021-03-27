@@ -1,12 +1,10 @@
 package main
 
 import (
-	ginzap "github.com/gin-contrib/zap"
-	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/router"
+	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"time"
 )
 
 func loadConfig() error {
@@ -18,39 +16,36 @@ func loadConfig() error {
 		return err
 	}
 
-	viper.SetDefault("production", false)
+	viper.SetDefault("mode", "local")
+	viper.SetDefault("domain", "localhost")
 
 	return nil
 }
 
-func isDev() bool {
-	mode := viper.GetBool("production")
-	return !mode
-}
-
 func newZapLogger() (*zap.Logger, error) {
-	if isDev() {
-		return zap.NewDevelopment()
-	} else {
+	if utils.IsProd() {
 		return zap.NewProduction()
+	} else {
+		return zap.NewDevelopment()
 	}
 }
 
-func newGinEngine(logger *zap.Logger) (*gin.Engine, error) {
+func newServer() (*router.Server, error) {
 	if err := loadConfig(); err != nil {
 		return nil, err
 	}
 
-	engine := gin.New()
-
-	engine.Use(ginzap.Ginzap(logger, time.RFC3339, false))
-	engine.Use(ginzap.RecoveryWithZap(logger, isDev()))
-
-	err := router.Init(engine, logger)
+	logger, err := newZapLogger()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return engine, nil
+	server, err := router.NewServer(logger)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return server, nil
 }

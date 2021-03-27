@@ -1,17 +1,11 @@
 package main
 
 func main() {
-	logger, err := newZapLogger()
+	server, err := newServer()
 
 	if err != nil {
 		panic(err)
 	}
 
-	engine, err := newGinEngine(logger)
-
-	if err != nil {
-		panic(err)
-	}
-
-	_ = engine.Run(":8080")
+	_ = server.Run(":8080")
 }
