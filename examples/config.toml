@@ -1,0 +1,24 @@
+client_id=""
+client_secret=""
+
+mariadb_user=""
+mariadb_password=""
+mariadb_address=""
+mariadb_db=""
+
+redis_password=""
+redis_secret=""
+
+domain=""
+
+email_domains = [
+
+]
+
+admin_emails = [
+
+]
+
+general_emails = [
+
+]
