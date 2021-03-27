@@ -37,7 +37,7 @@ func newDB() (*gorm.DB, error) {
 	dbuser := viper.GetString("mariadb_user")
 	dbpass := viper.GetString("mariadb_password")
 	dbname := viper.GetString("mariadb_dbname")
-	dsn := fmt.Sprintf("%s:%s@tcp(mariadb:3306)/%s?charset=utf8mb4&parseTime=True&loc=Asia/Tokyo", dbuser, dbpass, dbname)
+	dsn := fmt.Sprintf("%s:%s@tcp(mariadb:3306)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo", dbuser, dbpass, dbname)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

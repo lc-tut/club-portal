@@ -15,6 +15,7 @@ services:
     depends_on:
       - redis
       - mariadb
+    restart: on-failure
 
   redis:
     image: redis:alpine
@@ -30,15 +31,15 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - cfg/mariadb/conf:/etc/mysql/conf.d
-      - cfg/mariadb/sql:/docker-entrypoint-initdb.d
+      - ./cfg/mariadb/conf:/etc/mysql/conf.d
+      - ./cfg/mariadb/sql:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_pass
       MYSQL_DATABASE: club_portal
     networks:
       - mariadb-network
     secrets:
-      - dbpass
+      - db_pass
 
 networks:
   redis-network:
@@ -48,6 +49,6 @@ networks:
 
 secrets:
   config:
-    file: cfg/config.toml
-  dbpass:
-    file: cfg/db_pass
+    file: ./cfg/config.toml
+  db_pass:
+    file: ./cfg/db_pass
