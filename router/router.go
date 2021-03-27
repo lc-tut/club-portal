@@ -6,30 +6,33 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/auth"
 	"github.com/lc-tut/club-portal/router/data"
+	"go.uber.org/zap"
 )
 
 type IRouter interface {
 	AddRouter()
 }
 
-func Init(engine *gin.Engine) {
+func Init(engine *gin.Engine, logger *zap.Logger) error {
 	config := data.NewConfig(true)
 
 	store, err := data.NewRedisServer()
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	store.Options(*config.SessionCookieOptions)
 	engine.Use(sessions.Sessions(consts.SessionCookieName, store))
 
-	registerRouters(engine, config)
+	registerRouters(engine, config, logger)
+
+	return nil
 }
 
-func registerRouters(engine *gin.Engine, config *data.Config) {
+func registerRouters(engine *gin.Engine, config *data.Config, logger *zap.Logger) {
 	apiGroup := engine.Group("/api")
-	authRouter := auth.NewAuthRouter(apiGroup, config)
+	authRouter := auth.NewAuthRouter(apiGroup, config, logger)
 	addRouter(authRouter)
 }
 

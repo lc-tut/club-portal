@@ -7,7 +7,7 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN go build -o dist/
+RUN go build -o dist/ -ldflags "-s -w"
 
 FROM gcr.io/distroless/base
 

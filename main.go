@@ -1,18 +1,17 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	"github.com/lc-tut/club-portal/router"
-)
-
 func main() {
-	r := gin.Default()
+	logger, err := newZapLogger()
 
-	if err := loadConfig(); err != nil {
+	if err != nil {
 		panic(err)
 	}
 
-	router.Init(r)
+	engine, err := newGinEngine(logger)
 
-	_ = r.Run(":8080")
+	if err != nil {
+		panic(err)
+	}
+
+	_ = engine.Run(":8080")
 }
