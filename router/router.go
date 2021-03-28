@@ -8,7 +8,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/auth"
 	"github.com/lc-tut/club-portal/router/config"
-	"github.com/lc-tut/club-portal/router/middleware"
+	"github.com/lc-tut/club-portal/router/middlewares"
 	v1 "github.com/lc-tut/club-portal/router/v1"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
@@ -46,7 +46,7 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 }
 
 func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logger, db *gorm.DB) *Server {
-	mw := middleware.NewMiddleware(config.ToMiddlewareConfig(), logger)
+	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger)
 
 	apiGroup := engine.Group("/api")
 

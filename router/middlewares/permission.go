@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
@@ -11,8 +11,8 @@ func (mw *Middleware) AdminOnly() gin.HandlerFunc {
 		email := ctx.GetString(consts.UserEmail)
 
 		if !mw.config.WhitelistUsers.IsAdminUser(email) {
-			ctx.Status(http.StatusForbidden)
-			ctx.Abort()
+			ctx.AbortWithStatus(http.StatusForbidden)
+			return
 		}
 
 		ctx.Next()

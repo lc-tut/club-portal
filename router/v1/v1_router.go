@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/router/config"
-	"github.com/lc-tut/club-portal/router/middleware"
+	"github.com/lc-tut/club-portal/router/middlewares"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -27,7 +27,7 @@ type Router struct {
 	config     *config.V1Config
 	logger     *zap.Logger
 	db         *gorm.DB
-	middleware *middleware.Middleware
+	middleware *middlewares.Middleware
 }
 
 func (r *Router) AddRouter() {
@@ -43,7 +43,7 @@ func (r *Router) AddRouter() {
 	}
 }
 
-func NewV1Router(rg *gin.RouterGroup, config *config.V1Config, logger *zap.Logger, db *gorm.DB, middleware *middleware.Middleware) *Router {
+func NewV1Router(rg *gin.RouterGroup, config *config.V1Config, logger *zap.Logger, db *gorm.DB, middleware *middlewares.Middleware) *Router {
 	r := &Router{
 		rg:         rg,
 		config:     config,

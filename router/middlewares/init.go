@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"github.com/lc-tut/club-portal/router/config"

@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"github.com/gin-contrib/sessions"
@@ -14,16 +14,14 @@ func (mw *Middleware) CheckSession() gin.HandlerFunc {
 		sessionData, ok := sess.Get(consts.SessionKey).([]byte)
 
 		if !ok {
-			ctx.Status(http.StatusUnauthorized)
-			ctx.Abort()
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		s, err := utils.ByteSliceToSessionData(sessionData)
 
 		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
-			ctx.Abort()
+			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
