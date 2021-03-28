@@ -8,6 +8,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/auth"
 	"github.com/lc-tut/club-portal/router/data"
+	v1 "github.com/lc-tut/club-portal/router/v1"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -45,8 +46,12 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 
 func registerRouters(engine *gin.Engine, config *data.Config, logger *zap.Logger, db *gorm.DB) *Server {
 	apiGroup := engine.Group("/api")
-	authRouter := auth.NewAuthRouter(apiGroup, config, logger, db)
+
+	authRouter := auth.NewAuthRouter(apiGroup, config, logger)
+	v1Router := v1.NewV1Router(apiGroup, config, logger, db)
+
 	addRouter(authRouter)
+	addRouter(v1Router)
 
 	return &Server{engine}
 }
