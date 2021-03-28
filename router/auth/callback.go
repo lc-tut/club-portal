@@ -47,7 +47,8 @@ func (h *Handler) Callback() gin.HandlerFunc {
 		if err := sess.Save(); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時にキャッシュが削除されない
+			ctx.Redirect(http.StatusFound, "/")
 		}
 	}
 }
@@ -96,6 +97,7 @@ func (h *Handler) checkValidState(ctx *gin.Context) (string, error) {
 
 type jwtData struct {
 	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 func parseJWT(token string) (string, error) {
