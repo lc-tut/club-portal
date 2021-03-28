@@ -9,13 +9,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/data"
+	"github.com/lc-tut/club-portal/router/utils"
 	"net/http"
 	"strings"
 )
 
 func (h *Handler) Callback() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		defer deleteCookie(ctx, consts.AuthCSRFCookieName)
+		defer utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
 
 		email, err := h.checkValidState(ctx)
 
