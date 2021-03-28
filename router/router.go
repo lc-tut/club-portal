@@ -53,14 +53,15 @@ func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logg
 	authRouter := auth.NewAuthRouter(apiGroup, config.ToAuthConfig(), logger)
 	v1Router := v1.NewV1Router(apiGroup, config.ToV1Config(), logger, db, mw)
 
-	addRouter(authRouter)
-	addRouter(v1Router)
+	addRouter(authRouter, v1Router)
 
 	return &Server{engine}
 }
 
-func addRouter(r IRouter) {
-	r.AddRouter()
+func addRouter(routers ...IRouter) {
+	for _, r := range routers {
+		r.AddRouter()
+	}
 }
 
 func newRedisStore() (redis.Store, error) {
