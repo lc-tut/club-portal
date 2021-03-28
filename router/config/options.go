@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
@@ -40,19 +41,10 @@ func NewCSRFCookieOption() *CSRFCookieOption {
 	return opt
 }
 
-type SessionCookieOption struct {
-	Path     string
-	Domain   string
-	MaxAge   int
-	Secure   bool
-	HttpOnly bool
-	SameSite http.SameSite
-}
-
-func NewSessionCookieOption() *SessionCookieOption {
+func NewSessionCookieOption() sessions.Options {
 	domain := viper.GetString("domain")
 
-	opt := &SessionCookieOption{
+	opt := &sessions.Options{
 		Path:     consts.CookiePath,
 		Domain:   domain,
 		MaxAge:   consts.CookieSessionMaxAge,
@@ -66,7 +58,7 @@ func NewSessionCookieOption() *SessionCookieOption {
 		opt.Secure = true
 	}
 
-	return opt
+	return *opt
 }
 
 func NewOAuth2Config() (conf *oauth2.Config) {

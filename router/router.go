@@ -36,6 +36,10 @@ func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 }
 
 func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
+	sessionCookieOpt := config.NewSessionCookieOption()
+
+	ss.Options(sessionCookieOpt)
+
 	engine := gin.New()
 
 	engine.Use(ginzap.Ginzap(logger, time.RFC3339, false))

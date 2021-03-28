@@ -16,15 +16,13 @@ type Config struct {
 }
 
 func (c *Config) ToAuthConfig() *AuthConfig {
-	sessionCookie := NewSessionCookieOption()
 	csrfCookie := NewCSRFCookieOption()
 	googleConf := NewOAuth2Config()
 
 	authConf := &AuthConfig{
-		SessionCookieOptions: sessionCookie,
-		CSRFCookieOptions:    csrfCookie,
-		GoogleOAuthConfig:    googleConf,
-		WhitelistUsers:       c.WhitelistUsers,
+		CSRFCookieOptions: csrfCookie,
+		GoogleOAuthConfig: googleConf,
+		WhitelistUsers:    c.WhitelistUsers,
 	}
 	return authConf
 }
@@ -44,10 +42,9 @@ func (c *Config) ToV1Config() *V1Config {
 }
 
 type AuthConfig struct {
-	SessionCookieOptions *SessionCookieOption
-	CSRFCookieOptions    *CSRFCookieOption
-	GoogleOAuthConfig    *oauth2.Config
-	WhitelistUsers       utils.WhitelistInfo
+	CSRFCookieOptions *CSRFCookieOption
+	GoogleOAuthConfig *oauth2.Config
+	WhitelistUsers    utils.WhitelistInfo
 }
 
 type MiddlewareConfig struct {
