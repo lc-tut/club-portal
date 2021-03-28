@@ -6,7 +6,8 @@
 package router
 
 import (
-	"github.com/lc-tut/club-portal/router/data"
+	"github.com/lc-tut/club-portal/router/config"
+	"github.com/lc-tut/club-portal/router/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -19,16 +20,10 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 		return nil, err
 	}
 	engine := newGinEngine(logger, store)
-	sessionCookieOption := data.NewSessionCookieOption()
-	csrfCookieOption := data.NewCSRFCookieOption()
-	config := data.NewOAuth2Config()
-	whitelistInfo := data.NewWhitelist()
-	dataConfig := &data.Config{
-		SessionCookieOptions: sessionCookieOption,
-		CSRFCookieOptions:    csrfCookieOption,
-		GoogleOAuthConfig:    config,
-		WhitelistUsers:       whitelistInfo,
+	whitelistInfo := utils.NewWhitelist()
+	configConfig := &config.Config{
+		WhitelistUsers: whitelistInfo,
 	}
-	server := registerRouters(engine, dataConfig, logger, db)
+	server := registerRouters(engine, configConfig, logger, db)
 	return server, nil
 }

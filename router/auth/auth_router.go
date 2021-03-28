@@ -2,16 +2,16 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/lc-tut/club-portal/router/data"
+	"github.com/lc-tut/club-portal/router/config"
 	"go.uber.org/zap"
 )
 
 type Handler struct {
-	config *data.Config
+	config *config.AuthConfig
 	logger *zap.Logger
 }
 
-func newHandler(config *data.Config, logger *zap.Logger) *Handler {
+func newHandler(config *config.AuthConfig, logger *zap.Logger) *Handler {
 	return &Handler{
 		config: config,
 		logger: logger,
@@ -20,7 +20,7 @@ func newHandler(config *data.Config, logger *zap.Logger) *Handler {
 
 type Router struct {
 	rg     *gin.RouterGroup
-	config *data.Config
+	config *config.AuthConfig
 	logger *zap.Logger
 }
 
@@ -36,7 +36,7 @@ func (r *Router) AddRouter() {
 	}
 }
 
-func NewAuthRouter(rg *gin.RouterGroup, config *data.Config, logger *zap.Logger) *Router {
+func NewAuthRouter(rg *gin.RouterGroup, config *config.AuthConfig, logger *zap.Logger) *Router {
 	r := &Router{
 		rg:     rg,
 		config: config,

@@ -1,4 +1,4 @@
-package data
+package utils
 
 import (
 	"github.com/spf13/viper"

@@ -2,18 +2,19 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/lc-tut/club-portal/router/data"
+	"github.com/lc-tut/club-portal/router/config"
+	"github.com/lc-tut/club-portal/router/middleware"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type Handler struct {
-	config *data.Config
+	config *config.V1Config
 	logger *zap.Logger
 	db     *gorm.DB
 }
 
-func newHandler(config *data.Config, logger *zap.Logger, db *gorm.DB) *Handler {
+func newHandler(config *config.V1Config, logger *zap.Logger, db *gorm.DB) *Handler {
 	return &Handler{
 		config: config,
 		logger: logger,
@@ -22,22 +23,33 @@ func newHandler(config *data.Config, logger *zap.Logger, db *gorm.DB) *Handler {
 }
 
 type Router struct {
-	rg     *gin.RouterGroup
-	config *data.Config
-	logger *zap.Logger
-	db     *gorm.DB
+	rg         *gin.RouterGroup
+	config     *config.V1Config
+	logger     *zap.Logger
+	db         *gorm.DB
+	middleware *middleware.Middleware
 }
 
 func (r *Router) AddRouter() {
+	h := newHandler(r.config, r.logger, r.db)
 
+	v1Group := r.rg.Group("/v1", r.middleware.CheckSession())
+	{
+		userGroup := v1Group.Group("/user")
+		{
+			userGroup.GET("/", h.GetUser())
+			userGroup.GET("/:uuid", h.GetUserUUID(), r.middleware.AdminOnly())
+		}
+	}
 }
 
-func NewV1Router(rg *gin.RouterGroup, config *data.Config, logger *zap.Logger, db *gorm.DB) *Router {
+func NewV1Router(rg *gin.RouterGroup, config *config.V1Config, logger *zap.Logger, db *gorm.DB, middleware *middleware.Middleware) *Router {
 	r := &Router{
-		rg:     rg,
-		config: config,
-		logger: logger,
-		db:     db,
+		rg:         rg,
+		config:     config,
+		logger:     logger,
+		db:         db,
+		middleware: middleware,
 	}
 	return r
 }

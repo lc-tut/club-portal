@@ -1,9 +1,12 @@
-package data
+package config
 
 import (
+	"fmt"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"net/http"
 )
 
@@ -64,4 +67,18 @@ func NewSessionCookieOption() *SessionCookieOption {
 	}
 
 	return opt
+}
+
+func NewOAuth2Config() (conf *oauth2.Config) {
+	domain := viper.GetString("domain")
+	redirectURL := fmt.Sprintf("http://%s:8080/api/auth/callback", domain)
+
+	conf = &oauth2.Config{
+		ClientID:     viper.GetString("client_id"),
+		ClientSecret: viper.GetString("client_secret"),
+		Endpoint:     google.Endpoint,
+		RedirectURL:  redirectURL,
+		Scopes:       []string{"profile", "email"},
+	}
+	return
 }

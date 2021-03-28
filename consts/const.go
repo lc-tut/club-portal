@@ -8,4 +8,5 @@ const (
 	CookieHttpOnly      = true
 	CookieSessionMaxAge = 60 * 60 * 24 * 7
 	CookieCSRFMaxAge    = 60 * 15
+	UserEmail           = "email_address"
 )

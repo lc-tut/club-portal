@@ -8,7 +8,6 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/router/data"
 	"github.com/lc-tut/club-portal/router/utils"
 	"net/http"
 	"strings"
@@ -32,7 +31,7 @@ func (h *Handler) Callback() gin.HandlerFunc {
 			return
 		}
 
-		sessionData := data.NewSessionData(newUUID, email)
+		sessionData := utils.NewSessionData(newUUID, email)
 
 		b, err := json.Marshal(sessionData)
 
