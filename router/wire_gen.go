@@ -6,6 +6,7 @@
 package router
 
 import (
+	"github.com/lc-tut/club-portal/repos"
 	"github.com/lc-tut/club-portal/router/config"
 	"github.com/lc-tut/club-portal/router/utils"
 	"go.uber.org/zap"
@@ -24,6 +25,7 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 	configConfig := &config.Config{
 		WhitelistUsers: whitelistInfo,
 	}
-	server := registerRouters(engine, configConfig, logger, db)
+	repository := repos.NewRepository(logger, db)
+	server := registerRouters(engine, configConfig, logger, repository)
 	return server, nil
 }

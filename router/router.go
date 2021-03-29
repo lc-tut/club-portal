@@ -6,6 +6,7 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
+	"github.com/lc-tut/club-portal/repos"
 	"github.com/lc-tut/club-portal/router/auth"
 	"github.com/lc-tut/club-portal/router/config"
 	"github.com/lc-tut/club-portal/router/middlewares"
@@ -51,13 +52,13 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 	return engine
 }
 
-func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logger, db *gorm.DB) *Server {
+func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logger, repo repos.IRepository) *Server {
 	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger)
 
 	apiGroup := engine.Group("/api")
 
 	authRouter := auth.NewAuthRouter(apiGroup, config.ToAuthConfig(), logger)
-	v1Router := v1.NewV1Router(apiGroup, config.ToV1Config(), logger, db, mw)
+	v1Router := v1.NewV1Router(apiGroup, config.ToV1Config(), logger, repo, mw)
 
 	addRouter(authRouter, v1Router)
 
