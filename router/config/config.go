@@ -12,16 +12,15 @@ type IConfig interface {
 }
 
 type Config struct {
-	WhitelistUsers utils.WhitelistInfo
+	CSRFCookieOptions *CSRFCookieOption
+	GoogleOAuthConfig *oauth2.Config
+	WhitelistUsers    utils.WhitelistInfo
 }
 
 func (c *Config) ToAuthConfig() *AuthConfig {
-	csrfCookie := NewCSRFCookieOption()
-	googleConf := NewOAuth2Config()
-
 	authConf := &AuthConfig{
-		CSRFCookieOptions: csrfCookie,
-		GoogleOAuthConfig: googleConf,
+		CSRFCookieOptions: c.CSRFCookieOptions,
+		GoogleOAuthConfig: c.GoogleOAuthConfig,
 		WhitelistUsers:    c.WhitelistUsers,
 	}
 	return authConf

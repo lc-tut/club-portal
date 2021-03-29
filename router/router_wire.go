@@ -17,6 +17,8 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 		registerRouters,
 		newRedisStore,
 		repos.NewRepository,
+		config.NewCSRFCookieOption,
+		config.NewOAuth2Config,
 		utils.NewWhitelist,
 		wire.Struct(new(config.Config), "*"),
 		wire.Bind(new(config.IConfig), new(*config.Config)),
