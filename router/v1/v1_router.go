@@ -38,7 +38,7 @@ func (r *Router) AddRouter() {
 		userGroup := v1Group.Group("/user")
 		{
 			userGroup.GET("/", h.GetUser())
-			userGroup.GET("/:uuid", h.GetUserUUID(), r.middleware.AdminOnly())
+			userGroup.GET("/:uuid", r.middleware.AdminOnly(), h.GetUserUUID())
 		}
 	}
 }
