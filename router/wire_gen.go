@@ -16,7 +16,8 @@ import (
 // Injectors from router_wire.go:
 
 func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
-	store, err := newRedisStore()
+	options := config.NewSessionCookieOption()
+	store, err := newRedisStore(options)
 	if err != nil {
 		return nil, err
 	}

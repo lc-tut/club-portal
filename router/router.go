@@ -26,7 +26,7 @@ type Server struct {
 	*gin.Engine
 }
 
-func newRedisStore() (redis.Store, error) {
+func newRedisStore(opt sessions.Options) (redis.Store, error) {
 	secretKey := viper.GetString("redis_secret")
 	store, err := redis.NewStore(10, "tcp", "redis:6379", viper.GetString("redis_password"), []byte(secretKey))
 
@@ -34,14 +34,12 @@ func newRedisStore() (redis.Store, error) {
 		return nil, err
 	}
 
+	store.Options(opt)
+
 	return store, nil
 }
 
 func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
-	sessionCookieOpt := config.NewSessionCookieOption()
-
-	ss.Options(sessionCookieOpt)
-
 	engine := gin.New()
 
 	// コンテナ内の時間がデフォルトで UTC なので logger の時間を自前で JST にする

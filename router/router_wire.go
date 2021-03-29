@@ -19,6 +19,7 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 		repos.NewRepository,
 		config.NewCSRFCookieOption,
 		config.NewOAuth2Config,
+		config.NewSessionCookieOption,
 		utils.NewWhitelist,
 		wire.Struct(new(config.Config), "*"),
 		wire.Bind(new(config.IConfig), new(*config.Config)),
