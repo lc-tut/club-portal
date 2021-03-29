@@ -25,14 +25,15 @@ type Server struct {
 	*gin.Engine
 }
 
-func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
-	server, err := newServer(logger, db)
+func newRedisStore() (redis.Store, error) {
+	secretKey := viper.GetString("redis_secret")
+	store, err := redis.NewStore(10, "tcp", "redis:6379", viper.GetString("redis_password"), []byte(secretKey))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return server, nil
+	return store, nil
 }
 
 func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
@@ -42,6 +43,7 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 
 	engine := gin.New()
 
+	// コンテナ内の時間がデフォルトで UTC なので logger の時間を自前で JST にする
 	engine.Use(ginzap.Ginzap(logger, time.RFC3339, false))
 	engine.Use(ginzap.RecoveryWithZap(logger, !utils.IsProd()))
 	engine.Use(sessions.Sessions(consts.SessionCookieName, ss))
@@ -68,13 +70,12 @@ func addRouter(routers ...IRouter) {
 	}
 }
 
-func newRedisStore() (redis.Store, error) {
-	secretKey := viper.GetString("redis_secret")
-	store, err := redis.NewStore(10, "tcp", "redis:6379", viper.GetString("redis_password"), []byte(secretKey))
+func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
+	server, err := newServer(logger, db)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return store, nil
+	return server, nil
 }
