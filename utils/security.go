@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func CreateAuthState() (string, error) {
+func GenerateRand16() (string, error) {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 

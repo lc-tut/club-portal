@@ -18,7 +18,7 @@ func (h *Handler) SignIn() gin.HandlerFunc {
 			return
 		}
 
-		state, err := utils.CreateAuthState()
+		state, err := utils.GenerateRand16()
 
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
