@@ -11,3 +11,28 @@ const (
 	UserEmail           = "email_address"
 	ClubIDKeyName       = "club_id"
 )
+
+// DB のキャンパスタイプ
+type CampusType uint
+
+const (
+	CampusKamata   CampusType = 0
+	CampusHachioji CampusType = 1
+)
+
+// DB のサークルタイプ
+type ClubType uint
+
+const (
+	SportsType  ClubType = 0
+	CultureType ClubType = 1
+	KokasaiType ClubType = 2
+)
+
+// DB の公開か非公開か
+type Visibility uint
+
+const (
+	Visible   Visibility = 0
+	Invisible Visibility = 1
+)
