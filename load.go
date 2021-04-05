@@ -46,6 +46,10 @@ func newDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	if utils.IsLocal() {
+		db = db.Debug()
+	}
+
 	return db, err
 }
 
