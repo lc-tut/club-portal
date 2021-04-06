@@ -1,4 +1,4 @@
-name: Docker Push
+name: Docker
 
 on:
   push:
@@ -23,8 +23,8 @@ jobs:
         uses: docker/login-action@v1
         with:
           registory: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.USERNAME_KASH }}
+          password: ${{ secrets.PAT_KASH }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
