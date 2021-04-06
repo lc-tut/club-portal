@@ -1,10 +1,14 @@
 client_id=""
 client_secret=""
 
+mariadb_address=""
+mariadb_port=""
 mariadb_user=""
 mariadb_password=""
 mariadb_dbname=""
 
+redis_address=""
+redis_port=""
 redis_password=""
 redis_secret=""
 

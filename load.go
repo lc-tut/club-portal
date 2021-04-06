@@ -34,10 +34,12 @@ func newZapLogger() (*zap.Logger, error) {
 }
 
 func newDB() (*gorm.DB, error) {
-	dbuser := viper.GetString("mariadb_user")
-	dbpass := viper.GetString("mariadb_password")
-	dbname := viper.GetString("mariadb_dbname")
-	dsn := fmt.Sprintf("%s:%s@tcp(mariadb:3306)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo", dbuser, dbpass, dbname)
+	dbUser := viper.GetString("mariadb_user")
+	dbPass := viper.GetString("mariadb_password")
+	dbAddress := viper.GetString("mariadb_address")
+	dbPort := viper.GetString("mariadb_port")
+	dbName := viper.GetString("mariadb_dbname")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo", dbUser, dbPass, dbAddress, dbPort, dbName)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

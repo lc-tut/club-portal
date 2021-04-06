@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	ginzap "github.com/gin-contrib/zap"
@@ -28,7 +29,9 @@ type Server struct {
 
 func newRedisStore(opt sessions.Options) (redis.Store, error) {
 	secretKey := viper.GetString("redis_secret")
-	store, err := redis.NewStore(10, "tcp", "redis:6379", viper.GetString("redis_password"), []byte(secretKey))
+	address := fmt.Sprintf("%s:%s", viper.GetString("redis_address"), viper.GetString("redis_port"))
+	pass := viper.GetString("redis_password")
+	store, err := redis.NewStore(10, "tcp", address, pass, []byte(secretKey))
 
 	if err != nil {
 		return nil, err
