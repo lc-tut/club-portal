@@ -16,7 +16,7 @@ type ClubPlace struct {
 }
 
 type ActivityDetail struct {
-	TimeID  uint32 `gorm:"type:int unsigned;not null;primaryKey"`
-	PlaceID uint32 `gorm:"type:int unsigned;not null;primaryKey"`
-	UUID    string `gorm:"type:char(36);not null"`
+	TimeID   uint32 `gorm:"type:int unsigned;not null;primaryKey"`
+	PlaceID  uint32 `gorm:"type:int unsigned;not null;primaryKey"`
+	ClubUUID string `gorm:"type:char(36);not null"`
 }
