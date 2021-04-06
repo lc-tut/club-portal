@@ -23,12 +23,12 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.USERNAME_KASH }}
-          password: ${{ secrets.PAT_KASH }}
+          username: ${{ secrets.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: lc-tut/club-portal:master
+          tags: ghcr.io/lc-tut/club-portal:master
