@@ -12,7 +12,7 @@ const (
 	ClubIDKeyName       = "club_id"
 )
 
-// DB のキャンパスタイプ
+// サークルのキャンパスタイプ
 type CampusType uint
 
 const (
@@ -20,7 +20,7 @@ const (
 	CampusHachioji CampusType = 1
 )
 
-// DB のサークルタイプ
+// サークルの種類
 type ClubType uint
 
 const (
@@ -29,7 +29,7 @@ const (
 	KokasaiType ClubType = 2
 )
 
-// DB の公開か非公開か
+// サークルが公開か非公開か
 type Visibility uint
 
 const (
