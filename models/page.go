@@ -17,6 +17,7 @@ type ClubPage struct {
 	Links           []ClubLinks       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Schedules       []ClubSchedule    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Achievements    []ClubAchievement `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Image           []ClubImage       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Videos          []ClubVideo       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	ActivityDetails []ActivityDetail  `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
