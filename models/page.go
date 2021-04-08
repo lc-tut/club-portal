@@ -13,11 +13,10 @@ type ClubPage struct {
 	ClubType        uint8             `gorm:"type:tinyint;not null"`
 	Visible         bool              `gorm:"type:tinyint(1);not null"`
 	UpdatedAt       time.Time         `gorm:"type:datetime;not null"`
-	Activities      []ClubActivity    `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Links           []ClubLinks       `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Schedules       []ClubSchedule    `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Achievements    []ClubAchievement `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Image           []ClubImage       `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Videos          []ClubVideo       `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	ActivityDetails []ActivityDetail  `gorm:"foreignKey:ClubUUID;references:ClubUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Activities      []ClubActivity    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Links           []ClubLinks       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Schedules       []ClubSchedule    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Achievements    []ClubAchievement `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Videos          []ClubVideo       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	ActivityDetails []ActivityDetail  `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
