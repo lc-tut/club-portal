@@ -145,5 +145,6 @@ fabric.properties
 
 .env
 .idea/
-cfg/
+cfg/config.toml
+cfg/db_pass
 dist/
