@@ -11,7 +11,7 @@ type ClubPage struct {
 	Description     string            `gorm:"type:text;not null"`
 	Campus          uint8             `gorm:"type:tinyint;not null"`
 	ClubType        uint8             `gorm:"type:tinyint;not null"`
-	Visible         bool              `gorm:"type:tinyint(1);not null"`
+	Visible         uint8             `gorm:"type:tinyint(1);not null"`
 	UpdatedAt       time.Time         `gorm:"type:datetime;not null"`
 	Activities      []ClubContent     `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Links           []ClubLinks       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`

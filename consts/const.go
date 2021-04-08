@@ -13,7 +13,7 @@ const (
 )
 
 // サークルのキャンパスタイプ
-type CampusType uint
+type CampusType uint8
 
 const (
 	CampusKamata   CampusType = 0
@@ -21,7 +21,7 @@ const (
 )
 
 // サークルの種類
-type ClubType uint
+type ClubType uint8
 
 const (
 	SportsType  ClubType = 0
@@ -30,7 +30,7 @@ const (
 )
 
 // サークルが公開か非公開か
-type Visibility uint
+type Visibility uint8
 
 const (
 	Visible   Visibility = 0
