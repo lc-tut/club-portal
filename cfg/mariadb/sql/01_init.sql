@@ -1,3 +1,5 @@
+# TODO: using hash index to unique that refers text
+
 create table if not exists `club_pages` (
     `club_uuid` char(36) not null primary key,
     `club_slug` char(15) not null,
