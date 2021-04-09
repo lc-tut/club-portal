@@ -1,7 +1,6 @@
 package repos
 
 import (
-	"errors"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models"
@@ -28,7 +27,8 @@ type ClubPageRepo interface {
 
 	CreatePage(args ClubPageCreateArgs) error
 
-	UpdatePage(uuid string, clubID string, args ClubPageUpdateArgs) error
+	UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error
+	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
 }
 
 // TODO: Get records on foreign key.
@@ -46,7 +46,7 @@ func (r *Repository) GetAllPages() ([]models.ClubPage, error) {
 
 func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_uuid = ?", uuid).First(page)
+	tx := r.db.Where("club_uuid = ?", uuid).Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 
 func (r *Repository) GetPageByClubID(clubID string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_id = ?", clubID).First(page)
+	tx := r.db.Where("club_id = ?", clubID).Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -98,23 +98,18 @@ func (r *Repository) CreatePage(args ClubPageCreateArgs) error {
 	return nil
 }
 
-func (r *Repository) UpdatePage(uuid string, clubSlug string, args ClubPageUpdateArgs) error {
-	if uuid == "" && clubSlug == "" {
-		return errors.New("no uuid or clubSlug")
+func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Updates(args)
+
+	if err := tx.Error; err != nil {
+		return err
 	}
 
-	var searchID string
-	var whereSQL string
+	return nil
+}
 
-	if clubSlug != "" {
-		searchID = clubSlug
-		whereSQL = "club_slug = ?"
-	} else {
-		searchID = uuid
-		whereSQL = "club_uuid = ?"
-	}
-
-	tx := r.db.Model(&models.ClubPage{}).Where(whereSQL, searchID).Updates(args)
+func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", clubSlug).Updates(args)
 
 	if err := tx.Error; err != nil {
 		return err
