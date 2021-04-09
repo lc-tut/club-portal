@@ -14,10 +14,10 @@ type ClubPage struct {
 	Visible         uint8             `gorm:"type:tinyint(1);not null"`
 	UpdatedAt       time.Time         `gorm:"type:datetime;not null"`
 	Activities      []ClubContent     `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
-	Links           []ClubLinks       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Links           []ClubLink        `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Schedules       []ClubSchedule    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Achievements    []ClubAchievement `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
-	Image           []ClubImage       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	Images          []ClubImage       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Videos          []ClubVideo       `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	ActivityDetails []ActivityDetail  `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
