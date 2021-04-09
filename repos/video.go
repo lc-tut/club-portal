@@ -4,7 +4,8 @@ import "github.com/lc-tut/club-portal/models"
 
 type ClubVideoRepo interface {
 	GetVideoByID(videoID uint32) (*models.ClubVideo, error)
-	GetVideoByClubUUID(uuid string) (*models.ClubVideo, error)
+
+	GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error)
 
 	CreateVideo(clubUUID string, path string) error
 
@@ -22,9 +23,9 @@ func (r *Repository) GetVideoByID(videoID uint32) (*models.ClubVideo, error) {
 	return video, nil
 }
 
-func (r *Repository) GetVideoByClubUUID(uuid string) (*models.ClubVideo, error) {
-	video := &models.ClubVideo{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(video)
+func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error) {
+	video := make([]models.ClubVideo, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(video)
 
 	if err := tx.Error; err != nil {
 		return nil, err

@@ -5,7 +5,8 @@ import "github.com/lc-tut/club-portal/models"
 type ClubLinkRepo interface {
 	GetAllLinks() ([]models.ClubLink, error)
 	GetLinkByID(linkID uint32) (*models.ClubLink, error)
-	GetLinkByClubUUID(uuid string) (*models.ClubLink, error)
+
+	GetLinksByClubUUID(uuid string) ([]models.ClubLink, error)
 
 	CreateLink(clubUUID string, label string, url string) error
 
@@ -34,9 +35,9 @@ func (r *Repository) GetLinkByID(linkID uint32) (*models.ClubLink, error) {
 	return link, nil
 }
 
-func (r *Repository) GetLinkByClubUUID(uuid string) (*models.ClubLink, error) {
-	link := &models.ClubLink{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(link)
+func (r *Repository) GetLinksByClubUUID(uuid string) ([]models.ClubLink, error) {
+	link := make([]models.ClubLink, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(link)
 
 	if err := tx.Error; err != nil {
 		return nil, err

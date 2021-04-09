@@ -7,7 +7,8 @@ import (
 
 type ClubScheduleRepo interface {
 	GetScheduleByID(scheduleID uint32) (*models.ClubSchedule, error)
-	GetScheduleByClubUUID(uuid string) (*models.ClubSchedule, error)
+
+	GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule, error)
 
 	CreateSchedule(clubUUID string, month uint8, schedule string, remarks string) error
 
@@ -25,9 +26,9 @@ func (r *Repository) GetScheduleByID(scheduleID uint32) (*models.ClubSchedule, e
 	return schedule, nil
 }
 
-func (r *Repository) GetScheduleByClubUUID(uuid string) (*models.ClubSchedule, error) {
-	schedule := &models.ClubSchedule{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(schedule)
+func (r *Repository) GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule, error) {
+	schedule := make([]models.ClubSchedule, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(schedule)
 
 	if err := tx.Error; err != nil {
 		return nil, err

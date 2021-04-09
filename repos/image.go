@@ -4,7 +4,8 @@ import "github.com/lc-tut/club-portal/models"
 
 type ClubImageRepo interface {
 	GetImageByID(imageID uint32) (*models.ClubImage, error)
-	GetImageByClubUUID(uuid string) (*models.ClubImage, error)
+
+	GetImagesByClubUUID(uuid string) ([]models.ClubImage, error)
 
 	CreateImage(clubUUID string, path string) error
 
@@ -22,9 +23,9 @@ func (r *Repository) GetImageByID(imageID uint32) (*models.ClubImage, error) {
 	return image, nil
 }
 
-func (r *Repository) GetImageByClubUUID(uuid string) (*models.ClubImage, error) {
-	image := &models.ClubImage{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(image)
+func (r *Repository) GetImagesByClubUUID(uuid string) ([]models.ClubImage, error) {
+	image := make([]models.ClubImage, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(image)
 
 	if err := tx.Error; err != nil {
 		return nil, err

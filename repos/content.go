@@ -4,7 +4,8 @@ import "github.com/lc-tut/club-portal/models"
 
 type ClubContentRepo interface {
 	GetContentByID(contentID uint32) (*models.ClubContent, error)
-	GetContentByClubUUID(uuid string) (*models.ClubContent, error)
+
+	GetContentsByClubUUID(uuid string) ([]models.ClubContent, error)
 
 	CreateContent(clubUUID string, content string) error
 
@@ -22,9 +23,9 @@ func (r *Repository) GetContentByID(contentID uint32) (*models.ClubContent, erro
 	return content, nil
 }
 
-func (r *Repository) GetContentByClubUUID(uuid string) (*models.ClubContent, error) {
-	content := &models.ClubContent{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(content)
+func (r *Repository) GetContentsByClubUUID(uuid string) ([]models.ClubContent, error) {
+	content := make([]models.ClubContent, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(content)
 
 	if err := tx.Error; err != nil {
 		return nil, err
