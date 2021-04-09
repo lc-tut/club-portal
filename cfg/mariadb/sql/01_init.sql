@@ -16,10 +16,10 @@ create table if not exists `club_achievements` (
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
-create table if not exists `club_activities` (
-    `activity_id` int unsigned not null primary key auto_increment,
+create table if not exists `club_contents` (
+    `content_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
-    `activity` text not null unique,
+    `content` text not null unique,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
