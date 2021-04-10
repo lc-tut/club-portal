@@ -43,7 +43,7 @@ func (r *Router) AddRouter() {
 		clubGroup := v1Group.Group("/clubs")
 		{
 			clubGroup.GET("/", h.GetAllClub())
-			clubGroup.GET("/:clubid", r.middleware.SetClubIDKey(), h.GetClub())
+			clubGroup.GET("/:clubslug", r.middleware.SetClubIDKey(), h.GetClub())
 		}
 	}
 }
