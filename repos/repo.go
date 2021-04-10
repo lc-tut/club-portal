@@ -6,6 +6,16 @@ import (
 )
 
 type IRepository interface {
+	ClubAchievementRepo
+	ClubContentRepo
+	ClubImageRepo
+	ClubLinkRepo
+	ClubPageRepo
+	ClubScheduleRepo
+	ClubVideoRepo
+	ClubTimeRepo
+	ClubPlaceRepo
+	ClubTimeAndPlaceRepo
 }
 
 type Repository struct {
