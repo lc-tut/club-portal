@@ -3,6 +3,7 @@ package repos
 import (
 	"database/sql"
 	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/utils"
 )
 
 type ClubScheduleRepo interface {
@@ -38,25 +39,11 @@ func (r *Repository) GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule,
 }
 
 func (r *Repository) CreateSchedule(clubUUID string, month uint8, schedule string, remarks string) error {
-	var validatedRemarks sql.NullString
-
-	if remarks == "" {
-		validatedRemarks = sql.NullString{
-			String: "",
-			Valid:  false,
-		}
-	} else {
-		validatedRemarks = sql.NullString{
-			String: remarks,
-			Valid:  true,
-		}
-	}
-
 	sch := &models.ClubSchedule{
 		ClubUUID: clubUUID,
 		Month:    month,
 		Schedule: schedule,
-		Remarks:  validatedRemarks,
+		Remarks:  utils.ToNullString(remarks),
 	}
 
 	tx := r.db.Create(sch)

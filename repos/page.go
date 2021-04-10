@@ -31,11 +31,9 @@ type ClubPageRepo interface {
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
 }
 
-// TODO: Get records on foreign key.
-
 func (r *Repository) GetAllPages() ([]models.ClubPage, error) {
 	page := make([]models.ClubPage, 0)
-	tx := r.db.Find(&page)
+	tx := r.db.Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -46,7 +44,7 @@ func (r *Repository) GetAllPages() ([]models.ClubPage, error) {
 
 func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_uuid = ?", uuid).Take(page)
+	tx := r.db.Where("club_uuid = ?", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -57,7 +55,7 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 
 func (r *Repository) GetPageByClubID(clubID string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_id = ?", clubID).Take(page)
+	tx := r.db.Where("club_id = ?", clubID).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
