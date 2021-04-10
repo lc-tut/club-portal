@@ -23,7 +23,7 @@ type ClubPageUpdateArgs struct {
 type ClubPageRepo interface {
 	GetAllPages() ([]models.ClubPage, error)
 	GetPageByClubUUID(uuid string) (*models.ClubPage, error)
-	GetPageByClubID(clubID string) (*models.ClubPage, error)
+	GetPageByClubSlug(clubSlug string) (*models.ClubPage, error)
 
 	CreatePage(args ClubPageCreateArgs) error
 
@@ -53,9 +53,9 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 	return page, nil
 }
 
-func (r *Repository) GetPageByClubID(clubID string) (*models.ClubPage, error) {
+func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_id = ?", clubID).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_id = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err

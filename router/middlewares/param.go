@@ -7,8 +7,8 @@ import (
 
 func (mw *Middleware) SetClubIDKey() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		v := ctx.Param("clubid")
-		ctx.Set(consts.ClubIDKeyName, v)
+		v := ctx.Param("clubslug")
+		ctx.Set(consts.ClubSlugKeyName, v)
 		ctx.Next()
 	}
 }

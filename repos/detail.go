@@ -133,12 +133,12 @@ func (r *Repository) CreateClubPlace(place string, remarks string) error {
 }
 
 type ClubActivityDetailRepo interface {
-	GetClubActivityDetailByClubUUID(uuid string) ([]models.ActivityDetail, error)
+	GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error)
 
 	CreateClubActivityDetail(uuid string, clubTime models.ClubTime, clubPlace models.ClubPlace) error
 }
 
-func (r *Repository) GetClubActivityDetailByClubUUID(uuid string) ([]models.ActivityDetail, error) {
+func (r *Repository) GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error) {
 	details := make([]models.ActivityDetail, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(details)
 
@@ -188,32 +188,35 @@ func (r *Repository) CreateClubActivityDetail(uuid string, clubTime models.ClubT
 }
 
 type ClubTimeAndPlaceRepo interface {
-	GetClubDetailsByClubUUID(uuid string) ([]models.ClubTimeAndPlace, error)
+	GetClubTimeAndPlaces(uuid string) ([]models.ClubTimeAndPlace, error)
 }
 
-func (r *Repository) GetClubDetailsByClubUUID(uuid string) ([]models.ClubTimeAndPlace, error) {
+func (r *Repository) GetClubTimeAndPlaces(uuid string) ([]models.ClubTimeAndPlace, error) {
 	tps := make([]models.ClubTimeAndPlace, 0)
-	rows, err := r.db.Table("activity_details").Where("club_uuid = ?", uuid).Select("club_times.*, club_places.*").Joins("inner join club_times on activity_details.time_id = club_times.time_id").Joins("inner join club_places on activity_details.place_id = club_places.place_id").Rows()
+	rows, err := r.db.Table("activity_details").Where("club_uuid = ?", uuid).Select("club_uuid, club_times.*, club_places.*").Joins("inner join club_times on activity_details.time_id = club_times.time_id").Joins("inner join club_places on activity_details.place_id = club_places.place_id").Rows()
 
 	if err != nil {
 		return nil, err
 	}
 
-	var clubTime models.ClubTime
-	var clubPlace models.ClubPlace
+	var ct models.ClubTime
+	var cp models.ClubPlace
 
 	for rows.Next() {
-		if err := r.db.ScanRows(rows, &clubTime); err != nil {
+		if err := r.db.ScanRows(rows, &ct); err != nil {
 			return nil, err
 		}
 
-		if err := r.db.ScanRows(rows, &clubPlace); err != nil {
+		if err := r.db.ScanRows(rows, &cp); err != nil {
 			return nil, err
 		}
 
 		tp := models.ClubTimeAndPlace{
-			ClubTime:  clubTime,
-			ClubPlace: clubPlace,
+			Date:        ct.GetDate(),
+			Time:        ct.GetTime(),
+			TimeRemarks: ct.GetRemarks(),
+			Place:       cp.GetPlace(),
+			Remarks:     cp.GetRemarks(),
 		}
 		tps = append(tps, tp)
 	}

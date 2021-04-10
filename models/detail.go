@@ -44,6 +44,9 @@ type ActivityDetail struct {
 }
 
 type ClubTimeAndPlace struct {
-	ClubTime
-	ClubPlace
+	Date        string
+	Time        string
+	TimeRemarks string
+	Place       string
+	Remarks     string
 }
