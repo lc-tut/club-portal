@@ -16,7 +16,7 @@ type ClubRemarkArgs struct {
 type ClubRemarkRepo interface {
 	GetRemarkByClubUUID(uuid string) (*models.ClubRemark, error)
 
-	CreateRemark(args ClubRemarkArgs) error
+	CreateRemark(args []ClubRemarkArgs) error
 }
 
 func (r *Repository) GetRemarkByClubUUID(uuid string) (*models.ClubRemark, error) {
