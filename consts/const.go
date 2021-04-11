@@ -15,6 +15,10 @@ const (
 // サークルのキャンパスタイプ
 type CampusType uint8
 
+func (ct CampusType) ToPrimitive() uint8 {
+	return uint8(ct)
+}
+
 const (
 	CampusKamata   CampusType = 0
 	CampusHachioji CampusType = 1
@@ -22,6 +26,10 @@ const (
 
 // サークルの種類
 type ClubType uint8
+
+func (ct ClubType) ToPrimitive() uint8 {
+	return uint8(ct)
+}
 
 const (
 	SportsType  ClubType = 0
@@ -31,6 +39,10 @@ const (
 
 // サークルが公開か非公開か
 type Visibility uint8
+
+func (v Visibility) ToPrimitive() uint8 {
+	return uint8(v)
+}
 
 const (
 	Visible   Visibility = 0

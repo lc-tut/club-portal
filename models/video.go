@@ -5,3 +5,7 @@ type ClubVideo struct {
 	ClubUUID string `gorm:"type:char(36);not null"`
 	Path     string `gorm:"type:text;not null;unique"`
 }
+
+type ClubReqVideo struct {
+	Path string `json:"path"`
+}

@@ -5,3 +5,7 @@ type ClubImage struct {
 	ClubUUID string `gorm:"type:char(36);not null"`
 	Path     string `gorm:"type:text;not null;unique"`
 }
+
+type ClubReqImage struct {
+	Path string `json:"path"`
+}

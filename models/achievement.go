@@ -5,3 +5,7 @@ type ClubAchievement struct {
 	ClubUUID      string `gorm:"type:char(36);not null"`
 	Achievement   string `gorm:"type:text;not null"`
 }
+
+type ClubReqAchievement struct {
+	Achievement string `json:"achievement"`
+}

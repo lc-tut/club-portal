@@ -7,9 +7,9 @@ type ClubContentRepo interface {
 
 	GetContentsByClubUUID(uuid string) ([]models.ClubContent, error)
 
-	CreateContent(clubUUID string, content string) error
+	CreateContent(clubUUID string, content []string) error
 
-	UpdateContent(clubUUID string, content string) error
+	UpdateContent(clubUUID string, content []string) error
 }
 
 func (r *Repository) GetContentByID(contentID uint32) (*models.ClubContent, error) {
@@ -34,13 +34,18 @@ func (r *Repository) GetContentsByClubUUID(uuid string) ([]models.ClubContent, e
 	return content, nil
 }
 
-func (r *Repository) CreateContent(clubUUID string, content string) error {
-	cont := &models.ClubContent{
-		ClubUUID: clubUUID,
-		Content:  content,
+func (r *Repository) CreateContent(clubUUID string, contents []string) error {
+	contModels := make([]models.ClubContent, len(contents))
+
+	for _, c := range contents {
+		cont := models.ClubContent{
+			ClubUUID: clubUUID,
+			Content:  c,
+		}
+		contModels = append(contModels, cont)
 	}
 
-	tx := r.db.Create(cont)
+	tx := r.db.Create(&contModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -49,12 +54,18 @@ func (r *Repository) CreateContent(clubUUID string, content string) error {
 	return nil
 }
 
-func (r *Repository) UpdateContent(clubUUID string, content string) error {
-	cont := &models.ClubContent{
-		Content: content,
+func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
+	contModels := make([]models.ClubContent, len(contents))
+
+	for _, c := range contents {
+		cont := models.ClubContent{
+			ClubUUID: clubUUID,
+			Content:  c,
+		}
+		contModels = append(contModels, cont)
 	}
 
-	tx := r.db.Model(cont).Where("club_uuid = ?", clubUUID).Updates(cont)
+	tx := r.db.Model(&models.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(&contModels)
 
 	if err := tx.Error; err != nil {
 		return err

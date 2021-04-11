@@ -6,3 +6,8 @@ type ClubLink struct {
 	Label    string `gorm:"type:varchar(255);not null;unique"`
 	URL      string `gorm:"type:varchar(2047);not null;unique"`
 }
+
+type ClubReqLink struct {
+	Label string `json:"label"`
+	URL   string `json:"url"`
+}

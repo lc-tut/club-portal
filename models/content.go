@@ -5,3 +5,7 @@ type ClubContent struct {
 	ClubUUID  string `gorm:"type:char(36);not null"`
 	Content   string `gorm:"type:text;not null;unique"`
 }
+
+type ClubReqContent struct {
+	Content string `json:"content"`
+}

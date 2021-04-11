@@ -1,7 +1,6 @@
 package repos
 
 import (
-	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
@@ -25,7 +24,7 @@ type ClubPageRepo interface {
 	GetPageByClubUUID(uuid string) (*models.ClubPage, error)
 	GetPageByClubSlug(clubSlug string) (*models.ClubPage, error)
 
-	CreatePage(args ClubPageCreateArgs) error
+	CreatePage(uuid string, args ClubPageCreateArgs) error
 
 	UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
@@ -64,13 +63,7 @@ func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPage, error
 	return page, nil
 }
 
-func (r *Repository) CreatePage(args ClubPageCreateArgs) error {
-	clubUUID, err := uuid.NewUUID()
-
-	if err != nil {
-		return err
-	}
-
+func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 	slug, err := utils.GenerateRand15()
 
 	if err != nil {
@@ -78,7 +71,7 @@ func (r *Repository) CreatePage(args ClubPageCreateArgs) error {
 	}
 
 	page := &models.ClubPage{
-		ClubUUID:    clubUUID.String(),
+		ClubUUID:    uuid,
 		ClubSlug:    slug,
 		Name:        args.Name,
 		Description: args.Desc,

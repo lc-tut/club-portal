@@ -7,9 +7,9 @@ type ClubAchievementRepo interface {
 
 	GetAchievementsByClubUUID(uuid string) ([]models.ClubAchievement, error)
 
-	CreateAchievement(clubUUID string, achievement string) error
+	CreateAchievement(clubUUID string, achievements []string) error
 
-	UpdateAchievement(clubUUID string, achievement string) error
+	UpdateAchievement(clubUUID string, achievements []string) error
 }
 
 func (r *Repository) GetAchievementByID(achievementID uint32) (*models.ClubAchievement, error) {
@@ -34,13 +34,18 @@ func (r *Repository) GetAchievementsByClubUUID(uuid string) ([]models.ClubAchiev
 	return achievement, nil
 }
 
-func (r *Repository) CreateAchievement(clubUUID string, achievement string) error {
-	ach := &models.ClubAchievement{
-		ClubUUID:    clubUUID,
-		Achievement: achievement,
+func (r *Repository) CreateAchievement(clubUUID string, achievements []string) error {
+	achieveModels := make([]models.ClubAchievement, len(achievements))
+
+	for _, achieve := range achievements {
+		ach := models.ClubAchievement{
+			ClubUUID:    clubUUID,
+			Achievement: achieve,
+		}
+		achieveModels = append(achieveModels, ach)
 	}
 
-	tx := r.db.Create(ach)
+	tx := r.db.Create(&achieveModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -49,12 +54,18 @@ func (r *Repository) CreateAchievement(clubUUID string, achievement string) erro
 	return nil
 }
 
-func (r *Repository) UpdateAchievement(clubUUID string, achievement string) error {
-	ach := &models.ClubAchievement{
-		Achievement: achievement,
+func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) error {
+	achieveModels := make([]models.ClubAchievement, len(achievements))
+
+	for _, achieve := range achievements {
+		ach := models.ClubAchievement{
+			ClubUUID:    clubUUID,
+			Achievement: achieve,
+		}
+		achieveModels = append(achieveModels, ach)
 	}
 
-	tx := r.db.Model(ach).Where("club_uuid = ?", clubUUID).Updates(ach)
+	tx := r.db.Model(&models.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(&achieveModels)
 
 	if err := tx.Error; err != nil {
 		return err

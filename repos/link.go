@@ -1,6 +1,13 @@
 package repos
 
-import "github.com/lc-tut/club-portal/models"
+import (
+	"github.com/lc-tut/club-portal/models"
+)
+
+type ClubLinkArgs struct {
+	Label string
+	URL   string
+}
 
 type ClubLinkRepo interface {
 	GetAllLinks() ([]models.ClubLink, error)
@@ -8,9 +15,9 @@ type ClubLinkRepo interface {
 
 	GetLinksByClubUUID(uuid string) ([]models.ClubLink, error)
 
-	CreateLink(clubUUID string, label string, url string) error
+	CreateLink(clubUUID string, args []ClubLinkArgs) error
 
-	UpdateLink(clubUUID string, label string, url string) error
+	UpdateLink(clubUUID string, args []ClubLinkArgs) error
 }
 
 func (r *Repository) GetAllLinks() ([]models.ClubLink, error) {
@@ -46,14 +53,19 @@ func (r *Repository) GetLinksByClubUUID(uuid string) ([]models.ClubLink, error) 
 	return link, nil
 }
 
-func (r *Repository) CreateLink(clubUUID string, label string, url string) error {
-	link := &models.ClubLink{
-		ClubUUID: clubUUID,
-		Label:    label,
-		URL:      url,
+func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
+	links := make([]models.ClubLink, len(args))
+
+	for _, arg := range args {
+		link := models.ClubLink{
+			ClubUUID: clubUUID,
+			Label:    arg.Label,
+			URL:      arg.URL,
+		}
+		links = append(links, link)
 	}
 
-	tx := r.db.Create(link)
+	tx := r.db.Create(&links)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -62,13 +74,19 @@ func (r *Repository) CreateLink(clubUUID string, label string, url string) error
 	return nil
 }
 
-func (r *Repository) UpdateLink(clubUUID string, label string, url string) error {
-	updateLink := &models.ClubLink{
-		Label: label,
-		URL:   url,
+func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
+	links := make([]models.ClubLink, len(args))
+
+	for _, arg := range args {
+		link := models.ClubLink{
+			ClubUUID: clubUUID,
+			Label:    arg.Label,
+			URL:      arg.URL,
+		}
+		links = append(links, link)
 	}
 
-	tx := r.db.Model(updateLink).Where("club_uuid = ?", clubUUID).Updates(updateLink)
+	tx := r.db.Model(&models.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(&links)
 
 	if err := tx.Error; err == nil {
 		return err

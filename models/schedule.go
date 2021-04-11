@@ -9,3 +9,9 @@ type ClubSchedule struct {
 	Schedule   string         `gorm:"type:text;not null;unique"`
 	Remarks    sql.NullString `gorm:"type:text"`
 }
+
+type ClubReqSchedule struct {
+	Month    uint8   `json:"month"`
+	Schedule string  `json:"schedule"`
+	Remarks  *string `json:"remarks"`
+}

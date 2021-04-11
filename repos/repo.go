@@ -16,6 +16,8 @@ type IRepository interface {
 	ClubTimeRepo
 	ClubPlaceRepo
 	ClubTimeAndPlaceRepo
+	ClubActivityDetailRepo
+	ClubRemarkRepo
 }
 
 type Repository struct {

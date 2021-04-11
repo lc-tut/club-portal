@@ -7,9 +7,9 @@ type ClubVideoRepo interface {
 
 	GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error)
 
-	CreateVideo(clubUUID string, path string) error
+	CreateVideo(clubUUID string, path []string) error
 
-	UpdateVideo(clubUUID string, path string) error
+	UpdateVideo(clubUUID string, path []string) error
 }
 
 func (r *Repository) GetVideoByID(videoID uint32) (*models.ClubVideo, error) {
@@ -34,13 +34,18 @@ func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error
 	return video, nil
 }
 
-func (r *Repository) CreateVideo(clubUUID string, path string) error {
-	video := &models.ClubVideo{
-		ClubUUID: clubUUID,
-		Path:     path,
+func (r *Repository) CreateVideo(clubUUID string, path []string) error {
+	videos := make([]models.ClubVideo, len(path))
+
+	for _, p := range path {
+		video := models.ClubVideo{
+			ClubUUID: clubUUID,
+			Path:     p,
+		}
+		videos = append(videos, video)
 	}
 
-	tx := r.db.Create(video)
+	tx := r.db.Create(&videos)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -49,12 +54,17 @@ func (r *Repository) CreateVideo(clubUUID string, path string) error {
 	return nil
 }
 
-func (r *Repository) UpdateVideo(clubUUID string, path string) error {
-	video := &models.ClubVideo{
-		Path: path,
-	}
+func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
+	videos := make([]models.ClubVideo, len(path))
 
-	tx := r.db.Model(video).Where("club_uuid = ?", clubUUID).Updates(video)
+	for _, p := range path {
+		video := models.ClubVideo{
+			ClubUUID: clubUUID,
+			Path:     p,
+		}
+		videos = append(videos, video)
+	}
+	tx := r.db.Model(&models.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(&videos)
 
 	if err := tx.Error; err != nil {
 		return err

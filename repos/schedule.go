@@ -1,19 +1,24 @@
 package repos
 
 import (
-	"database/sql"
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
 )
+
+type ClubScheduleArgs struct {
+	Month    uint8
+	Schedule string
+	Remarks  string
+}
 
 type ClubScheduleRepo interface {
 	GetScheduleByID(scheduleID uint32) (*models.ClubSchedule, error)
 
 	GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule, error)
 
-	CreateSchedule(clubUUID string, month uint8, schedule string, remarks string) error
+	CreateSchedule(clubUUID string, args []ClubScheduleArgs) error
 
-	UpdateSchedule(clubUUID string, month uint8, schedule string, remarks string) error
+	UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error
 }
 
 func (r *Repository) GetScheduleByID(scheduleID uint32) (*models.ClubSchedule, error) {
@@ -38,15 +43,20 @@ func (r *Repository) GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule,
 	return schedule, nil
 }
 
-func (r *Repository) CreateSchedule(clubUUID string, month uint8, schedule string, remarks string) error {
-	sch := &models.ClubSchedule{
-		ClubUUID: clubUUID,
-		Month:    month,
-		Schedule: schedule,
-		Remarks:  utils.ToNullString(remarks),
+func (r *Repository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) error {
+	schedules := make([]models.ClubSchedule, len(args))
+
+	for _, arg := range args {
+		sch := models.ClubSchedule{
+			ClubUUID: clubUUID,
+			Month:    arg.Month,
+			Schedule: arg.Schedule,
+			Remarks:  utils.ToNullString(arg.Remarks),
+		}
+		schedules = append(schedules, sch)
 	}
 
-	tx := r.db.Create(sch)
+	tx := r.db.Create(&schedules)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -55,28 +65,20 @@ func (r *Repository) CreateSchedule(clubUUID string, month uint8, schedule strin
 	return nil
 }
 
-func (r *Repository) UpdateSchedule(clubUUID string, month uint8, schedule string, remarks string) error {
-	var validatedRemarks sql.NullString
+func (r *Repository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
+	schedules := make([]models.ClubSchedule, len(args))
 
-	if remarks == "" {
-		validatedRemarks = sql.NullString{
-			String: "",
-			Valid:  false,
+	for _, arg := range args {
+		sch := models.ClubSchedule{
+			ClubUUID: clubUUID,
+			Month:    arg.Month,
+			Schedule: arg.Schedule,
+			Remarks:  utils.ToNullString(arg.Remarks),
 		}
-	} else {
-		validatedRemarks = sql.NullString{
-			String: remarks,
-			Valid:  true,
-		}
+		schedules = append(schedules, sch)
 	}
 
-	sch := &models.ClubSchedule{
-		Month:    month,
-		Schedule: schedule,
-		Remarks:  validatedRemarks,
-	}
-
-	tx := r.db.Model(sch).Where("club_uuid = ?", clubUUID).Updates(sch)
+	tx := r.db.Model(&models.ClubSchedule{}).Where("club_uuid = ?", clubUUID).Updates(&schedules)
 
 	if err := tx.Error; err != nil {
 		return err

@@ -7,9 +7,9 @@ type ClubImageRepo interface {
 
 	GetImagesByClubUUID(uuid string) ([]models.ClubImage, error)
 
-	CreateImage(clubUUID string, path string) error
+	CreateImage(clubUUID string, path []string) error
 
-	UpdateImage(clubUUID string, path string) error
+	UpdateImage(clubUUID string, path []string) error
 }
 
 func (r *Repository) GetImageByID(imageID uint32) (*models.ClubImage, error) {
@@ -34,13 +34,18 @@ func (r *Repository) GetImagesByClubUUID(uuid string) ([]models.ClubImage, error
 	return image, nil
 }
 
-func (r *Repository) CreateImage(clubUUID string, path string) error {
-	image := &models.ClubImage{
-		ClubUUID: clubUUID,
-		Path:     path,
+func (r *Repository) CreateImage(clubUUID string, path []string) error {
+	imageModels := make([]models.ClubImage, len(path))
+
+	for _, p := range path {
+		image := models.ClubImage{
+			ClubUUID: clubUUID,
+			Path:     p,
+		}
+		imageModels = append(imageModels, image)
 	}
 
-	tx := r.db.Create(image)
+	tx := r.db.Create(&imageModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -49,12 +54,18 @@ func (r *Repository) CreateImage(clubUUID string, path string) error {
 	return nil
 }
 
-func (r *Repository) UpdateImage(clubUUID string, path string) error {
-	image := &models.ClubImage{
-		Path: path,
+func (r *Repository) UpdateImage(clubUUID string, path []string) error {
+	imageModels := make([]models.ClubImage, len(path))
+
+	for _, p := range path {
+		image := models.ClubImage{
+			ClubUUID: clubUUID,
+			Path:     p,
+		}
+		imageModels = append(imageModels, image)
 	}
 
-	tx := r.db.Model(image).Where("club_uuid = ?", clubUUID).Updates(image)
+	tx := r.db.Model(&models.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(&imageModels)
 
 	if err := tx.Error; err != nil {
 		return err
