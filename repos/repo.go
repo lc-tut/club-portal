@@ -15,7 +15,6 @@ type IRepository interface {
 	ClubVideoRepo
 	ClubTimeRepo
 	ClubPlaceRepo
-	ClubTimeAndPlaceRepo
 	ClubActivityDetailRepo
 	ClubRemarkRepo
 }

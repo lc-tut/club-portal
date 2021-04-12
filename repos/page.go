@@ -7,11 +7,21 @@ import (
 )
 
 type ClubPageCreateArgs struct {
-	Name     string
-	Desc     string
-	Campus   consts.CampusType
-	ClubType consts.ClubType
-	Visible  consts.Visibility
+	Name            string
+	Desc            string
+	Campus          consts.CampusType
+	ClubType        consts.ClubType
+	Visible         consts.Visibility
+	Contents        []string
+	Links           []ClubLinkArgs
+	Schedules       []ClubScheduleArgs
+	Achievements    []string
+	Images          []string
+	Videos          []string
+	Times           []ClubTimeArgs
+	Places          []ClubPlaceArgs
+	Remarks         []ClubRemarkArgs
+	ActivityDetails []ClubActivityDetailArgs
 }
 
 type ClubPageUpdateArgs struct {
@@ -127,14 +137,52 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 		ClubSlug:    slug,
 		Name:        args.Name,
 		Description: args.Desc,
-		Campus:      uint8(args.Campus),
-		ClubType:    uint8(args.ClubType),
-		Visible:     uint8(args.Visible),
+		Campus:      args.Campus.ToPrimitive(),
+		ClubType:    args.ClubType.ToPrimitive(),
+		Visible:     args.Visible.ToPrimitive(),
 	}
 
-	tx := r.db.Create(page)
+	if err := r.db.Create(page).Error; err != nil {
+		return err
+	}
 
-	if err := tx.Error; err != nil {
+	if err := r.CreateContent(uuid, args.Contents); err != nil {
+		return err
+	}
+
+	if err := r.CreateLink(uuid, args.Links); err != nil {
+		return err
+	}
+
+	if err := r.CreateSchedule(uuid, args.Schedules); err != nil {
+		return err
+	}
+
+	if err := r.CreateAchievement(uuid, args.Achievements); err != nil {
+		return err
+	}
+
+	if err := r.CreateImage(uuid, args.Images); err != nil {
+		return err
+	}
+
+	if err := r.CreateVideo(uuid, args.Videos); err != nil {
+		return err
+	}
+
+	if err := r.CreateTime(args.Times); err != nil {
+		return err
+	}
+
+	if err := r.CreatePlace(args.Places); err != nil {
+		return err
+	}
+
+	if err := r.CreateClubActivityDetail(uuid, args.ActivityDetails); err != nil {
+		return err
+	}
+
+	if err := r.CreateRemark(uuid, args.Remarks); err != nil {
 		return err
 	}
 

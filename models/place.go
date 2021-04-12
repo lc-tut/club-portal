@@ -24,18 +24,12 @@ func (p Places) ToPlaceResponse(remarks []ClubRemark) *[]PlaceResponse {
 	for i, place := range p {
 		placeRes := PlaceResponse{
 			Place:   place.Place,
-			Remarks: utils.ToNilOrString(remarks[i].PlaceRemarks),
+			Remarks: utils.ToNilOrString(remarks[i].PlaceRemark),
 		}
 		res[i] = placeRes
 	}
 
 	return &res
-}
-
-type PlaceRequest struct {
-	PlaceID uint32  `json:"place_id"`
-	Place   string  `json:"place"`
-	Remarks *string `json:"remarks"`
 }
 
 type PlaceResponse struct {

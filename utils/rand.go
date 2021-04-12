@@ -31,5 +31,6 @@ func GenerateRand15() (string, error) {
 	for _, v := range b {
 		result += string(letters[int(v)%lettersLen])
 	}
+
 	return result, nil
 }

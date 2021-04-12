@@ -10,15 +10,15 @@ type ActivityDetail struct {
 }
 
 type DetailRelations struct {
-	ClubUUID     string
-	TimeID       uint32
-	Date         string
-	Time         string
-	PlaceID      uint32
-	Place        string
-	RemarkID     uint32
-	PlaceRemarks sql.NullString
-	TimeRemarks  sql.NullString
+	ClubUUID    string
+	TimeID      uint32
+	Date        string
+	Time        string
+	PlaceID     uint32
+	Place       string
+	RemarkID    uint32
+	PlaceRemark sql.NullString
+	TimeRemark  sql.NullString
 }
 
 type Relations []DetailRelations
@@ -57,15 +57,25 @@ func (r Relations) ToClubRemark() []ClubRemark {
 
 	for i, rel := range r {
 		cr := ClubRemark{
-			RemarkID:     rel.RemarkID,
-			ClubUUID:     rel.ClubUUID,
-			PlaceID:      rel.PlaceID,
-			TimeID:       rel.TimeID,
-			PlaceRemarks: rel.PlaceRemarks,
-			TimeRemarks:  rel.TimeRemarks,
+			RemarkID:    rel.RemarkID,
+			ClubUUID:    rel.ClubUUID,
+			PlaceID:     rel.PlaceID,
+			TimeID:      rel.TimeID,
+			PlaceRemark: rel.PlaceRemark,
+			TimeRemark:  rel.TimeRemark,
 		}
 		remarks[i] = cr
 	}
 
 	return remarks
+}
+
+type ActivityDetailRequest struct {
+	TimeID      uint32  `json:"time_id"`
+	Date        string  `json:"date"`
+	Time        string  `json:"time"`
+	TimeRemark  *string `json:"time_remark"`
+	PlaceID     uint32  `json:"place_id"`
+	Place       string  `json:"place"`
+	PlaceRemark *string `json:"place_remark"`
 }

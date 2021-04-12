@@ -30,19 +30,12 @@ func (t Times) ToTimeResponse(remarks []ClubRemark) *[]TimeResponse {
 		timeRes := TimeResponse{
 			Date:    time.Date,
 			Time:    time.Time,
-			Remarks: utils.ToNilOrString(remarks[i].TimeRemarks),
+			Remarks: utils.ToNilOrString(remarks[i].TimeRemark),
 		}
 		res[i] = timeRes
 	}
 
 	return &res
-}
-
-type TimeRequest struct {
-	TimeID  uint32  `json:"time_id"`
-	Date    string  `json:"date"`
-	Time    string  `json:"time"`
-	Remarks *string `json:"remarks"`
 }
 
 type TimeResponse struct {

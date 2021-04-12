@@ -1,6 +1,10 @@
 package utils
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+	"github.com/lc-tut/club-portal/consts"
+)
 
 func ToNullString(s string) sql.NullString {
 	var ns sql.NullString
@@ -36,11 +40,29 @@ func ToNilOrString(s sql.NullString) *string {
 	}
 }
 
-func ValidateIDValue(id uint32, inc *uint32) uint32 {
-	if id == 0 {
-		id = *inc
-		*inc++
+func ToCampusType(i uint8) (consts.CampusType, error) {
+	typed := consts.CampusType(i)
+	if typed > consts.CampusHachioji {
+		return 0, errors.New("invalid argument")
+	} else {
+		return typed, nil
 	}
+}
 
-	return id
+func ToClubType(i uint8) (consts.ClubType, error) {
+	typed := consts.ClubType(i)
+	if typed > consts.KokasaiType {
+		return 0, errors.New("invalid argument")
+	} else {
+		return typed, nil
+	}
+}
+
+func ToVisibility(i uint8) (consts.Visibility, error) {
+	typed := consts.Visibility(i)
+	if typed > consts.Invisible {
+		return 0, errors.New("invalid argument")
+	} else {
+		return typed, nil
+	}
 }
