@@ -22,7 +22,7 @@ create table if not exists `club_contents` (
     `content_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
     `content` text not null,
-    unique (`club_uuid`, `content`) using hash,
+    unique (`content`) using hash,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -30,15 +30,15 @@ create table if not exists `club_images` (
     `image_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
     `path` text not null,
-    unique (`club_uuid`, `path`) using hash,
+    unique (`path`) using hash,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
 create table if not exists `club_videos` (
      `video_id` int unsigned not null primary key auto_increment,
      `club_uuid` char(36) not null,
-     `path` text not null unique,
-     unique (`club_uuid`, `path`) using hash,
+     `path` text not null,
+     unique (`path`) using hash,
      foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -48,7 +48,7 @@ create table if not exists `club_schedules` (
     `month` tinyint unsigned not null,
     `schedule` text not null,
     `remarks` text,
-    unique (`club_uuid`, `month`, `schedule`) using hash,
+    unique (`month`, `schedule`) using hash,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -57,7 +57,7 @@ create table if not exists `club_links` (
     `club_uuid` char(36) not null,
     `label` varchar(255) not null,
     `url` varchar(2047) not null,
-    unique (`club_uuid`, `label`, `url`) using hash,
+    unique (`label`, `url`) using hash,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
