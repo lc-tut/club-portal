@@ -6,6 +6,25 @@ type ClubAchievement struct {
 	Achievement   string `gorm:"type:text;not null"`
 }
 
-type ClubReqAchievement struct {
+type Achievements []ClubAchievement
+
+func (ac Achievements) ToAchievementResponse() *[]AchievementResponse {
+	res := make([]AchievementResponse, len(ac))
+
+	for i, achieve := range ac {
+		achieveRes := AchievementResponse{
+			Achievement: achieve.Achievement,
+		}
+		res[i] = achieveRes
+	}
+
+	return &res
+}
+
+type AchievementRequest struct {
+	Achievement string `json:"achievement"`
+}
+
+type AchievementResponse struct {
 	Achievement string `json:"achievement"`
 }

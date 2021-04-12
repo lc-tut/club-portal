@@ -2,3 +2,4 @@ examples/
 .idea/
 *.iml
 .gitignore
+dist/

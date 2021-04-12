@@ -6,71 +6,130 @@ import (
 	"github.com/lc-tut/club-portal/utils"
 )
 
-func ValidateToContentArgs(models []models.ClubReqContent) []string {
-	contents := make([]string, 0)
+func validateToContentArgs(models []models.ContentRequest) []string {
+	contents := make([]string, len(models))
 
-	for _, m := range models {
-		contents = append(contents, m.Content)
+	for i, m := range models {
+		contents[i] = m.Content
 	}
 
 	return contents
 }
 
-func ValidateToLinksArgs(models []models.ClubReqLink) []repos.ClubLinkArgs {
-	links := make([]repos.ClubLinkArgs, 0)
+func validateToLinksArgs(models []models.LinkRequest) []repos.ClubLinkArgs {
+	links := make([]repos.ClubLinkArgs, len(models))
 
-	for _, m := range models {
+	for i, m := range models {
 		link := repos.ClubLinkArgs{
 			Label: m.Label,
 			URL:   m.URL,
 		}
-		links = append(links, link)
+		links[i] = link
 	}
 
 	return links
 }
 
-func ValidateToScheduleArgs(models []models.ClubReqSchedule) []repos.ClubScheduleArgs {
-	schedules := make([]repos.ClubScheduleArgs, 0)
+func validateToScheduleArgs(models []models.ScheduleRequest) []repos.ClubScheduleArgs {
+	schedules := make([]repos.ClubScheduleArgs, len(models))
 
-	for _, m := range models {
+	for i, m := range models {
 		schedule := repos.ClubScheduleArgs{
 			Month:    m.Month,
 			Schedule: m.Schedule,
 			Remarks:  utils.NilToEmptyString(m.Remarks),
 		}
-		schedules = append(schedules, schedule)
+		schedules[i] = schedule
 	}
 
 	return schedules
 }
 
-func ValidateToAchievementArgs(models []models.ClubReqAchievement) []string {
-	achieves := make([]string, 0)
+func validateToAchievementArgs(models []models.AchievementRequest) []string {
+	achieves := make([]string, len(models))
 
-	for _, m := range models {
-		achieves = append(achieves, m.Achievement)
+	for i, m := range models {
+		achieves[i] = m.Achievement
 	}
 
 	return achieves
 }
 
-func ValidateToImageArgs(models []models.ClubReqImage) []string {
-	images := make([]string, 0)
+func validateToImageArgs(models []models.ImageRequest) []string {
+	images := make([]string, len(models))
 
-	for _, m := range models {
-		images = append(images, m.Path)
+	for i, m := range models {
+		images[i] = m.Path
 	}
 
 	return images
 }
 
-func ValidateToVideoArgs(models []models.ClubReqVideo) []string {
-	videos := make([]string, 0)
+func validateToVideoArgs(models []models.VideoRequest) []string {
+	videos := make([]string, len(models))
 
-	for _, m := range models {
-		videos = append(videos, m.Path)
+	for i, m := range models {
+		videos[i] = m.Path
 	}
 
 	return videos
+}
+
+func validateToTimeArgs(models []models.ActivityDetailRequest) []repos.ClubTimeArgs {
+	times := make([]repos.ClubTimeArgs, len(models))
+
+	for i, m := range models {
+		time := repos.ClubTimeArgs{
+			TimeID: m.TimeID,
+			Date:   m.Date,
+			Time:   m.Time,
+		}
+		times[i] = time
+	}
+
+	return times
+}
+
+func validateToPlaceArgs(models []models.ActivityDetailRequest) []repos.ClubPlaceArgs {
+	places := make([]repos.ClubPlaceArgs, len(models))
+
+	for i, m := range models {
+		place := repos.ClubPlaceArgs{
+			PlaceID: m.PlaceID,
+			Place:   m.Place,
+		}
+		places[i] = place
+	}
+
+	return places
+}
+
+func validateToRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubRemarkArgs {
+	remarks := make([]repos.ClubRemarkArgs, len(models))
+
+	for i, m := range models {
+		remark := repos.ClubRemarkArgs{
+			TimeID:       m.TimeID,
+			PlaceID:      m.PlaceID,
+			TimeRemarks:  utils.NilToEmptyString(m.TimeRemark),
+			PlaceRemarks: utils.NilToEmptyString(m.PlaceRemark),
+		}
+		remarks[i] = remark
+	}
+
+	return remarks
+}
+
+func validateToActivityDetailArg(models []models.ActivityDetailRequest) []repos.ClubActivityDetailArgs {
+	details := make([]repos.ClubActivityDetailArgs, len(models))
+
+	for i, m := range models {
+		detail := repos.ClubActivityDetailArgs{
+			TimeID:  m.TimeID,
+			PlaceID: m.PlaceID,
+		}
+		details[i] = detail
+	}
+
+	return details
 }

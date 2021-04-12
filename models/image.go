@@ -6,6 +6,23 @@ type ClubImage struct {
 	Path     string `gorm:"type:text;not null;unique"`
 }
 
-type ClubReqImage struct {
+type Images []ClubImage
+
+func (im Images) ToImageResponse() *[]ImageResponse {
+	res := make([]ImageResponse, len(im))
+
+	for i, image := range im {
+		imageRes := ImageResponse{Path: image.Path}
+		res[i] = imageRes
+	}
+
+	return &res
+}
+
+type ImageRequest struct {
+	Path string `json:"path"`
+}
+
+type ImageResponse struct {
 	Path string `json:"path"`
 }
