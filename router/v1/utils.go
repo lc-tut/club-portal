@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/repos"
-	"github.com/lc-tut/club-portal/router/utils"
+	"github.com/lc-tut/club-portal/utils"
 )
 
 func ValidateToContentArgs(models []models.ClubReqContent) []string {

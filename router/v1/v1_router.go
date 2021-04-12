@@ -33,7 +33,7 @@ type Router struct {
 func (r *Router) AddRouter() {
 	h := newHandler(r.config, r.logger, r.repo)
 
-	v1Group := r.rg.Group("/v1", r.middleware.CheckSession())
+	v1Group := r.rg.Group("/v1")
 	{
 		userGroup := v1Group.Group("/user")
 		{

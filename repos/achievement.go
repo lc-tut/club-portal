@@ -37,12 +37,12 @@ func (r *Repository) GetAchievementsByClubUUID(uuid string) ([]models.ClubAchiev
 func (r *Repository) CreateAchievement(clubUUID string, achievements []string) error {
 	achieveModels := make([]models.ClubAchievement, len(achievements))
 
-	for _, achieve := range achievements {
+	for i, achieve := range achievements {
 		ach := models.ClubAchievement{
 			ClubUUID:    clubUUID,
 			Achievement: achieve,
 		}
-		achieveModels = append(achieveModels, ach)
+		achieveModels[i] = ach
 	}
 
 	tx := r.db.Create(&achieveModels)
@@ -57,12 +57,12 @@ func (r *Repository) CreateAchievement(clubUUID string, achievements []string) e
 func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) error {
 	achieveModels := make([]models.ClubAchievement, len(achievements))
 
-	for _, achieve := range achievements {
+	for i, achieve := range achievements {
 		ach := models.ClubAchievement{
 			ClubUUID:    clubUUID,
 			Achievement: achieve,
 		}
-		achieveModels = append(achieveModels, ach)
+		achieveModels[i] = ach
 	}
 
 	tx := r.db.Model(&models.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(&achieveModels)

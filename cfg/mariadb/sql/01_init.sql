@@ -1,5 +1,3 @@
-# TODO: using hash index to unique that refers text
-
 create table if not exists `club_pages` (
     `club_uuid` char(36) not null primary key,
     `club_slug` char(15) not null,
@@ -14,7 +12,7 @@ create table if not exists `club_pages` (
 create table if not exists `club_achievements` (
     `achievement_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
-    `achievements` text not null,
+    `achievement` text not null,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -84,7 +82,7 @@ create table if not exists `activity_details` (
 );
 
 create table if not exists `club_remarks` (
-    `remark_id` int unsigned not null primary key,
+    `remark_id` int unsigned not null primary key auto_increment,
     `time_id` int unsigned not null,
     `place_id` int unsigned not null,
     `club_uuid` char(36) not null,

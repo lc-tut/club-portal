@@ -37,12 +37,12 @@ func (r *Repository) GetImagesByClubUUID(uuid string) ([]models.ClubImage, error
 func (r *Repository) CreateImage(clubUUID string, path []string) error {
 	imageModels := make([]models.ClubImage, len(path))
 
-	for _, p := range path {
+	for i, p := range path {
 		image := models.ClubImage{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
-		imageModels = append(imageModels, image)
+		imageModels[i] = image
 	}
 
 	tx := r.db.Create(&imageModels)
@@ -57,12 +57,12 @@ func (r *Repository) CreateImage(clubUUID string, path []string) error {
 func (r *Repository) UpdateImage(clubUUID string, path []string) error {
 	imageModels := make([]models.ClubImage, len(path))
 
-	for _, p := range path {
+	for i, p := range path {
 		image := models.ClubImage{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
-		imageModels = append(imageModels, image)
+		imageModels[i] = image
 	}
 
 	tx := r.db.Model(&models.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(&imageModels)

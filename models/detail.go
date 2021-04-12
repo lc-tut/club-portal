@@ -4,7 +4,7 @@ type ClubTime struct {
 	TimeID    uint32      `gorm:"type:int unsigned not null auto_increment;primaryKey"`
 	Date      string      `gorm:"type:varchar(3);not null;unique"`
 	Time      string      `gorm:"type:varchar(255);not null;unique"`
-	ClubPlace []ClubPlace `gorm:"many2many:activity_details;foreignKey:timeID;joinForeignKey:timeID;references:PlaceID;joinReferences:PlaceID"`
+	ClubPlace []ClubPlace `gorm:"many2many:activity_details;foreignKey:TimeID;joinForeignKey:TimeID;references:PlaceID;joinReferences:PlaceID"`
 }
 
 func (ct *ClubTime) GetTimeID() uint32 {

@@ -46,14 +46,14 @@ func (r *Repository) GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule,
 func (r *Repository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) error {
 	schedules := make([]models.ClubSchedule, len(args))
 
-	for _, arg := range args {
+	for i, arg := range args {
 		sch := models.ClubSchedule{
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
 			Remarks:  utils.ToNullString(arg.Remarks),
 		}
-		schedules = append(schedules, sch)
+		schedules[i] = sch
 	}
 
 	tx := r.db.Create(&schedules)
@@ -68,14 +68,14 @@ func (r *Repository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) er
 func (r *Repository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
 	schedules := make([]models.ClubSchedule, len(args))
 
-	for _, arg := range args {
+	for i, arg := range args {
 		sch := models.ClubSchedule{
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
 			Remarks:  utils.ToNullString(arg.Remarks),
 		}
-		schedules = append(schedules, sch)
+		schedules[i] = sch
 	}
 
 	tx := r.db.Model(&models.ClubSchedule{}).Where("club_uuid = ?", clubUUID).Updates(&schedules)

@@ -42,11 +42,3 @@ func ToVisibility(i uint8) (consts.Visibility, error) {
 		return typed, nil
 	}
 }
-
-func NilToEmptyString(s *string) string {
-	if s == nil {
-		return ""
-	} else {
-		return *s
-	}
-}

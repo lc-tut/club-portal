@@ -37,12 +37,12 @@ func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error
 func (r *Repository) CreateVideo(clubUUID string, path []string) error {
 	videos := make([]models.ClubVideo, len(path))
 
-	for _, p := range path {
+	for i, p := range path {
 		video := models.ClubVideo{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
-		videos = append(videos, video)
+		videos[i] = video
 	}
 
 	tx := r.db.Create(&videos)
@@ -57,12 +57,12 @@ func (r *Repository) CreateVideo(clubUUID string, path []string) error {
 func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
 	videos := make([]models.ClubVideo, len(path))
 
-	for _, p := range path {
+	for i, p := range path {
 		video := models.ClubVideo{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
-		videos = append(videos, video)
+		videos[i] = video
 	}
 	tx := r.db.Model(&models.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(&videos)
 

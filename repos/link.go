@@ -56,13 +56,13 @@ func (r *Repository) GetLinksByClubUUID(uuid string) ([]models.ClubLink, error) 
 func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
 	links := make([]models.ClubLink, len(args))
 
-	for _, arg := range args {
+	for i, arg := range args {
 		link := models.ClubLink{
 			ClubUUID: clubUUID,
 			Label:    arg.Label,
 			URL:      arg.URL,
 		}
-		links = append(links, link)
+		links[i] = link
 	}
 
 	tx := r.db.Create(&links)
@@ -77,13 +77,13 @@ func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
 func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 	links := make([]models.ClubLink, len(args))
 
-	for _, arg := range args {
+	for i, arg := range args {
 		link := models.ClubLink{
 			ClubUUID: clubUUID,
 			Label:    arg.Label,
 			URL:      arg.URL,
 		}
-		links = append(links, link)
+		links[i] = link
 	}
 
 	tx := r.db.Model(&models.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(&links)

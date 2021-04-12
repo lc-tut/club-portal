@@ -37,12 +37,12 @@ func (r *Repository) GetContentsByClubUUID(uuid string) ([]models.ClubContent, e
 func (r *Repository) CreateContent(clubUUID string, contents []string) error {
 	contModels := make([]models.ClubContent, len(contents))
 
-	for _, c := range contents {
+	for i, c := range contents {
 		cont := models.ClubContent{
 			ClubUUID: clubUUID,
 			Content:  c,
 		}
-		contModels = append(contModels, cont)
+		contModels[i] = cont
 	}
 
 	tx := r.db.Create(&contModels)
@@ -57,12 +57,12 @@ func (r *Repository) CreateContent(clubUUID string, contents []string) error {
 func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
 	contModels := make([]models.ClubContent, len(contents))
 
-	for _, c := range contents {
+	for i, c := range contents {
 		cont := models.ClubContent{
 			ClubUUID: clubUUID,
 			Content:  c,
 		}
-		contModels = append(contModels, cont)
+		contModels[i] = cont
 	}
 
 	tx := r.db.Model(&models.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(&contModels)

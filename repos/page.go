@@ -54,7 +54,7 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
 
 func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPage, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_id = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_slug = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err

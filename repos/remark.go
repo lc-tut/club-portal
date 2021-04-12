@@ -14,27 +14,27 @@ type ClubRemarkArgs struct {
 }
 
 type ClubRemarkRepo interface {
-	GetRemarkByClubUUID(uuid string) (*models.ClubRemark, error)
+	GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error)
 
 	CreateRemark(args []ClubRemarkArgs) error
 }
 
-func (r *Repository) GetRemarkByClubUUID(uuid string) (*models.ClubRemark, error) {
-	remark := &models.ClubRemark{}
+func (r *Repository) GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error) {
+	remarks := make([]models.ClubRemark, 0)
 
-	tx := r.db.Where("club_uuid = ?", uuid).Take(&remark)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
 
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
-	return remark, nil
+	return remarks, nil
 }
 
 func (r *Repository) CreateRemark(args []ClubRemarkArgs) error {
 	remarks := make([]models.ClubRemark, len(args))
 
-	for _, arg := range args {
+	for i, arg := range args {
 		remark := models.ClubRemark{
 			ClubUUID:     arg.ClubUUID,
 			TimeID:       arg.TimeID,
@@ -42,7 +42,7 @@ func (r *Repository) CreateRemark(args []ClubRemarkArgs) error {
 			TimeRemarks:  utils.ToNullString(arg.TimeRemarks),
 			PlaceRemarks: utils.ToNullString(arg.PlaceRemarks),
 		}
-		remarks = append(remarks, remark)
+		remarks[i] = remark
 	}
 
 	tx := r.db.Create(&remarks)
