@@ -3,8 +3,6 @@ package repos
 import (
 	"errors"
 	"github.com/lc-tut/club-portal/models"
-	"github.com/lc-tut/club-portal/utils"
-	"gorm.io/gorm"
 )
 
 type ClubTimeArgs struct {
@@ -180,6 +178,8 @@ type ClubActivityDetailArgs struct {
 type ClubActivityDetailRepo interface {
 	GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error)
 
+	GetAllRelations(uuid string) ([]models.DetailRelations, error)
+
 	CreateClubActivityDetail(uuid string, args []ClubActivityDetailArgs) error
 }
 
@@ -192,6 +192,32 @@ func (r *Repository) GetClubActivityDetail(uuid string) ([]models.ActivityDetail
 	}
 
 	return details, nil
+}
+
+func (r *Repository) GetAllRelations(uuid string) ([]models.DetailRelations, error) {
+	joinQuery1 := "inner join club_times on using (time_id)"
+	joinQuery2 := "inner join club_places on using (place_id)"
+	joinQuery3 := "inner join club_remarks on using (club_uuid, time_id, place_id)"
+
+	rows, err := r.db.Table("activity_details").Where("activity_details.club_uuid = ?", uuid).Joins(joinQuery1).Joins(joinQuery2).Joins(joinQuery3).Rows()
+
+	if err != nil {
+		return nil, err
+	}
+
+	relations := make([]models.DetailRelations, len(uuid))
+	i := 0
+
+	for rows.Next() {
+		var relation models.DetailRelations
+		if err := r.db.ScanRows(rows, &relation); err != nil {
+			return nil, err
+		}
+		relations[i] = relation
+		i++
+	}
+
+	return relations, nil
 }
 
 func (r *Repository) CreateClubActivityDetail(uuid string, args []ClubActivityDetailArgs) error {
@@ -222,120 +248,6 @@ func (r *Repository) CreateClubActivityDetail(uuid string, args []ClubActivityDe
 	}
 
 	if err := r.CreateRemark(crArgs); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type ClubTimeAndPlaceRepo interface {
-	GetClubTimeAndPlaces(uuid string) ([]models.ClubTimeAndPlace, error)
-	CreateClubTimeAndPlaces(uuid string, tps []models.ClubTimeAndPlace) error
-}
-
-func (r *Repository) GetClubTimeAndPlaces(uuid string) ([]models.ClubTimeAndPlace, error) {
-	tps := make([]models.ClubTimeAndPlace, 0)
-	joinQuery1 := "inner join club_times on activity_details.time_id = club_times.time_id"
-	joinQuery2 := "inner join club_places on activity_details.place_id = club_places.place_id"
-	joinQuery3 := "inner join club_remarks on activity_details.club_uuid = club_remarks.club_uuid and activity_details.time_id = club_remarks.time_id and activity_details.place_id = club_remarks.place_id"
-	rows, err := r.db.Table("activity_details").Where("activity_details.club_uuid = ?", uuid).Select("club_times.*, club_places.*, club_remarks.*").Joins(joinQuery1).Joins(joinQuery2).Joins(joinQuery3).Rows()
-
-	if err != nil {
-		return nil, err
-	}
-
-	var ct models.ClubTime
-	var cp models.ClubPlace
-	var rm models.ClubRemark
-
-	for rows.Next() {
-		if err := r.db.ScanRows(rows, &ct); err != nil {
-			return nil, err
-		}
-
-		if err := r.db.ScanRows(rows, &cp); err != nil {
-			return nil, err
-		}
-
-		if err := r.db.ScanRows(rows, &rm); err != nil {
-			return nil, err
-		}
-
-		tp := models.ClubTimeAndPlace{
-			TimeID:       ct.GetTimeID(),
-			Date:         ct.GetDate(),
-			Time:         ct.GetTime(),
-			TimeRemarks:  utils.ToNilOrString(rm.TimeRemarks),
-			PlaceID:      cp.GetPlaceID(),
-			Place:        cp.GetPlace(),
-			PlaceRemarks: utils.ToNilOrString(rm.PlaceRemarks),
-		}
-		tps = append(tps, tp)
-	}
-
-	return tps, nil
-}
-
-func (r *Repository) CreateClubTimeAndPlaces(uuid string, tps []models.ClubTimeAndPlace) error {
-	var autoTimeID uint32
-	var autoPlaceID uint32
-
-	atTx := r.db.Table("information_schema.tables").Select("auto_increment").Where("table_name = ?", "club_times").Take(&autoTimeID)
-
-	if err := atTx.Error; err != nil {
-		return err
-	}
-
-	apTx := r.db.Table("information_schema.tables").Select("auto_increment").Where("table_name = ?", "club_places").Take(&autoPlaceID)
-
-	if err := apTx.Error; err != nil {
-		return err
-	}
-
-	ctArgs := make([]ClubTimeArgs, len(tps))
-	cpArgs := make([]ClubPlaceArgs, len(tps))
-	adArgs := make([]ClubActivityDetailArgs, len(tps))
-
-	for i, tp := range tps {
-		timeID := utils.ValidateIDValue(tp.TimeID, &autoTimeID)
-		placeID := utils.ValidateIDValue(tp.PlaceID, &autoPlaceID)
-		ctArg := ClubTimeArgs{
-			TimeID: timeID,
-			Date:   tp.Date,
-			Time:   tp.Time,
-		}
-		cpArg := ClubPlaceArgs{
-			PlaceID: placeID,
-			Place:   tp.Place,
-		}
-		adArg := ClubActivityDetailArgs{
-			TimeID:       timeID,
-			TimeRemarks:  utils.NilToEmptyString(tp.TimeRemarks),
-			PlaceID:      placeID,
-			PlaceRemarks: utils.NilToEmptyString(tp.PlaceRemarks),
-		}
-		ctArgs[i] = ctArg
-		cpArgs[i] = cpArg
-		adArgs[i] = adArg
-	}
-
-	err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.CreateClubTime(ctArgs); err != nil {
-			return err
-		}
-
-		if err := r.CreateClubPlace(cpArgs); err != nil {
-			return err
-		}
-
-		if err := r.CreateClubActivityDetail(uuid, adArgs); err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
 		return err
 	}
 

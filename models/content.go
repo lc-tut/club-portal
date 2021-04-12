@@ -6,6 +6,23 @@ type ClubContent struct {
 	Content   string `gorm:"type:text;not null;unique"`
 }
 
-type ClubReqContent struct {
+type Contents []ClubContent
+
+func (c Contents) ToContentResponse() *[]ContentResponse {
+	res := make([]ContentResponse, len(c))
+
+	for i, con := range c {
+		contentRes := ContentResponse{Content: con.Content}
+		res[i] = contentRes
+	}
+
+	return &res
+}
+
+type ContentRequest struct {
+	Content string `json:"content"`
+}
+
+type ContentResponse struct {
 	Content string `json:"content"`
 }

@@ -20,9 +20,9 @@ type ClubPageUpdateArgs struct {
 }
 
 type ClubPageRepo interface {
-	GetAllPages() ([]models.ClubPage, error)
-	GetPageByClubUUID(uuid string) (*models.ClubPage, error)
-	GetPageByClubSlug(clubSlug string) (*models.ClubPage, error)
+	GetAllPages() ([]models.ClubPageExternalInfo, error)
+	GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error)
+	GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error)
 
 	CreatePage(uuid string, args ClubPageCreateArgs) error
 
@@ -30,7 +30,7 @@ type ClubPageRepo interface {
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
 }
 
-func (r *Repository) GetAllPages() ([]models.ClubPage, error) {
+func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
 	page := make([]models.ClubPage, 0)
 	tx := r.db.Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
@@ -38,21 +38,48 @@ func (r *Repository) GetAllPages() ([]models.ClubPage, error) {
 		return nil, err
 	}
 
-	return page, nil
+	typedPage := models.Pages(page)
+
+	return typedPage.ToExternalInfo(), nil
 }
 
-func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPage, error) {
-	page := &models.ClubPage{}
-	tx := r.db.Where("club_uuid = ?", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error) {
+	page := models.ClubPage{}
+	tx := r.db.Where("club_uuid = ?", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
-	return page, nil
+	rels, err := r.GetAllRelations(page.ClubUUID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	typedRels := models.Relations(rels)
+
+	info := &models.ClubPageInternalInfo{
+		ClubUUID:     uuid,
+		Name:         page.Name,
+		Description:  page.Description,
+		Campus:       page.Campus,
+		ClubType:     page.ClubType,
+		UpdatedAt:    page.UpdatedAt,
+		Contents:     *page.Contents.ToContentResponse(),
+		Links:        *page.Links.ToLinkResponse(),
+		Schedules:    *page.Schedules.ToScheduleResponse(),
+		Achievements: page.Achievements.ToAchievementResponse(),
+		Images:       page.Images.ToImageResponse(),
+		Videos:       page.Videos.ToVideoResponse(),
+		Times:        models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+	}
+
+	return info, nil
 }
 
-func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPage, error) {
+func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error) {
 	page := &models.ClubPage{}
 	tx := r.db.Where("club_slug = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
@@ -60,7 +87,32 @@ func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPage, error
 		return nil, err
 	}
 
-	return page, nil
+	rels, err := r.GetAllRelations(page.ClubUUID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	typedRels := models.Relations(rels)
+
+	info := &models.ClubPageInternalInfo{
+		ClubUUID:     page.ClubUUID,
+		Name:         page.Name,
+		Description:  page.Description,
+		Campus:       page.Campus,
+		ClubType:     page.ClubType,
+		UpdatedAt:    page.UpdatedAt,
+		Contents:     *page.Contents.ToContentResponse(),
+		Links:        *page.Links.ToLinkResponse(),
+		Schedules:    *page.Schedules.ToScheduleResponse(),
+		Achievements: page.Achievements.ToAchievementResponse(),
+		Images:       page.Images.ToImageResponse(),
+		Videos:       page.Videos.ToVideoResponse(),
+		Times:        models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+	}
+
+	return info, nil
 }
 
 func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {

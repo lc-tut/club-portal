@@ -1,37 +1,6 @@
 package models
 
-type ClubTime struct {
-	TimeID    uint32      `gorm:"type:int unsigned not null auto_increment;primaryKey"`
-	Date      string      `gorm:"type:varchar(3);not null;unique"`
-	Time      string      `gorm:"type:varchar(255);not null;unique"`
-	ClubPlace []ClubPlace `gorm:"many2many:activity_details;foreignKey:TimeID;joinForeignKey:TimeID;references:PlaceID;joinReferences:PlaceID"`
-}
-
-func (ct *ClubTime) GetTimeID() uint32 {
-	return ct.TimeID
-}
-
-func (ct *ClubTime) GetDate() string {
-	return ct.Date
-}
-
-func (ct *ClubTime) GetTime() string {
-	return ct.Time
-}
-
-type ClubPlace struct {
-	PlaceID  uint32     `gorm:"type:int unsigned not null auto_increment;primaryKey"`
-	Place    string     `gorm:"type:text;not null;unique"`
-	ClubTime []ClubTime `gorm:"many2many:activity_details;foreignKey:PlaceID;joinForeignKey:PlaceID;references:TimeID;joinReferences:TimeID"`
-}
-
-func (cp *ClubPlace) GetPlaceID() uint32 {
-	return cp.PlaceID
-}
-
-func (cp *ClubPlace) GetPlace() string {
-	return cp.Place
-}
+import "database/sql"
 
 type ActivityDetail struct {
 	TimeID   uint32     `gorm:"type:int unsigned;not null;primaryKey"`
@@ -40,12 +9,63 @@ type ActivityDetail struct {
 	Remarks  ClubRemark `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
 
-type ClubTimeAndPlace struct {
-	TimeID       uint32  `json:"time_id"`
-	Date         string  `json:"date"`
-	Time         string  `json:"time"`
-	TimeRemarks  *string `json:"time_remarks"`
-	PlaceID      uint32  `json:"place_id"`
-	Place        string  `json:"place"`
-	PlaceRemarks *string `json:"place_remarks"`
+type DetailRelations struct {
+	ClubUUID     string
+	TimeID       uint32
+	Date         string
+	Time         string
+	PlaceID      uint32
+	Place        string
+	RemarkID     uint32
+	PlaceRemarks sql.NullString
+	TimeRemarks  sql.NullString
+}
+
+type Relations []DetailRelations
+
+func (r Relations) ToClubTime() []ClubTime {
+	times := make([]ClubTime, len(r))
+
+	for i, rel := range r {
+		ct := ClubTime{
+			TimeID: rel.TimeID,
+			Date:   rel.Date,
+			Time:   rel.Time,
+		}
+		times[i] = ct
+	}
+
+	return times
+}
+
+func (r Relations) ToClubPlace() []ClubPlace {
+	places := make([]ClubPlace, len(r))
+
+	for i, rel := range r {
+		cp := ClubPlace{
+			PlaceID: rel.PlaceID,
+			Place:   rel.Place,
+		}
+		places[i] = cp
+	}
+
+	return places
+}
+
+func (r Relations) ToClubRemark() []ClubRemark {
+	remarks := make([]ClubRemark, len(r))
+
+	for i, rel := range r {
+		cr := ClubRemark{
+			RemarkID:     rel.RemarkID,
+			ClubUUID:     rel.ClubUUID,
+			PlaceID:      rel.PlaceID,
+			TimeID:       rel.TimeID,
+			PlaceRemarks: rel.PlaceRemarks,
+			TimeRemarks:  rel.TimeRemarks,
+		}
+		remarks[i] = cr
+	}
+
+	return remarks
 }

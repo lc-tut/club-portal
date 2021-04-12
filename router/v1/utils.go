@@ -6,7 +6,7 @@ import (
 	"github.com/lc-tut/club-portal/utils"
 )
 
-func ValidateToContentArgs(models []models.ClubReqContent) []string {
+func ValidateToContentArgs(models []models.ContentRequest) []string {
 	contents := make([]string, 0)
 
 	for _, m := range models {
@@ -16,7 +16,7 @@ func ValidateToContentArgs(models []models.ClubReqContent) []string {
 	return contents
 }
 
-func ValidateToLinksArgs(models []models.ClubReqLink) []repos.ClubLinkArgs {
+func ValidateToLinksArgs(models []models.LinkRequest) []repos.ClubLinkArgs {
 	links := make([]repos.ClubLinkArgs, 0)
 
 	for _, m := range models {
@@ -30,7 +30,7 @@ func ValidateToLinksArgs(models []models.ClubReqLink) []repos.ClubLinkArgs {
 	return links
 }
 
-func ValidateToScheduleArgs(models []models.ClubReqSchedule) []repos.ClubScheduleArgs {
+func ValidateToScheduleArgs(models []models.ScheduleRequest) []repos.ClubScheduleArgs {
 	schedules := make([]repos.ClubScheduleArgs, 0)
 
 	for _, m := range models {
@@ -45,7 +45,7 @@ func ValidateToScheduleArgs(models []models.ClubReqSchedule) []repos.ClubSchedul
 	return schedules
 }
 
-func ValidateToAchievementArgs(models []models.ClubReqAchievement) []string {
+func ValidateToAchievementArgs(models []models.AchievementRequest) []string {
 	achieves := make([]string, 0)
 
 	for _, m := range models {
@@ -55,7 +55,7 @@ func ValidateToAchievementArgs(models []models.ClubReqAchievement) []string {
 	return achieves
 }
 
-func ValidateToImageArgs(models []models.ClubReqImage) []string {
+func ValidateToImageArgs(models []models.ImageRequest) []string {
 	images := make([]string, 0)
 
 	for _, m := range models {
@@ -65,7 +65,7 @@ func ValidateToImageArgs(models []models.ClubReqImage) []string {
 	return images
 }
 
-func ValidateToVideoArgs(models []models.ClubReqVideo) []string {
+func ValidateToVideoArgs(models []models.VideoRequest) []string {
 	videos := make([]string, 0)
 
 	for _, m := range models {
