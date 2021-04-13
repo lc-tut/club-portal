@@ -1,6 +1,9 @@
 package repos
 
-import "github.com/lc-tut/club-portal/models"
+import (
+	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
+)
 
 type ClubAchievementRepo interface {
 	GetAchievementByID(achievementID uint32) (*models.ClubAchievement, error)
@@ -8,6 +11,7 @@ type ClubAchievementRepo interface {
 	GetAchievementsByClubUUID(uuid string) ([]models.ClubAchievement, error)
 
 	CreateAchievement(clubUUID string, achievements []string) error
+	CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error
 
 	UpdateAchievement(clubUUID string, achievements []string) error
 }
@@ -35,7 +39,13 @@ func (r *Repository) GetAchievementsByClubUUID(uuid string) ([]models.ClubAchiev
 }
 
 func (r *Repository) CreateAchievement(clubUUID string, achievements []string) error {
-	achieveModels := make([]models.ClubAchievement, len(achievements))
+	length := len(achievements)
+
+	if length == 0 {
+		return nil
+	}
+
+	achieveModels := make([]models.ClubAchievement, length)
 
 	for i, achieve := range achievements {
 		ach := models.ClubAchievement{
@@ -54,8 +64,38 @@ func (r *Repository) CreateAchievement(clubUUID string, achievements []string) e
 	return nil
 }
 
+func (r *Repository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
+	length := len(achievements)
+
+	if length == 0 {
+		return nil
+	}
+
+	achieveModels := make([]models.ClubAchievement, length)
+
+	for i, achieve := range achievements {
+		ach := models.ClubAchievement{
+			ClubUUID:    clubUUID,
+			Achievement: achieve,
+		}
+		achieveModels[i] = ach
+	}
+
+	if err := tx.Create(&achieveModels).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) error {
-	achieveModels := make([]models.ClubAchievement, len(achievements))
+	length := len(achievements)
+
+	if length == 0 {
+		return nil
+	}
+
+	achieveModels := make([]models.ClubAchievement, length)
 
 	for i, achieve := range achievements {
 		ach := models.ClubAchievement{

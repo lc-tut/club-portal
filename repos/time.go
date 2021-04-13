@@ -3,6 +3,7 @@ package repos
 import (
 	"errors"
 	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
 )
 
 type ClubTimeArgs struct {
@@ -17,6 +18,7 @@ type ClubTimeRepo interface {
 	GetTimesByClubUUID(uuid string) ([]models.ClubTime, error)
 
 	CreateTime(args []ClubTimeArgs) error
+	CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error
 
 	UpdateTime(timeID []uint32, args []ClubTimeArgs) error
 }
@@ -58,6 +60,25 @@ func (r *Repository) CreateTime(args []ClubTimeArgs) error {
 	tx := r.db.Create(&timeModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error {
+	timeModels := make([]models.ClubTime, len(args))
+
+	for i, arg := range args {
+		t := models.ClubTime{
+			TimeID: arg.TimeID,
+			Date:   arg.Date,
+			Time:   arg.Time,
+		}
+		timeModels[i] = t
+	}
+
+	if err := tx.Create(&timeModels).Error; err != nil {
 		return err
 	}
 

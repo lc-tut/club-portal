@@ -1,6 +1,9 @@
 package repos
 
-import "github.com/lc-tut/club-portal/models"
+import (
+	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
+)
 
 type ClubVideoRepo interface {
 	GetVideoByID(videoID uint32) (*models.ClubVideo, error)
@@ -8,6 +11,7 @@ type ClubVideoRepo interface {
 	GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error)
 
 	CreateVideo(clubUUID string, path []string) error
+	CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 
 	UpdateVideo(clubUUID string, path []string) error
 }
@@ -35,7 +39,13 @@ func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error
 }
 
 func (r *Repository) CreateVideo(clubUUID string, path []string) error {
-	videos := make([]models.ClubVideo, len(path))
+	length := len(path)
+
+	if length == 0 {
+		return nil
+	}
+
+	videos := make([]models.ClubVideo, length)
 
 	for i, p := range path {
 		video := models.ClubVideo{
@@ -54,8 +64,38 @@ func (r *Repository) CreateVideo(clubUUID string, path []string) error {
 	return nil
 }
 
+func (r *Repository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+	length := len(path)
+
+	if length == 0 {
+		return nil
+	}
+
+	videos := make([]models.ClubVideo, length)
+
+	for i, p := range path {
+		video := models.ClubVideo{
+			ClubUUID: clubUUID,
+			Path:     p,
+		}
+		videos[i] = video
+	}
+
+	if err := tx.Create(&videos).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
-	videos := make([]models.ClubVideo, len(path))
+	length := len(path)
+
+	if length == 0 {
+		return nil
+	}
+
+	videos := make([]models.ClubVideo, length)
 
 	for i, p := range path {
 		video := models.ClubVideo{

@@ -1,6 +1,9 @@
 package repos
 
-import "github.com/lc-tut/club-portal/models"
+import (
+	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
+)
 
 type ClubContentRepo interface {
 	GetContentByID(contentID uint32) (*models.ClubContent, error)
@@ -8,6 +11,7 @@ type ClubContentRepo interface {
 	GetContentsByClubUUID(uuid string) ([]models.ClubContent, error)
 
 	CreateContent(clubUUID string, content []string) error
+	CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 
 	UpdateContent(clubUUID string, content []string) error
 }
@@ -48,6 +52,24 @@ func (r *Repository) CreateContent(clubUUID string, contents []string) error {
 	tx := r.db.Create(&contModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
+	contModels := make([]models.ClubContent, len(contents))
+
+	for i, c := range contents {
+		cont := models.ClubContent{
+			ClubUUID: clubUUID,
+			Content:  c,
+		}
+		contModels[i] = cont
+	}
+
+	if err := tx.Create(&contModels).Error; err != nil {
 		return err
 	}
 

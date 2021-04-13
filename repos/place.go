@@ -3,6 +3,7 @@ package repos
 import (
 	"errors"
 	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
 )
 
 type ClubPlaceArgs struct {
@@ -16,6 +17,7 @@ type ClubPlaceRepo interface {
 	GetPlacesByClubUUID(uuid string) ([]models.ClubPlace, error)
 
 	CreatePlace(args []ClubPlaceArgs) error
+	CreatePlaceWithTx(tx *gorm.DB, args []ClubPlaceArgs) error
 
 	UpdatePlace(placeID []uint32, args []ClubPlaceArgs) error
 }
@@ -56,6 +58,24 @@ func (r *Repository) CreatePlace(args []ClubPlaceArgs) error {
 	tx := r.db.Create(&placeModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreatePlaceWithTx(tx *gorm.DB, args []ClubPlaceArgs) error {
+	placeModels := make([]models.ClubPlace, len(args))
+
+	for i, arg := range args {
+		placeModel := models.ClubPlace{
+			PlaceID: arg.PlaceID,
+			Place:   arg.Place,
+		}
+		placeModels[i] = placeModel
+	}
+
+	if err := tx.Create(&placeModels).Error; err != nil {
 		return err
 	}
 

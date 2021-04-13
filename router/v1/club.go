@@ -44,9 +44,9 @@ type CreatePostData struct {
 	Contents        []models.ContentRequest        `json:"contents"`
 	Links           []models.LinkRequest           `json:"links"`
 	Schedules       []models.ScheduleRequest       `json:"schedules"`
-	Achievements    *[]models.AchievementRequest   `json:"achievements"`
-	Images          *[]models.ImageRequest         `json:"images"`
-	Videos          *[]models.VideoRequest         `json:"videos"`
+	Achievements    []models.AchievementRequest    `json:"achievements"`
+	Images          []models.ImageRequest          `json:"images"`
+	Videos          []models.VideoRequest          `json:"videos"`
 	ActivityDetails []models.ActivityDetailRequest `json:"activity_details"`
 }
 
@@ -101,9 +101,9 @@ func (*Handler) createArgs(ctx *gin.Context, pd *CreatePostData) (*repos.ClubPag
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
-		Achievements:    validateToAchievementArgs(*pd.Achievements),
-		Images:          validateToImageArgs(*pd.Images),
-		Videos:          validateToVideoArgs(*pd.Videos),
+		Achievements:    validateToAchievementArgs(pd.Achievements),
+		Images:          validateToImageArgs(pd.Images),
+		Videos:          validateToVideoArgs(pd.Videos),
 		Times:           validateToTimeArgs(pd.ActivityDetails),
 		Places:          validateToPlaceArgs(pd.ActivityDetails),
 		Remarks:         validateToRemarkArgs(pd.ActivityDetails),
