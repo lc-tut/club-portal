@@ -2,6 +2,7 @@ package repos
 
 import (
 	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
 )
 
 type ClubLinkArgs struct {
@@ -16,6 +17,7 @@ type ClubLinkRepo interface {
 	GetLinksByClubUUID(uuid string) ([]models.ClubLink, error)
 
 	CreateLink(clubUUID string, args []ClubLinkArgs) error
+	CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
 
 	UpdateLink(clubUUID string, args []ClubLinkArgs) error
 }
@@ -68,6 +70,25 @@ func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
 	tx := r.db.Create(&links)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+	links := make([]models.ClubLink, len(args))
+
+	for i, arg := range args {
+		link := models.ClubLink{
+			ClubUUID: clubUUID,
+			Label:    arg.Label,
+			URL:      arg.URL,
+		}
+		links[i] = link
+	}
+
+	if err := tx.Create(&links).Error; err != nil {
 		return err
 	}
 
