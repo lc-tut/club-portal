@@ -144,7 +144,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 	}
 
 	err = r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.db.Create(page).Error; err != nil {
+		if err := tx.Create(page).Error; err != nil {
 			return err
 		}
 
