@@ -1,9 +1,9 @@
 package repos
 
 import (
-	"errors"
 	"github.com/lc-tut/club-portal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ClubPlaceArgs struct {
@@ -18,8 +18,6 @@ type ClubPlaceRepo interface {
 
 	CreatePlace(args []ClubPlaceArgs) error
 	CreatePlaceWithTx(tx *gorm.DB, args []ClubPlaceArgs) error
-
-	UpdatePlace(placeID []uint32, args []ClubPlaceArgs) error
 }
 
 func (r *Repository) GetPlaceByID(placeID uint32) (*models.ClubPlace, error) {
@@ -55,7 +53,7 @@ func (r *Repository) CreatePlace(args []ClubPlaceArgs) error {
 		placeModels[i] = placeModel
 	}
 
-	tx := r.db.Create(&placeModels)
+	tx := r.db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&placeModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -75,30 +73,7 @@ func (r *Repository) CreatePlaceWithTx(tx *gorm.DB, args []ClubPlaceArgs) error 
 		placeModels[i] = placeModel
 	}
 
-	if err := tx.Create(&placeModels).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Repository) UpdatePlace(placeID []uint32, args []ClubPlaceArgs) error {
-	if len(placeID) != len(args) {
-		return errors.New("invalid argument")
-	}
-
-	placeModels := make([]models.ClubPlace, len(placeID))
-
-	for i, arg := range args {
-		placeModel := models.ClubPlace{
-			Place: arg.Place,
-		}
-		placeModels[i] = placeModel
-	}
-
-	tx := r.db.Model(&models.ClubPlace{}).Where("place_id = ?", placeID).Updates(&placeModels)
-
-	if err := tx.Error; err != nil {
+	if err := tx.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&placeModels).Error; err != nil {
 		return err
 	}
 

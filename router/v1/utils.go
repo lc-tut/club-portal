@@ -120,11 +120,11 @@ func validateToRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubRem
 	return remarks
 }
 
-func validateToActivityDetailArg(models []models.ActivityDetailRequest) []repos.ClubActivityDetailArgs {
-	details := make([]repos.ClubActivityDetailArgs, len(models))
+func validateToActivityDetailArgs(models []models.ActivityDetailRequest) []repos.ActivityDetailArgs {
+	details := make([]repos.ActivityDetailArgs, len(models))
 
 	for i, m := range models {
-		detail := repos.ClubActivityDetailArgs{
+		detail := repos.ActivityDetailArgs{
 			TimeID:  m.TimeID,
 			PlaceID: m.PlaceID,
 		}

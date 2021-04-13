@@ -14,6 +14,7 @@ type ClubAchievementRepo interface {
 	CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error
 
 	UpdateAchievement(clubUUID string, achievements []string) error
+	UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error
 }
 
 func (r *Repository) GetAchievementByID(achievementID uint32) (*models.ClubAchievement, error) {
@@ -105,9 +106,27 @@ func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) e
 		achieveModels[i] = ach
 	}
 
-	tx := r.db.Model(&models.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(&achieveModels)
+	tx := r.db.Model(&models.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(achieveModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
+	length := len(achievements)
+
+	if length == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&models.Achievements{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateAchievementWithTx(tx, clubUUID, achievements); err != nil {
 		return err
 	}
 

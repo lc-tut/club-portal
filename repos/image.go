@@ -14,6 +14,7 @@ type ClubImageRepo interface {
 	CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
 
 	UpdateImage(clubUUID string, path []string) error
+	UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
 }
 
 func (r *Repository) GetImageByID(imageID uint32) (*models.ClubImage, error) {
@@ -105,9 +106,27 @@ func (r *Repository) UpdateImage(clubUUID string, path []string) error {
 		imageModels[i] = image
 	}
 
-	tx := r.db.Model(&models.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(&imageModels)
+	tx := r.db.Model(&models.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(imageModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+	length := len(path)
+
+	if length == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubImage{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateImageWithTx(tx, clubUUID, path); err != nil {
 		return err
 	}
 

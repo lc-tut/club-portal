@@ -22,12 +22,21 @@ type ClubPageCreateArgs struct {
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs
 	Remarks         []ClubRemarkArgs
-	ActivityDetails []ClubActivityDetailArgs
+	ActivityDetails []ActivityDetailArgs
 }
 
 type ClubPageUpdateArgs struct {
-	Desc    string
-	Visible consts.Visibility
+	Desc            string
+	Contents        []string
+	Links           []ClubLinkArgs
+	Schedules       []ClubScheduleArgs
+	Achievements    []string
+	Images          []string
+	Videos          []string
+	Times           []ClubTimeArgs
+	Places          []ClubPlaceArgs
+	Remarks         []ClubRemarkArgs
+	ActivityDetails []ActivityDetailArgs
 }
 
 type ClubPageRepo interface {
@@ -180,7 +189,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 			return err
 		}
 
-		if err := r.CreateClubActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
 			return err
 		}
 
@@ -199,9 +208,55 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 }
 
 func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Updates(args)
+	page := models.ClubPage{
+		Description: args.Desc,
+	}
 
-	if err := tx.Error; err != nil {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&page).Where("club_uuid = ?", uuid).Updates(page).Error; err != nil {
+			return err
+		}
+
+		if err := r.UpdateContentWithTx(tx, uuid, args.Contents); err != nil {
+			return err
+		}
+
+		if err := r.UpdateLinkWithTx(tx, uuid, args.Links); err != nil {
+			return err
+		}
+
+		if err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
+			return err
+		}
+
+		if err := r.UpdateImageWithTx(tx, uuid, args.Images); err != nil {
+			return err
+		}
+
+		if err := r.UpdateVideoWithTx(tx, uuid, args.Videos); err != nil {
+			return err
+		}
+
+		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
+			return err
+		}
+
+		if err := r.CreatePlaceWithTx(tx, args.Places); err != nil {
+			return err
+		}
+
+		if err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+			return err
+		}
+
+		if err := r.UpdateRemarkWithTx(tx, uuid, args.Remarks); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 
@@ -209,9 +264,15 @@ func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) 
 }
 
 func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", clubSlug).Updates(args)
+	page := models.ClubPage{}
+
+	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	if err := r.UpdatePageByClubUUID(page.ClubUUID, args); err != nil {
 		return err
 	}
 

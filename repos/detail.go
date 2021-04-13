@@ -5,21 +5,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type ClubActivityDetailArgs struct {
+type ActivityDetailArgs struct {
 	TimeID  uint32
 	PlaceID uint32
 }
 
 type ClubActivityDetailRepo interface {
-	GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error)
+	GetActivityDetail(uuid string) ([]models.ActivityDetail, error)
 
 	GetAllRelations(uuid string) ([]models.DetailRelations, error)
 
-	CreateClubActivityDetail(uuid string, args []ClubActivityDetailArgs) error
-	CreateClubActivityDetailWithTx(tx *gorm.DB, uuid string, args []ClubActivityDetailArgs) error
+	CreateActivityDetail(uuid string, args []ActivityDetailArgs) error
+	CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
+
+	UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
 }
 
-func (r *Repository) GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error) {
+func (r *Repository) GetActivityDetail(uuid string) ([]models.ActivityDetail, error) {
 	details := make([]models.ActivityDetail, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&details)
 
@@ -57,7 +59,7 @@ func (r *Repository) GetAllRelations(uuid string) ([]models.DetailRelations, err
 	return relations, nil
 }
 
-func (r *Repository) CreateClubActivityDetail(uuid string, args []ClubActivityDetailArgs) error {
+func (r *Repository) CreateActivityDetail(uuid string, args []ActivityDetailArgs) error {
 	adModels := make([]models.ActivityDetail, len(args))
 
 	for i, arg := range args {
@@ -78,7 +80,7 @@ func (r *Repository) CreateClubActivityDetail(uuid string, args []ClubActivityDe
 	return nil
 }
 
-func (r *Repository) CreateClubActivityDetailWithTx(tx *gorm.DB, uuid string, args []ClubActivityDetailArgs) error {
+func (r *Repository) CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error {
 	adModels := make([]models.ActivityDetail, len(args))
 
 	for i, arg := range args {
@@ -91,6 +93,22 @@ func (r *Repository) CreateClubActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 	}
 
 	if err := tx.Create(&adModels).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error {
+	if len(args) == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid = ?", uuid).Delete(&models.ActivityDetail{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateActivityDetailWithTx(tx, uuid, args); err != nil {
 		return err
 	}
 
