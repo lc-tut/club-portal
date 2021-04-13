@@ -3,6 +3,7 @@ package repos
 import (
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
+	"gorm.io/gorm"
 )
 
 type ClubRemarkArgs struct {
@@ -16,6 +17,7 @@ type ClubRemarkRepo interface {
 	GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error)
 
 	CreateRemark(uuid string, args []ClubRemarkArgs) error
+	CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
 }
 
 func (r *Repository) GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error) {
@@ -47,6 +49,27 @@ func (r *Repository) CreateRemark(uuid string, args []ClubRemarkArgs) error {
 	tx := r.db.Create(&remarks)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+	remarks := make([]models.ClubRemark, len(args))
+
+	for i, arg := range args {
+		remark := models.ClubRemark{
+			ClubUUID:    uuid,
+			TimeID:      arg.TimeID,
+			PlaceID:     arg.PlaceID,
+			TimeRemark:  utils.ToNullString(arg.TimeRemarks),
+			PlaceRemark: utils.ToNullString(arg.PlaceRemarks),
+		}
+		remarks[i] = remark
+	}
+
+	if err := tx.Create(&remarks).Error; err != nil {
 		return err
 	}
 

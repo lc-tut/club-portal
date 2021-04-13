@@ -2,6 +2,7 @@ package repos
 
 import (
 	"github.com/lc-tut/club-portal/models"
+	"gorm.io/gorm"
 )
 
 type ClubActivityDetailArgs struct {
@@ -15,6 +16,7 @@ type ClubActivityDetailRepo interface {
 	GetAllRelations(uuid string) ([]models.DetailRelations, error)
 
 	CreateClubActivityDetail(uuid string, args []ClubActivityDetailArgs) error
+	CreateClubActivityDetailWithTx(tx *gorm.DB, uuid string, args []ClubActivityDetailArgs) error
 }
 
 func (r *Repository) GetClubActivityDetail(uuid string) ([]models.ActivityDetail, error) {
@@ -70,6 +72,25 @@ func (r *Repository) CreateClubActivityDetail(uuid string, args []ClubActivityDe
 	tx := r.db.Create(&adModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateClubActivityDetailWithTx(tx *gorm.DB, uuid string, args []ClubActivityDetailArgs) error {
+	adModels := make([]models.ActivityDetail, len(args))
+
+	for i, arg := range args {
+		model := models.ActivityDetail{
+			TimeID:   arg.TimeID,
+			PlaceID:  arg.PlaceID,
+			ClubUUID: uuid,
+		}
+		adModels[i] = model
+	}
+
+	if err := tx.Create(&adModels).Error; err != nil {
 		return err
 	}
 

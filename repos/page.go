@@ -4,6 +4,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
+	"gorm.io/gorm"
 )
 
 type ClubPageCreateArgs struct {
@@ -79,11 +80,11 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInf
 		Contents:     *page.Contents.ToContentResponse(),
 		Links:        *page.Links.ToLinkResponse(),
 		Schedules:    *page.Schedules.ToScheduleResponse(),
-		Achievements: page.Achievements.ToAchievementResponse(),
-		Images:       page.Images.ToImageResponse(),
-		Videos:       page.Videos.ToVideoResponse(),
-		Times:        models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		Achievements: *page.Achievements.ToAchievementResponse(),
+		Images:       *page.Images.ToImageResponse(),
+		Videos:       *page.Videos.ToVideoResponse(),
+		Times:        *models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       *models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
@@ -115,11 +116,11 @@ func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInterna
 		Contents:     *page.Contents.ToContentResponse(),
 		Links:        *page.Links.ToLinkResponse(),
 		Schedules:    *page.Schedules.ToScheduleResponse(),
-		Achievements: page.Achievements.ToAchievementResponse(),
-		Images:       page.Images.ToImageResponse(),
-		Videos:       page.Videos.ToVideoResponse(),
-		Times:        models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		Achievements: *page.Achievements.ToAchievementResponse(),
+		Images:       *page.Images.ToImageResponse(),
+		Videos:       *page.Videos.ToVideoResponse(),
+		Times:        *models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       *models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
@@ -142,47 +143,55 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 		Visible:     args.Visible.ToPrimitive(),
 	}
 
-	if err := r.db.Create(page).Error; err != nil {
-		return err
-	}
+	err = r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(page).Error; err != nil {
+			return err
+		}
 
-	if err := r.CreateContent(uuid, args.Contents); err != nil {
-		return err
-	}
+		if err := r.CreateContentWithTx(tx, uuid, args.Contents); err != nil {
+			return err
+		}
 
-	if err := r.CreateLink(uuid, args.Links); err != nil {
-		return err
-	}
+		if err := r.CreateLinkWithTx(tx, uuid, args.Links); err != nil {
+			return err
+		}
 
-	if err := r.CreateSchedule(uuid, args.Schedules); err != nil {
-		return err
-	}
+		if err := r.CreateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
+			return err
+		}
 
-	if err := r.CreateAchievement(uuid, args.Achievements); err != nil {
-		return err
-	}
+		if err := r.CreateAchievementWithTx(tx, uuid, args.Achievements); err != nil {
+			return err
+		}
 
-	if err := r.CreateImage(uuid, args.Images); err != nil {
-		return err
-	}
+		if err := r.CreateImageWithTx(tx, uuid, args.Images); err != nil {
+			return err
+		}
 
-	if err := r.CreateVideo(uuid, args.Videos); err != nil {
-		return err
-	}
+		if err := r.CreateVideoWithTx(tx, uuid, args.Videos); err != nil {
+			return err
+		}
 
-	if err := r.CreateTime(args.Times); err != nil {
-		return err
-	}
+		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
+			return err
+		}
 
-	if err := r.CreatePlace(args.Places); err != nil {
-		return err
-	}
+		if err := r.CreatePlaceWithTx(tx, args.Places); err != nil {
+			return err
+		}
 
-	if err := r.CreateClubActivityDetail(uuid, args.ActivityDetails); err != nil {
-		return err
-	}
+		if err := r.CreateClubActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+			return err
+		}
 
-	if err := r.CreateRemark(uuid, args.Remarks); err != nil {
+		if err := r.CreateRemarkWithTx(tx, uuid, args.Remarks); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 

@@ -47,7 +47,7 @@ func (p Pages) ToExternalInfo() []ClubPageExternalInfo {
 			Campus:      page.Campus,
 			ClubType:    page.ClubType,
 			UpdatedAt:   page.UpdatedAt,
-			Images:      page.Images.ToImageResponse(),
+			Images:      *page.Images.ToImageResponse(),
 		}
 		exInfo[i] = info
 	}
@@ -56,29 +56,29 @@ func (p Pages) ToExternalInfo() []ClubPageExternalInfo {
 }
 
 type ClubPageExternalInfo struct {
-	ClubUUID    string           `json:"club_uuid"`
-	ClubSlug    string           `json:"club_slug"`
-	Name        string           `json:"name"`
-	Description string           `json:"description"`
-	Campus      uint8            `json:"campus"`
-	ClubType    uint8            `json:"club_type"`
-	UpdatedAt   time.Time        `json:"updated_at"`
-	Images      *[]ImageResponse `json:"images"`
+	ClubUUID    string          `json:"club_uuid"`
+	ClubSlug    string          `json:"club_slug"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Campus      uint8           `json:"campus"`
+	ClubType    uint8           `json:"club_type"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	Images      []ImageResponse `json:"images"`
 }
 
 type ClubPageInternalInfo struct {
-	ClubUUID     string                 `json:"club_uuid"`
-	Name         string                 `json:"name"`
-	Description  string                 `json:"description"`
-	Campus       uint8                  `json:"campus"`
-	ClubType     uint8                  `json:"club_type"`
-	UpdatedAt    time.Time              `json:"updated_at"`
-	Contents     []ContentResponse      `json:"contents"`
-	Links        []LinkResponse         `json:"links"`
-	Schedules    []ScheduleResponse     `json:"schedules"`
-	Achievements *[]AchievementResponse `json:"achievements"`
-	Images       *[]ImageResponse       `json:"images"`
-	Videos       *[]VideoResponse       `json:"videos"`
-	Times        *[]TimeResponse        `json:"times"`
-	Places       *[]PlaceResponse       `json:"places"`
+	ClubUUID     string                `json:"club_uuid"`
+	Name         string                `json:"name"`
+	Description  string                `json:"description"`
+	Campus       uint8                 `json:"campus"`
+	ClubType     uint8                 `json:"club_type"`
+	UpdatedAt    time.Time             `json:"updated_at"`
+	Contents     []ContentResponse     `json:"contents"`
+	Links        []LinkResponse        `json:"links"`
+	Schedules    []ScheduleResponse    `json:"schedules"`
+	Achievements []AchievementResponse `json:"achievements"`
+	Images       []ImageResponse       `json:"images"`
+	Videos       []VideoResponse       `json:"videos"`
+	Times        []TimeResponse        `json:"times"`
+	Places       []PlaceResponse       `json:"places"`
 }

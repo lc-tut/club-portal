@@ -3,6 +3,7 @@ package repos
 import (
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
+	"gorm.io/gorm"
 )
 
 type ClubScheduleArgs struct {
@@ -17,6 +18,7 @@ type ClubScheduleRepo interface {
 	GetSchedulesByClubUUID(uuid string) ([]models.ClubSchedule, error)
 
 	CreateSchedule(clubUUID string, args []ClubScheduleArgs) error
+	CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error
 
 	UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error
 }
@@ -59,6 +61,26 @@ func (r *Repository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) er
 	tx := r.db.Create(&schedules)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error {
+	schedules := make([]models.ClubSchedule, len(args))
+
+	for i, arg := range args {
+		sch := models.ClubSchedule{
+			ClubUUID: clubUUID,
+			Month:    arg.Month,
+			Schedule: arg.Schedule,
+			Remarks:  utils.ToNullString(arg.Remarks),
+		}
+		schedules[i] = sch
+	}
+
+	if err := tx.Create(&schedules).Error; err != nil {
 		return err
 	}
 
