@@ -48,6 +48,9 @@ type ClubPageRepo interface {
 
 	UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
+
+	DeletePageByClubUUID(uuid string) error
+	DeletePageByClubSlug(slug string) error
 }
 
 func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
@@ -273,6 +276,26 @@ func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateAr
 	}
 
 	if err := r.UpdatePageByClubUUID(page.ClubUUID, args); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) DeletePageByClubUUID(uuid string) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) DeletePageByClubSlug(slug string) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
+
+	if err := tx.Error; err != nil {
 		return err
 	}
 

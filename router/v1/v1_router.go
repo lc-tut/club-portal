@@ -46,6 +46,7 @@ func (r *Router) AddRouter() {
 			clubGroup.POST("/", h.CreateClub())
 			clubGroup.GET("/:clubslug", r.middleware.SetClubIDKey(), h.GetClub())
 			clubGroup.PUT("/:clubslug", r.middleware.SetClubIDKey(), h.UpdateClub())
+			clubGroup.DELETE("/:clubslug", r.middleware.SetClubIDKey(), h.DeleteClub())
 		}
 	}
 }

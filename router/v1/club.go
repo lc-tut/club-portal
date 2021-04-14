@@ -181,3 +181,15 @@ func (h *Handler) updatePage(slug string, args repos.ClubPageUpdateArgs) error {
 
 	return nil
 }
+
+func (h *Handler) DeleteClub() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		slug := ctx.GetString(consts.ClubSlugKeyName)
+
+		if err := h.repo.DeletePageByClubSlug(slug); err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.Status(http.StatusOK)
+		}
+	}
+}
