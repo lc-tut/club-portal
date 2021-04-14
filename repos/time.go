@@ -1,9 +1,9 @@
 package repos
 
 import (
-	"errors"
 	"github.com/lc-tut/club-portal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ClubTimeArgs struct {
@@ -19,8 +19,6 @@ type ClubTimeRepo interface {
 
 	CreateTime(args []ClubTimeArgs) error
 	CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error
-
-	UpdateTime(timeID []uint32, args []ClubTimeArgs) error
 }
 
 func (r *Repository) GetTimeByID(timeID uint32) (*models.ClubTime, error) {
@@ -57,7 +55,7 @@ func (r *Repository) CreateTime(args []ClubTimeArgs) error {
 		timeModels[i] = t
 	}
 
-	tx := r.db.Create(&timeModels)
+	tx := r.db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&timeModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -78,32 +76,7 @@ func (r *Repository) CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error {
 		timeModels[i] = t
 	}
 
-	if err := tx.Create(&timeModels).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *Repository) UpdateTime(timeID []uint32, args []ClubTimeArgs) error {
-	if len(timeID) != len(args) {
-		return errors.New("invalid argument")
-	}
-
-	timeModels := make([]models.ClubTime, len(timeID))
-
-	for i, arg := range args {
-		t := models.ClubTime{
-
-			Date: arg.Date,
-			Time: arg.Time,
-		}
-		timeModels[i] = t
-	}
-
-	tx := r.db.Model(&models.ClubTime{}).Where("time_id = ?", timeID).Updates(&timeModels)
-
-	if err := tx.Error; err != nil {
+	if err := tx.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&timeModels).Error; err != nil {
 		return err
 	}
 

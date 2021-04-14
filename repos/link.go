@@ -20,6 +20,7 @@ type ClubLinkRepo interface {
 	CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
 
 	UpdateLink(clubUUID string, args []ClubLinkArgs) error
+	UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
 }
 
 func (r *Repository) GetAllLinks() ([]models.ClubLink, error) {
@@ -96,7 +97,13 @@ func (r *Repository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubL
 }
 
 func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
-	links := make([]models.ClubLink, len(args))
+	length := len(args)
+
+	if length == 0 {
+		return nil
+	}
+
+	links := make([]models.ClubLink, length)
 
 	for i, arg := range args {
 		link := models.ClubLink{
@@ -107,9 +114,27 @@ func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 		links[i] = link
 	}
 
-	tx := r.db.Model(&models.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(&links)
+	tx := r.db.Model(&models.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(links)
 
 	if err := tx.Error; err == nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+	length := len(args)
+
+	if length == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubLink{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateLinkWithTx(tx, clubUUID, args); err == nil {
 		return err
 	}
 

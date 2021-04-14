@@ -57,12 +57,3 @@ func ToClubType(i uint8) (consts.ClubType, error) {
 		return typed, nil
 	}
 }
-
-func ToVisibility(i uint8) (consts.Visibility, error) {
-	typed := consts.Visibility(i)
-	if typed > consts.Invisible {
-		return 0, errors.New("invalid argument")
-	} else {
-		return typed, nil
-	}
-}

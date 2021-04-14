@@ -14,6 +14,7 @@ type ClubContentRepo interface {
 	CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 
 	UpdateContent(clubUUID string, content []string) error
+	UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 }
 
 func (r *Repository) GetContentByID(contentID uint32) (*models.ClubContent, error) {
@@ -77,7 +78,13 @@ func (r *Repository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents 
 }
 
 func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
-	contModels := make([]models.ClubContent, len(contents))
+	length := len(contents)
+
+	if length == 0 {
+		return nil
+	}
+
+	contModels := make([]models.ClubContent, length)
 
 	for i, c := range contents {
 		cont := models.ClubContent{
@@ -87,9 +94,27 @@ func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
 		contModels[i] = cont
 	}
 
-	tx := r.db.Model(&models.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(&contModels)
+	tx := r.db.Model(&models.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(contModels)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
+	length := len(contents)
+
+	if length == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&models.ClubContent{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateContentWithTx(tx, clubUUID, contents); err != nil {
 		return err
 	}
 

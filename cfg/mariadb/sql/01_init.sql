@@ -45,7 +45,6 @@ create table if not exists `club_schedules` (
     `month` tinyint unsigned not null,
     `schedule` text not null,
     `remarks` text,
-    unique (`month`, `schedule`) using hash,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -73,7 +72,7 @@ create table if not exists `activity_details` (
     `time_id` int unsigned not null,
     `place_id` int unsigned not null,
     `club_uuid` char(36) not null,
-    primary key (`time_id`, `place_id`),
+    primary key (`time_id`, `place_id`, `club_uuid`),
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict,
     foreign key (`time_id`) references `club_times` (`time_id`) on delete cascade on update restrict,
     foreign key (`place_id`) references `club_places` (`place_id`) on delete cascade on update restrict

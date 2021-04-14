@@ -12,7 +12,7 @@ type ClubPageCreateArgs struct {
 	Desc            string
 	Campus          consts.CampusType
 	ClubType        consts.ClubType
-	Visible         consts.Visibility
+	Visible         bool
 	Contents        []string
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
@@ -22,12 +22,21 @@ type ClubPageCreateArgs struct {
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs
 	Remarks         []ClubRemarkArgs
-	ActivityDetails []ClubActivityDetailArgs
+	ActivityDetails []ActivityDetailArgs
 }
 
 type ClubPageUpdateArgs struct {
-	Desc    string
-	Visible consts.Visibility
+	Desc            string
+	Contents        []string
+	Links           []ClubLinkArgs
+	Schedules       []ClubScheduleArgs
+	Achievements    []string
+	Images          []string
+	Videos          []string
+	Times           []ClubTimeArgs
+	Places          []ClubPlaceArgs
+	Remarks         []ClubRemarkArgs
+	ActivityDetails []ActivityDetailArgs
 }
 
 type ClubPageRepo interface {
@@ -39,11 +48,14 @@ type ClubPageRepo interface {
 
 	UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
+
+	DeletePageByClubUUID(uuid string) error
+	DeletePageByClubSlug(slug string) error
 }
 
 func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
 	page := make([]models.ClubPage, 0)
-	tx := r.db.Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
+	tx := r.db.Where("visible is true").Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -56,7 +68,7 @@ func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
 
 func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error) {
 	page := models.ClubPage{}
-	tx := r.db.Where("club_uuid = ?", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -92,7 +104,7 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInf
 
 func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_slug = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -140,7 +152,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 		Description: args.Desc,
 		Campus:      args.Campus.ToPrimitive(),
 		ClubType:    args.ClubType.ToPrimitive(),
-		Visible:     args.Visible.ToPrimitive(),
+		Visible:     args.Visible,
 	}
 
 	err = r.db.Transaction(func(tx *gorm.DB) error {
@@ -180,7 +192,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 			return err
 		}
 
-		if err := r.CreateClubActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
 			return err
 		}
 
@@ -199,7 +211,79 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 }
 
 func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Updates(args)
+	page := models.ClubPage{
+		Description: args.Desc,
+	}
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&page).Where("club_uuid = ?", uuid).Updates(page).Error; err != nil {
+			return err
+		}
+
+		if err := r.UpdateContentWithTx(tx, uuid, args.Contents); err != nil {
+			return err
+		}
+
+		if err := r.UpdateLinkWithTx(tx, uuid, args.Links); err != nil {
+			return err
+		}
+
+		if err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
+			return err
+		}
+
+		if err := r.UpdateImageWithTx(tx, uuid, args.Images); err != nil {
+			return err
+		}
+
+		if err := r.UpdateVideoWithTx(tx, uuid, args.Videos); err != nil {
+			return err
+		}
+
+		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
+			return err
+		}
+
+		if err := r.CreatePlaceWithTx(tx, args.Places); err != nil {
+			return err
+		}
+
+		if err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+			return err
+		}
+
+		if err := r.UpdateRemarkWithTx(tx, uuid, args.Remarks); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
+	page := models.ClubPage{}
+
+	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	if err := r.UpdatePageByClubUUID(page.ClubUUID, args); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) DeletePageByClubUUID(uuid string) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -208,8 +292,8 @@ func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) 
 	return nil
 }
 
-func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", clubSlug).Updates(args)
+func (r *Repository) DeletePageByClubSlug(slug string) error {
+	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
 
 	if err := tx.Error; err != nil {
 		return err

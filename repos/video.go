@@ -14,6 +14,7 @@ type ClubVideoRepo interface {
 	CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 
 	UpdateVideo(clubUUID string, path []string) error
+	UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 }
 
 func (r *Repository) GetVideoByID(videoID uint32) (*models.ClubVideo, error) {
@@ -104,9 +105,27 @@ func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
 		}
 		videos[i] = video
 	}
-	tx := r.db.Model(&models.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(&videos)
+	tx := r.db.Model(&models.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(videos)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+	length := len(path)
+
+	if length == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubVideo{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateVideoWithTx(tx, clubUUID, path); err != nil {
 		return err
 	}
 

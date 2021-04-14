@@ -14,13 +14,15 @@ type ClubRemarkArgs struct {
 }
 
 type ClubRemarkRepo interface {
-	GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error)
+	GetRemarksByClubUUID(uuid string) ([]models.ClubRemark, error)
 
 	CreateRemark(uuid string, args []ClubRemarkArgs) error
 	CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
+
+	UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
 }
 
-func (r *Repository) GetRemarkByClubUUID(uuid string) ([]models.ClubRemark, error) {
+func (r *Repository) GetRemarksByClubUUID(uuid string) ([]models.ClubRemark, error) {
 	remarks := make([]models.ClubRemark, 0)
 
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
@@ -70,6 +72,22 @@ func (r *Repository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRem
 	}
 
 	if err := tx.Create(&remarks).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+	if len(args) == 0 {
+		return nil
+	}
+
+	if err := tx.Where("club_uuid = ?", uuid).Delete(&models.ClubRemark{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.CreateRemarkWithTx(tx, uuid, args); err != nil {
 		return err
 	}
 
