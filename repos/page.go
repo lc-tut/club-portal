@@ -139,11 +139,7 @@ func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInterna
 }
 
 func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
-	slug, err := utils.GenerateRand15()
-
-	if err != nil {
-		return err
-	}
+	slug := utils.GenerateSlug(uuid)
 
 	page := &models.ClubPage{
 		ClubUUID:    uuid,
@@ -155,7 +151,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 		Visible:     args.Visible,
 	}
 
-	err = r.db.Transaction(func(tx *gorm.DB) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(page).Error; err != nil {
 			return err
 		}

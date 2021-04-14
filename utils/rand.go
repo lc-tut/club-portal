@@ -2,6 +2,8 @@ package utils
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -16,21 +18,10 @@ func GenerateCSRFState() (string, error) {
 	return fmt.Sprintf("%x", b), nil
 }
 
-func GenerateRand15() (string, error) {
-	const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
-	lettersLen := len(letters)
+func GenerateSlug(uuid string) string {
+	hashedUUID := sha256.Sum256([]byte(uuid))
+	str := hex.EncodeToString(hashedUUID[:])
+	result := str[:15]
 
-	b := make([]byte, 15)
-	_, err := rand.Read(b)
-
-	if err != nil {
-		return "", err
-	}
-
-	var result string
-	for _, v := range b {
-		result += string(letters[int(v)%lettersLen])
-	}
-
-	return result, nil
+	return result
 }
