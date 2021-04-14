@@ -36,15 +36,3 @@ const (
 	CultureType ClubType = 1
 	KokasaiType ClubType = 2
 )
-
-// サークルが公開か非公開か
-type Visibility uint8
-
-func (v Visibility) ToPrimitive() uint8 {
-	return uint8(v)
-}
-
-const (
-	Visible   Visibility = 0
-	Invisible Visibility = 1
-)

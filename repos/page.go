@@ -12,7 +12,7 @@ type ClubPageCreateArgs struct {
 	Desc            string
 	Campus          consts.CampusType
 	ClubType        consts.ClubType
-	Visible         consts.Visibility
+	Visible         bool
 	Contents        []string
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
@@ -52,7 +52,7 @@ type ClubPageRepo interface {
 
 func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
 	page := make([]models.ClubPage, 0)
-	tx := r.db.Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
+	tx := r.db.Where("visible is true").Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
 
 func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error) {
 	page := models.ClubPage{}
-	tx := r.db.Where("club_uuid = ?", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInf
 
 func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error) {
 	page := &models.ClubPage{}
-	tx := r.db.Where("club_slug = ?", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 		Description: args.Desc,
 		Campus:      args.Campus.ToPrimitive(),
 		ClubType:    args.ClubType.ToPrimitive(),
-		Visible:     args.Visible.ToPrimitive(),
+		Visible:     args.Visible,
 	}
 
 	err = r.db.Transaction(func(tx *gorm.DB) error {

@@ -40,7 +40,6 @@ type CreatePostData struct {
 	Description     string                         `json:"description"`
 	Campus          uint8                          `json:"campus"`
 	ClubType        uint8                          `json:"club_type"`
-	Visible         uint8                          `json:"visible"`
 	Contents        []models.ContentRequest        `json:"contents"`
 	Links           []models.LinkRequest           `json:"links"`
 	Schedules       []models.ScheduleRequest       `json:"schedules"`
@@ -86,18 +85,12 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *CreatePostData) (*repos.Clu
 		return nil, err
 	}
 
-	visible, err := utils.ToVisibility(pd.Visible)
-
-	if err != nil {
-		return nil, err
-	}
-
 	pageArgs := &repos.ClubPageCreateArgs{
 		Name:            pd.Name,
 		Desc:            pd.Description,
 		Campus:          campus,
 		ClubType:        clubType,
-		Visible:         visible,
+		Visible:         true,
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
