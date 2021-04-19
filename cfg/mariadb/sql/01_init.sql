@@ -93,14 +93,14 @@ create table if not exists `club_remarks` (
 create table if not exists `domain_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
-    `name` varchar(31) not null,
+    `name` varchar(32) not null,
     unique (`email`, `name`)
 );
 
 create table if not exists `general_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
-    `name` varchar(31) not null,
+    `name` varchar(32) not null,
     `club_uuid` char(36) not null,
     unique (`email`, `name`),
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict

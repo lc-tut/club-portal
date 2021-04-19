@@ -1,9 +1,12 @@
 package repos
 
-import "github.com/lc-tut/club-portal/models"
+import (
+	"errors"
+	"github.com/lc-tut/club-portal/models"
+)
 
-type UserRepository interface {
-	GetAllGeneralUser() (*models.GeneralUser, error)
+type UserRepo interface {
+	GetAllGeneralUser() ([]models.GeneralUser, error)
 
 	GetDomainUserByUUID(uuid string) (*models.DomainUser, error)
 	GetDomainUserByEmail(email string) (*models.DomainUser, error)
@@ -18,4 +21,154 @@ type UserRepository interface {
 	CreateGeneralUser(uuid string, email string, name string, clubUUID string) error
 
 	UpdateDomainUser(uuid string, name string) error
+}
+
+func (r *Repository) GetAllGeneralUser() ([]models.GeneralUser, error) {
+	users := make([]models.GeneralUser, 0)
+	tx := r.db.Find(users)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (r *Repository) GetDomainUserByUUID(uuid string) (*models.DomainUser, error) {
+	user := &models.DomainUser{}
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetDomainUserByEmail(email string) (*models.DomainUser, error) {
+	user := &models.DomainUser{}
+	tx := r.db.Where("email = ?", email).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetGeneralUserByUUID(uuid string) (*models.GeneralUser, error) {
+	user := &models.GeneralUser{}
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetGeneralUserByEmail(email string) (*models.GeneralUser, error) {
+	user := &models.GeneralUser{}
+	tx := r.db.Where("email = ?", email).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetAdminUserByUUID(uuid string) (*models.AdminUser, error) {
+	user := &models.AdminUser{}
+	tx := r.db.Where("user_uuid", uuid).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetAdminUserByEmail(email string) (*models.AdminUser, error) {
+	user := &models.AdminUser{}
+	tx := r.db.Where("email = ?", email).Take(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) GetUserByUUIDFromRole(uuid string, role string) (models.UserInfo, error) {
+	switch role {
+	case "domain":
+		return r.GetDomainUserByUUID(uuid)
+	case "general":
+		return r.GetGeneralUserByUUID(uuid)
+	case "admin":
+		return r.GetAdminUserByUUID(uuid)
+	default:
+		return nil, errors.New("no role: " + role)
+	}
+}
+
+func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.UserInfo, error) {
+	switch role {
+	case "domain":
+		return r.GetDomainUserByEmail(email)
+	case "general":
+		return r.GetGeneralUserByEmail(email)
+	case "admin":
+		return r.GetAdminUserByEmail(email)
+	default:
+		return nil, errors.New("no role: " + role)
+	}
+}
+
+func (r *Repository) CreateDomainUser(uuid string, email string, name string) error {
+	user := &models.DomainUser{
+		UserUUID: uuid,
+		Email:    email,
+		Name:     name,
+	}
+
+	tx := r.db.Create(user)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) CreateGeneralUser(uuid string, email string, name string, clubUUID string) error {
+	user := &models.GeneralUser{
+		UserUUID: uuid,
+		Email:    email,
+		Name:     name,
+		ClubUUID: clubUUID,
+	}
+
+	tx := r.db.Create(user)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateDomainUser(uuid string, name string) error {
+	user := models.DomainUser{
+		Name: name,
+	}
+
+	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
 }

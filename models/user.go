@@ -8,13 +8,13 @@ type UserInfo interface {
 }
 
 type DomainUser struct {
-	UserID string `gorm:"type:char(36);not null;primaryKey"`
-	Email  string `gorm:"type:varchar(255);not null;unique"`
-	Name   string `gorm:"type:varchar(32);not null;unique"`
+	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
+	Email    string `gorm:"type:varchar(255);not null;unique"`
+	Name     string `gorm:"type:varchar(32);not null;unique"`
 }
 
 func (u *DomainUser) GetUserID() string {
-	id := u.UserID
+	id := u.UserUUID
 	return id
 }
 
@@ -34,14 +34,14 @@ func (u *DomainUser) GetRole() string {
 }
 
 type GeneralUser struct {
-	UserID   string `gorm:"type:char(36);not null;primaryKey"`
+	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
 	Email    string `gorm:"type:varchar(255);not null;unique"`
 	Name     string `gorm:"type:varchar(32);not null;unique"`
 	ClubUUID string `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
 
 func (u *GeneralUser) GetUserID() string {
-	id := u.UserID
+	id := u.UserUUID
 	return id
 }
 
@@ -61,13 +61,13 @@ func (u *GeneralUser) GetRole() string {
 }
 
 type AdminUser struct {
-	UserID string `gorm:"type:char(36);not null;primaryKey"`
-	Email  string `gorm:"type:varchar(255);not null;unique"`
-	Name   string `gorm:"type:varchar(32);not null;unique"`
+	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
+	Email    string `gorm:"type:varchar(255);not null;unique"`
+	Name     string `gorm:"type:varchar(32);not null;unique"`
 }
 
 func (u *AdminUser) GetUserID() string {
-	id := u.UserID
+	id := u.UserUUID
 	return id
 }
 
