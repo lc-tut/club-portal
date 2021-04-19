@@ -109,6 +109,6 @@ create table if not exists `general_users` (
 create table if not exists `admin_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
-    `name` varchar(31) not null,
+    `name` varchar(32) not null,
     unique (`email`, `name`)
 )
