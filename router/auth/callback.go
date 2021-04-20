@@ -113,10 +113,10 @@ func (h *Handler) getUserOrCreate(data *jwtData) (models.UserInfo, error) {
 	} else {
 		user, err = h.repo.GetDomainUserByEmail(email)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUserUUID, err := uuid.NewRandom()
+			newUserUUID, _err := uuid.NewRandom() // err のオーバライドを回避するために _err とする
 
-			if err != nil {
-				return nil, err
+			if _err != nil {
+				return nil, _err
 			}
 
 			user, err = h.repo.CreateDomainUser(newUserUUID.String(), email, data.Name)
