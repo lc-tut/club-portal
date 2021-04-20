@@ -3,6 +3,7 @@ package repos
 import (
 	"errors"
 	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/utils"
 )
 
 type UserRepo interface {
@@ -17,10 +18,11 @@ type UserRepo interface {
 	GetUserByUUIDFromRole(uuid string, role string) (models.UserInfo, error)
 	GetUserByEmailFromRole(email string, role string) (models.UserInfo, error)
 
-	CreateDomainUser(uuid string, email string, name string) error
-	CreateGeneralUser(uuid string, email string, name string, clubUUID string) error
+	CreateDomainUser(uuid string, email string, name string) (*models.DomainUser, error)
+	CreateGeneralUser(uuid string, email string, name string) (*models.GeneralUser, error)
 
 	UpdateDomainUser(uuid string, name string) error
+	UpdateGeneralUser(uuid string, name string, clubUUID string) error
 }
 
 func (r *Repository) GetAllGeneralUser() ([]models.GeneralUser, error) {
@@ -126,7 +128,7 @@ func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.U
 	}
 }
 
-func (r *Repository) CreateDomainUser(uuid string, email string, name string) error {
+func (r *Repository) CreateDomainUser(uuid string, email string, name string) (*models.DomainUser, error) {
 	user := &models.DomainUser{
 		UserUUID: uuid,
 		Email:    email,
@@ -136,21 +138,35 @@ func (r *Repository) CreateDomainUser(uuid string, email string, name string) er
 	tx := r.db.Create(user)
 
 	if err := tx.Error; err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return user, nil
 }
 
-func (r *Repository) CreateGeneralUser(uuid string, email string, name string, clubUUID string) error {
+func (r *Repository) CreateGeneralUser(uuid string, email string, name string) (*models.GeneralUser, error) {
 	user := &models.GeneralUser{
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
-		ClubUUID: clubUUID,
+		ClubUUID: utils.ToNullString(""),
 	}
 
 	tx := r.db.Create(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) UpdateDomainUser(uuid string, name string) error {
+	user := models.DomainUser{
+		Name: name,
+	}
+
+	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -159,9 +175,10 @@ func (r *Repository) CreateGeneralUser(uuid string, email string, name string, c
 	return nil
 }
 
-func (r *Repository) UpdateDomainUser(uuid string, name string) error {
-	user := models.DomainUser{
-		Name: name,
+func (r *Repository) UpdateGeneralUser(uuid string, name string, clubUUID string) error {
+	user := models.GeneralUser{
+		Name:     name,
+		ClubUUID: utils.ToNullString(clubUUID),
 	}
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)

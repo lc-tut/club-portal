@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lc-tut/club-portal/repos"
 	"github.com/lc-tut/club-portal/router/config"
 	"go.uber.org/zap"
 )
@@ -9,11 +10,13 @@ import (
 type Handler struct {
 	config *config.AuthConfig
 	logger *zap.Logger
+	repo   repos.IRepository
 }
 
-func newHandler(config *config.AuthConfig, logger *zap.Logger) *Handler {
+func newHandler(config *config.AuthConfig, logger *zap.Logger, repo repos.IRepository) *Handler {
 	return &Handler{
 		config: config,
+		repo:   repo,
 		logger: logger,
 	}
 }
@@ -22,10 +25,11 @@ type Router struct {
 	rg     *gin.RouterGroup
 	config *config.AuthConfig
 	logger *zap.Logger
+	repo   repos.IRepository
 }
 
 func (r *Router) AddRouter() {
-	h := newHandler(r.config, r.logger)
+	h := newHandler(r.config, r.logger, r.repo)
 
 	authGroup := r.rg.Group("/auth")
 	{
@@ -36,11 +40,12 @@ func (r *Router) AddRouter() {
 	}
 }
 
-func NewAuthRouter(rg *gin.RouterGroup, config *config.AuthConfig, logger *zap.Logger) *Router {
+func NewAuthRouter(rg *gin.RouterGroup, config *config.AuthConfig, logger *zap.Logger, repo repos.IRepository) *Router {
 	r := &Router{
 		rg:     rg,
 		config: config,
 		logger: logger,
+		repo:   repo,
 	}
 	return r
 }

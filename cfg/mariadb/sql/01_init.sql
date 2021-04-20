@@ -101,9 +101,9 @@ create table if not exists `general_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
     `name` varchar(32) not null,
-    `club_uuid` char(36) not null,
+    `club_uuid` char(36),
     unique (`email`, `name`),
-    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete set null on update restrict
 );
 
 create table if not exists `admin_users` (

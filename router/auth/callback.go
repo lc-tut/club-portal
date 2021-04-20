@@ -8,7 +8,9 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
+	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/router/utils"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 )
@@ -17,34 +19,14 @@ func (h *Handler) Callback() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		defer utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
 
-		email, err := h.checkValidState(ctx)
+		data, err := h.checkValidState(ctx)
 
-		if err != nil || !h.config.WhitelistUsers.IsUser(email) {
+		if err != nil || !h.config.WhitelistUsers.IsUser(data.Email) {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
-		newUUID, err := uuid.NewRandom()
-
-		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		sessionData := utils.NewSessionData(newUUID, email)
-
-		b, err := json.Marshal(sessionData)
-
-		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		sess := sessions.Default(ctx)
-
-		sess.Set(consts.SessionKey, b)
-
-		if err := sess.Save(); err != nil {
+		if err := h.createSession(ctx, data); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時にキャッシュが削除されない
@@ -53,67 +35,129 @@ func (h *Handler) Callback() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) checkValidState(ctx *gin.Context) (string, error) {
-	queries := ctx.Request.URL.Query()
-
-	queryState, ok := queries["state"]
-
-	if !ok {
-		return "", errors.New("invalid query")
-	}
-
-	cookieState, err := ctx.Cookie(consts.AuthCSRFCookieName)
-
-	if err != nil {
-		return "", err
-	}
-
-	if queryState[0] != cookieState {
-		return "", errors.New("invalid state")
-	}
-
-	code, ok := queries["code"]
-
-	if !ok {
-		return "", errors.New("invalid query")
-	}
-
-	token, err := h.config.GoogleOAuthConfig.Exchange(ctx, code[0])
-
-	if err != nil {
-		return "", err
-	}
-
-	idToken := token.Extra("id_token").(string)
-
-	email, err := parseJWT(idToken)
-
-	if err != nil {
-		return "", err
-	}
-
-	return email, nil
-}
-
 type jwtData struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
 
-func parseJWT(token string) (string, error) {
+func (h *Handler) checkValidState(ctx *gin.Context) (*jwtData, error) {
+	queries := ctx.Request.URL.Query()
+
+	queryState, ok := queries["state"]
+
+	if !ok {
+		return nil, errors.New("invalid query")
+	}
+
+	cookieState, err := ctx.Cookie(consts.AuthCSRFCookieName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if queryState[0] != cookieState {
+		return nil, errors.New("invalid state")
+	}
+
+	code, ok := queries["code"]
+
+	if !ok {
+		return nil, errors.New("invalid query")
+	}
+
+	token, err := h.config.GoogleOAuthConfig.Exchange(ctx, code[0])
+
+	if err != nil {
+		return nil, err
+	}
+
+	idToken := token.Extra("id_token").(string)
+
+	data, err := parseJWT(idToken)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func parseJWT(token string) (*jwtData, error) {
 	jwt := strings.Split(token, ".")
 	payload := strings.TrimSuffix(jwt[1], "=")
 	b, err := base64.RawURLEncoding.DecodeString(payload)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	jd := &jwtData{}
 
 	if err := json.Unmarshal(b, jd); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return jd.Email, nil
+	return jd, nil
+}
+
+func (h *Handler) getUserOrCreate(data *jwtData) (models.UserInfo, error) {
+	var user models.UserInfo
+	var err error
+
+	email := data.Email
+
+	if h.config.WhitelistUsers.IsAdminUser(email) {
+		user, err = h.repo.GetAdminUserByEmail(email)
+	} else if h.config.WhitelistUsers.IsGeneralUser(email) {
+		user, err = h.repo.GetGeneralUserByEmail(email)
+	} else {
+		user, err = h.repo.GetDomainUserByEmail(email)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newUserUUID, err := uuid.NewRandom()
+
+			if err != nil {
+				return nil, err
+			}
+
+			user, err = h.repo.CreateDomainUser(newUserUUID.String(), email, data.Name)
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
+	user, err := h.getUserOrCreate(data)
+
+	if err != nil {
+		return err
+	}
+
+	sessionUUID, err := uuid.NewRandom()
+
+	if err != nil {
+		return err
+	}
+
+	sessionData := utils.NewSessionData(sessionUUID.String(), user.GetUserID(), user.GetEmail(), user.GetName(), user.GetRole())
+
+	b, err := json.Marshal(sessionData)
+
+	if err != nil {
+		return err
+	}
+
+	sess := sessions.Default(ctx)
+
+	sess.Set(consts.SessionKey, b)
+
+	if err := sess.Save(); err != nil {
+		return err
+	}
+
+	return nil
 }

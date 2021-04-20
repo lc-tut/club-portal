@@ -1,5 +1,7 @@
 package models
 
+import "database/sql"
+
 type UserInfo interface {
 	GetUserID() string
 	GetEmail() string
@@ -34,10 +36,10 @@ func (u *DomainUser) GetRole() string {
 }
 
 type GeneralUser struct {
-	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
-	Email    string `gorm:"type:varchar(255);not null;unique"`
-	Name     string `gorm:"type:varchar(32);not null;unique"`
-	ClubUUID string `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
+	UserUUID string         `gorm:"type:char(36);not null;primaryKey"`
+	Email    string         `gorm:"type:varchar(255);not null;unique"`
+	Name     string         `gorm:"type:varchar(32);not null;unique"`
+	ClubUUID sql.NullString `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 }
 
 func (u *GeneralUser) GetUserID() string {
