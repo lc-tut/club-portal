@@ -58,7 +58,7 @@ func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logg
 
 	apiGroup := engine.Group("/api")
 
-	authRouter := auth.NewAuthRouter(apiGroup, config.ToAuthConfig(), logger)
+	authRouter := auth.NewAuthRouter(apiGroup, config.ToAuthConfig(), logger, repo)
 	v1Router := v1.NewV1Router(apiGroup, config.ToV1Config(), logger, repo, mw)
 
 	addRouter(authRouter, v1Router)

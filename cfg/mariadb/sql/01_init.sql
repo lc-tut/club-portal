@@ -89,3 +89,26 @@ create table if not exists `club_remarks` (
     foreign key (`time_id`) references `activity_details` (`time_id`) on delete cascade on update restrict,
     foreign key (`place_id`) references `activity_details` (`place_id`) on delete cascade on update restrict
 );
+
+create table if not exists `domain_users` (
+    `user_uuid` char(36) not null primary key,
+    `email` varchar(255) not null,
+    `name` varchar(32) not null,
+    unique (`email`, `name`)
+);
+
+create table if not exists `general_users` (
+    `user_uuid` char(36) not null primary key,
+    `email` varchar(255) not null,
+    `name` varchar(32) not null,
+    `club_uuid` char(36),
+    unique (`email`, `name`),
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete set null on update restrict
+);
+
+create table if not exists `admin_users` (
+    `user_uuid` char(36) not null primary key,
+    `email` varchar(255) not null,
+    `name` varchar(32) not null,
+    unique (`email`, `name`)
+)

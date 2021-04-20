@@ -1,17 +1,20 @@
 package utils
 
-import "github.com/google/uuid"
-
 type SessionData struct {
-	UUID  string
-	Email string
+	SessionUUID string `json:"session_uuid"`
+	UserUUID    string `json:"user_uuid"`
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	Role        string `json:"role"`
 }
 
-func NewSessionData(uuid uuid.UUID, email string) *SessionData {
-	u := uuid.String()
+func NewSessionData(sessionUUID string, userUUID string, email string, name string, role string) *SessionData {
 	s := &SessionData{
-		UUID:  u,
-		Email: email,
+		SessionUUID: sessionUUID,
+		UserUUID:    userUUID,
+		Email:       email,
+		Name:        name,
+		Role:        role,
 	}
 	return s
 }
