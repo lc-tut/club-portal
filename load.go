@@ -8,8 +8,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"math/rand"
-	"time"
 )
 
 func loadConfig() error {
@@ -56,8 +54,6 @@ func newDB() (*gorm.DB, error) {
 }
 
 func newServer() (*router.Server, error) {
-	rand.Seed(time.Now().UnixNano())
-
 	if err := loadConfig(); err != nil {
 		return nil, err
 	}
