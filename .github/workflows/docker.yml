@@ -33,15 +33,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Add image tag (master)
-        if: github.ref == "refs/heads/master"
+        if: github.ref == 'refs/heads/master'
         run: echo "DOCKER_TAG=master-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Add image tag (dev)
-        if: github.ref == "refs/heads/dev"
+        if: github.ref == 'refs/heads/dev'
         run: echo "DOCKER_TAG=dev-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Add image tag (release)
-        if: github.event_name == "release"
+        if: github.event_name == 'release'
         run: echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
       - name: Build and push
