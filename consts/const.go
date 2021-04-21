@@ -10,9 +10,10 @@ const (
 	CookieCSRFMaxAge    = 60 * 15
 	UserEmail           = "email_address"
 	ClubSlugKeyName     = "club_slug"
+	UserUUID            = "user_uuid"
 )
 
-// サークルのキャンパスタイプ
+// CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)
 type CampusType uint8
 
 func (ct CampusType) ToPrimitive() uint8 {
@@ -24,7 +25,7 @@ const (
 	CampusHachioji CampusType = 1
 )
 
-// サークルの種類
+// ClubType サークルの種類 (0: 体育会系, 1: 文化会系, 2: 実行委員会)
 type ClubType uint8
 
 func (ct ClubType) ToPrimitive() uint8 {
