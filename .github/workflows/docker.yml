@@ -35,13 +35,13 @@ jobs:
       - name: Add image tag (master)
         if: github.ref == 'refs/heads/master'
         run: |
-          COMMITID=${git rev-parse --short ${{ github.sha }}}
+          COMMITID=$(git rev-parse --short ${{ github.sha }})
           echo "DOCKER_TAG=master-${COMMITID}" >> $GITHUB_ENV
 
       - name: Add image tag (dev)
         if: github.ref == 'refs/heads/dev'
         run: |
-          COMMITID=${git rev-parse --short ${{ github.sha }}}
+          COMMITID=$(git rev-parse --short ${{ github.sha }})
           echo "DOCKER_TAG=dev-${COMMITID}" >> $GITHUB_ENV
 
       - name: Add image tag (release)
