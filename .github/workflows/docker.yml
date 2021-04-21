@@ -4,11 +4,16 @@ on:
   push:
     branches:
       - master
+      - dev
     paths-ignore:
       - examples/*
       - .gitignore
       - LICENSE
       - README.md
+
+  release:
+    types:
+      - published
 
 jobs:
   push:
@@ -27,9 +32,24 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Add image tag (master)
+        if: github.ref == "refs/heads/master"
+        env:
+          DOCKER_TAG: master-${{ github.sha }}
+
+      - name: Add image tag (dev)
+        if: github.ref == "refs/heads/dev"
+        env:
+          DOCKER_TAG: dev-${{ github.sha }}
+
+      - name: Add image tag (release)
+        if: github.event_name == "release"
+        env:
+          DOCKER_TAG: ${{ github.event.release.tag_name }}
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: ghcr.io/lc-tut/club-portal:master
+          tags: ghcr.io/lc-tut/club-portal:${{ env.DOCKER_TAG }}
