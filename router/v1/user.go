@@ -27,6 +27,14 @@ func (h *Handler) GetUser() gin.HandlerFunc {
 
 func (h *Handler) GetUserUUID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// TODO: implement
+		uuid := ctx.GetString(consts.UserUUIDKeyName)
+		role := ctx.GetString(consts.SessionUserRole)
+		user, err := h.repo.GetUserByUUIDFromRole(uuid, role)
+
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusOK, user.ToUserResponse())
+		}
 	}
 }

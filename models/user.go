@@ -7,6 +7,7 @@ type UserInfo interface {
 	GetEmail() string
 	GetName() string
 	GetRole() string
+	ToUserResponse() *UserResponse
 }
 
 type DomainUser struct {
@@ -33,6 +34,17 @@ func (u *DomainUser) GetName() string {
 func (u *DomainUser) GetRole() string {
 	role := "domain"
 	return role
+}
+
+func (u *DomainUser) ToUserResponse() *UserResponse {
+	res := &UserResponse{
+		UserUUID: u.UserUUID,
+		Email:    u.Email,
+		Name:     u.Name,
+		Role:     u.GetRole(),
+	}
+
+	return res
 }
 
 type GeneralUser struct {
@@ -62,6 +74,17 @@ func (u *GeneralUser) GetRole() string {
 	return role
 }
 
+func (u *GeneralUser) ToUserResponse() *UserResponse {
+	res := &UserResponse{
+		UserUUID: u.UserUUID,
+		Email:    u.Email,
+		Name:     u.Name,
+		Role:     u.GetRole(),
+	}
+
+	return res
+}
+
 type AdminUser struct {
 	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
 	Email    string `gorm:"type:varchar(255);not null;unique"`
@@ -86,6 +109,17 @@ func (u *AdminUser) GetName() string {
 func (u *AdminUser) GetRole() string {
 	role := "admin"
 	return role
+}
+
+func (u *AdminUser) ToUserResponse() *UserResponse {
+	res := &UserResponse{
+		UserUUID: u.UserUUID,
+		Email:    u.Email,
+		Name:     u.Name,
+		Role:     u.GetRole(),
+	}
+
+	return res
 }
 
 type UserResponse struct {
