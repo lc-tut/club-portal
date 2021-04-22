@@ -87,3 +87,10 @@ func (u *AdminUser) GetRole() string {
 	role := "admin"
 	return role
 }
+
+type UserResponse struct {
+	UserUUID string `json:"user_uuid"`
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Role     string `json:"role"`
+}

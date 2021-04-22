@@ -108,6 +108,15 @@ func (h *Handler) getUserOrCreate(data *jwtData) (models.UserInfo, error) {
 
 	if h.config.WhitelistUsers.IsAdminUser(email) {
 		user, err = h.repo.GetAdminUserByEmail(email)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newUserUUID, _err := uuid.NewRandom()
+
+			if _err != nil {
+				return nil, _err
+			}
+
+			user, err = h.repo.CreateAdminUser(newUserUUID.String(), email, data.Name)
+		}
 	} else if h.config.WhitelistUsers.IsGeneralUser(email) {
 		user, err = h.repo.GetGeneralUserByEmail(email)
 	} else {

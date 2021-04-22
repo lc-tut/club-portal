@@ -20,6 +20,7 @@ type UserRepo interface {
 
 	CreateDomainUser(uuid string, email string, name string) (*models.DomainUser, error)
 	CreateGeneralUser(uuid string, email string, name string) (*models.GeneralUser, error)
+	CreateAdminUser(uuid string, email string, name string) (*models.AdminUser, error)
 
 	UpdateDomainUser(uuid string, name string) error
 	UpdateGeneralUser(uuid string, name string, clubUUID string) error
@@ -150,6 +151,22 @@ func (r *Repository) CreateGeneralUser(uuid string, email string, name string) (
 		Email:    email,
 		Name:     name,
 		ClubUUID: utils.ToNullString(""),
+	}
+
+	tx := r.db.Create(user)
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (r *Repository) CreateAdminUser(uuid string, email string, name string) (*models.AdminUser, error) {
+	user := &models.AdminUser{
+		UserUUID: uuid,
+		Email:    email,
+		Name:     name,
 	}
 
 	tx := r.db.Create(user)

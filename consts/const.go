@@ -8,9 +8,12 @@ const (
 	CookieHttpOnly      = true
 	CookieSessionMaxAge = 60 * 60 * 24 * 7
 	CookieCSRFMaxAge    = 60 * 15
-	UserEmail           = "email_address"
-	ClubSlugKeyName     = "club_slug"
-	UserUUID            = "user_uuid"
+	SessionUserEmail    = "sess_user_email"
+	SessionUserUUID     = "sess_user_uuid"
+	SessionUserName     = "sess_user_name"
+	SessionUserRole     = "sess_user_role"
+	ClubSlugKeyName     = "club_slug_key"
+	UserUUIDKeyName     = "user_uuid_key"
 )
 
 // CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)
