@@ -82,7 +82,7 @@ func (w *Whitelist) IsGeneralUser(email string) bool {
 func NewWhitelist() WhitelistInfo {
 	ed := viper.GetStringSlice("email_domains")
 	ae := viper.GetStringSlice("admin_emails")
-	ge := viper.GetStringSlice("general_emails")
+	ge := viper.GetStringSlice("general_emails") // will deprecate
 
 	users := append(ge, ae...)
 
