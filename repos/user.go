@@ -28,7 +28,7 @@ type UserRepo interface {
 
 func (r *Repository) GetAllGeneralUser() ([]models.GeneralUser, error) {
 	users := make([]models.GeneralUser, 0)
-	tx := r.db.Find(users)
+	tx := r.db.Find(&users)
 
 	if err := tx.Error; err != nil {
 		return nil, err
