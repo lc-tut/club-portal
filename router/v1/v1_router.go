@@ -38,6 +38,7 @@ func (r *Router) AddRouter() {
 		userGroup := v1Group.Group("/users", r.middleware.CheckSession())
 		{
 			userGroup.GET("/", h.GetUser())
+			userGroup.POST("/", r.middleware.AdminOnly(), h.CreateGeneralUser())
 			userGroup.GET("/:uuid", r.middleware.SetUserUUIDKey(), r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
 		}
 		clubGroup := v1Group.Group("/clubs")

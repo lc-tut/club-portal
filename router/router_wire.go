@@ -24,6 +24,7 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 		wire.Struct(new(config.Config), "*"),
 		wire.Bind(new(config.IConfig), new(*config.Config)),
 		wire.Bind(new(repos.IRepository), new(*repos.Repository)),
+		wire.Bind(new(repos.UserRepo), new(*repos.Repository)),
 	)
 
 	return nil, nil

@@ -128,3 +128,15 @@ type UserResponse struct {
 	Name     string `json:"name"`
 	Role     string `json:"role"`
 }
+
+type GeneralUserSlice []GeneralUser
+
+func (g GeneralUserSlice) GetEmails() []string {
+	emails := make([]string, len(g))
+
+	for i, email := range g {
+		emails[i] = email.GetEmail()
+	}
+
+	return emails
+}
