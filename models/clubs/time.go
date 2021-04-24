@@ -23,7 +23,7 @@ func (ct *ClubTime) GetTime() string {
 
 type Times []ClubTime
 
-func (t Times) ToTimeResponse(remarks []ClubRemark) *[]TimeResponse {
+func (t Times) ToTimeResponse(remarks []ClubRemark) []TimeResponse {
 	res := make([]TimeResponse, len(t))
 
 	for i, time := range t {
@@ -35,7 +35,7 @@ func (t Times) ToTimeResponse(remarks []ClubRemark) *[]TimeResponse {
 		res[i] = timeRes
 	}
 
-	return &res
+	return res
 }
 
 type TimeResponse struct {

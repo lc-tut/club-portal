@@ -9,7 +9,7 @@ type ClubLink struct {
 
 type Links []ClubLink
 
-func (l Links) ToLinkResponse() *[]LinkResponse {
+func (l Links) ToLinkResponse() []LinkResponse {
 	res := make([]LinkResponse, len(l))
 
 	for i, link := range l {
@@ -20,7 +20,7 @@ func (l Links) ToLinkResponse() *[]LinkResponse {
 		res[i] = linkRes
 	}
 
-	return &res
+	return res
 }
 
 type LinkRequest struct {

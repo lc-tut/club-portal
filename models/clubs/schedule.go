@@ -15,7 +15,7 @@ type ClubSchedule struct {
 
 type Schedules []ClubSchedule
 
-func (s Schedules) ToScheduleResponse() *[]ScheduleResponse {
+func (s Schedules) ToScheduleResponse() []ScheduleResponse {
 	res := make([]ScheduleResponse, len(s))
 
 	for i, schedule := range s {
@@ -27,7 +27,7 @@ func (s Schedules) ToScheduleResponse() *[]ScheduleResponse {
 		res[i] = scheduleRes
 	}
 
-	return &res
+	return res
 }
 
 type ScheduleRequest struct {

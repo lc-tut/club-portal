@@ -47,7 +47,7 @@ func (p Pages) ToExternalInfo() []ClubPageExternalInfo {
 			Campus:      page.Campus,
 			ClubType:    page.ClubType,
 			UpdatedAt:   page.UpdatedAt,
-			Images:      *page.Images.ToImageResponse(),
+			Images:      page.Images.ToImageResponse(),
 		}
 		exInfo[i] = info
 	}

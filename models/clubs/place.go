@@ -18,7 +18,7 @@ func (cp *ClubPlace) GetPlace() string {
 
 type Places []ClubPlace
 
-func (p Places) ToPlaceResponse(remarks []ClubRemark) *[]PlaceResponse {
+func (p Places) ToPlaceResponse(remarks []ClubRemark) []PlaceResponse {
 	res := make([]PlaceResponse, len(p))
 
 	for i, place := range p {
@@ -29,7 +29,7 @@ func (p Places) ToPlaceResponse(remarks []ClubRemark) *[]PlaceResponse {
 		res[i] = placeRes
 	}
 
-	return &res
+	return res
 }
 
 type PlaceResponse struct {
