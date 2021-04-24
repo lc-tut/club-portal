@@ -40,6 +40,7 @@ func (r *Router) AddRouter() {
 			userGroup.GET("/", h.GetUser())
 			userGroup.POST("/", r.middleware.AdminOnly(), h.CreateGeneralUser())
 			userGroup.GET("/:uuid", r.middleware.SetUserUUIDKey(), r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
+			userGroup.PUT("/:uuid", r.middleware.SetUserUUIDKey(), r.middleware.OverGeneralOnly(), h.UpdateUser())
 		}
 		clubGroup := v1Group.Group("/clubs")
 		{

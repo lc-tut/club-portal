@@ -1,10 +1,15 @@
 package repos
 
 import (
-	"errors"
+	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models"
 	"github.com/lc-tut/club-portal/utils"
 )
+
+type UpdateUserArgs struct {
+	Name     string
+	ClubUUID *string
+}
 
 type UserRepo interface {
 	GetAllGeneralUser() ([]models.GeneralUser, error)
@@ -24,6 +29,8 @@ type UserRepo interface {
 
 	UpdateDomainUser(uuid string, name string) error
 	UpdateGeneralUser(uuid string, name string, clubUUID string) error
+	UpdateAdminUser(uuid string, name string) error
+	UpdateUserFromRole(uuid string, role string, args UpdateUserArgs) error
 }
 
 func (r *Repository) GetAllGeneralUser() ([]models.GeneralUser, error) {
@@ -104,28 +111,34 @@ func (r *Repository) GetAdminUserByEmail(email string) (*models.AdminUser, error
 }
 
 func (r *Repository) GetUserByUUIDFromRole(uuid string, role string) (models.UserInfo, error) {
-	switch role {
-	case "domain":
-		return r.GetDomainUserByUUID(uuid)
-	case "general":
-		return r.GetGeneralUserByUUID(uuid)
-	case "admin":
+	userType, err := utils.ToUserType(role)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if userType == consts.AdminUser {
 		return r.GetAdminUserByUUID(uuid)
-	default:
-		return nil, errors.New("no role: " + role)
+	} else if userType == consts.GeneralUser {
+		return r.GetGeneralUserByUUID(uuid)
+	} else {
+		return r.GetAdminUserByUUID(uuid)
 	}
 }
 
 func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.UserInfo, error) {
-	switch role {
-	case "domain":
-		return r.GetDomainUserByEmail(email)
-	case "general":
-		return r.GetGeneralUserByEmail(email)
-	case "admin":
+	userType, err := utils.ToUserType(role)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if userType == consts.AdminUser {
 		return r.GetAdminUserByEmail(email)
-	default:
-		return nil, errors.New("no role: " + role)
+	} else if userType == consts.GeneralUser {
+		return r.GetGeneralUserByEmail(email)
+	} else {
+		return r.GetAdminUserByEmail(email)
 	}
 }
 
@@ -201,6 +214,42 @@ func (r *Repository) UpdateGeneralUser(uuid string, name string, clubUUID string
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateAdminUser(uuid string, name string) error {
+	user := models.AdminUser{
+		Name: name,
+	}
+
+	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateUserFromRole(uuid string, role string, args UpdateUserArgs) error {
+	userType, err := utils.ToUserType(role)
+
+	if err != nil {
+		return err
+	}
+
+	if userType == consts.AdminUser {
+		err = r.UpdateAdminUser(uuid, args.Name)
+	} else if userType == consts.GeneralUser {
+		err = r.UpdateGeneralUser(uuid, args.Name, utils.NilToEmptyString(args.ClubUUID))
+	} else {
+		err = r.UpdateDomainUser(uuid, args.Name)
+	}
+
+	if err != nil {
 		return err
 	}
 

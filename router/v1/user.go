@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/repos"
 	"net/http"
 )
 
@@ -68,6 +69,38 @@ func (h *Handler) CreateGeneralUser() gin.HandlerFunc {
 		} else {
 			h.config.WhitelistUsers.AddGeneralUser(res.GetEmail())
 			ctx.JSON(http.StatusCreated, res)
+		}
+	}
+}
+
+type UserUpdatePostData struct {
+	Name     string  `json:"name"`
+	Role     string  `json:"role"`
+	ClubUUID *string `json:"club_uuid"`
+}
+
+func (h *Handler) UpdateUser() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pd := &UserUpdatePostData{}
+
+		if err := ctx.ShouldBindJSON(pd); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
+		userUUID := ctx.GetString(consts.UserUUIDKeyName)
+
+		args := repos.UpdateUserArgs{
+			Name:     pd.Name,
+			ClubUUID: pd.ClubUUID,
+		}
+
+		tx := h.repo.UpdateUserFromRole(userUUID, pd.Role, args)
+
+		if err := tx.Error; err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }
