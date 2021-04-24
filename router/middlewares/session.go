@@ -25,7 +25,10 @@ func (mw *Middleware) CheckSession() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(consts.UserEmail, s.Email)
+		ctx.Set(consts.SessionUserUUID, s.UserUUID)
+		ctx.Set(consts.SessionUserEmail, s.Email)
+		ctx.Set(consts.SessionUserName, s.Name)
+		ctx.Set(consts.SessionUserRole, s.Role)
 
 		ctx.Next()
 	}

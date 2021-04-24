@@ -12,3 +12,11 @@ func (mw *Middleware) SetClubIDKey() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func (mw *Middleware) SetUserUUIDKey() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		v := ctx.Param("uuid")
+		ctx.Set(consts.UserUUIDKeyName, v)
+		ctx.Next()
+	}
+}

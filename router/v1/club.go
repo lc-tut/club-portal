@@ -35,7 +35,7 @@ func (h *Handler) GetClub() gin.HandlerFunc {
 	}
 }
 
-type CreatePostData struct {
+type ClubCreatePostData struct {
 	Name            string                         `json:"name"`
 	Description     string                         `json:"description"`
 	Campus          uint8                          `json:"campus"`
@@ -51,7 +51,7 @@ type CreatePostData struct {
 
 func (h *Handler) CreateClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pd := &CreatePostData{}
+		pd := &ClubCreatePostData{}
 
 		pageArgs, err := h.makeCreateArgs(ctx, pd)
 
@@ -68,7 +68,7 @@ func (h *Handler) CreateClub() gin.HandlerFunc {
 	}
 }
 
-func (*Handler) makeCreateArgs(ctx *gin.Context, pd *CreatePostData) (*repos.ClubPageCreateArgs, error) {
+func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos.ClubPageCreateArgs, error) {
 	if err := ctx.ShouldBindJSON(pd); err != nil {
 		return nil, err
 	}

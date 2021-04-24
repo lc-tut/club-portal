@@ -57,3 +57,12 @@ func ToClubType(i uint8) (consts.ClubType, error) {
 		return typed, nil
 	}
 }
+
+func ToUserType(s string) (consts.UserType, error) {
+	switch s {
+	case "admin", "general", "domain":
+		return consts.UserType(s), nil
+	default:
+		return "", errors.New("no role: " + s)
+	}
+}
