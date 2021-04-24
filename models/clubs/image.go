@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubImage struct {
 	ImageID  uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
@@ -8,7 +8,7 @@ type ClubImage struct {
 
 type Images []ClubImage
 
-func (im Images) ToImageResponse() *[]ImageResponse {
+func (im Images) ToImageResponse() []ImageResponse {
 	res := make([]ImageResponse, len(im))
 
 	for i, image := range im {
@@ -16,7 +16,7 @@ func (im Images) ToImageResponse() *[]ImageResponse {
 		res[i] = imageRes
 	}
 
-	return &res
+	return res
 }
 
 type ImageRequest struct {

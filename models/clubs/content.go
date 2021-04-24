@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubContent struct {
 	ContentID uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
@@ -8,7 +8,7 @@ type ClubContent struct {
 
 type Contents []ClubContent
 
-func (c Contents) ToContentResponse() *[]ContentResponse {
+func (c Contents) ToContentResponse() []ContentResponse {
 	res := make([]ContentResponse, len(c))
 
 	for i, con := range c {
@@ -16,7 +16,7 @@ func (c Contents) ToContentResponse() *[]ContentResponse {
 		res[i] = contentRes
 	}
 
-	return &res
+	return res
 }
 
 type ContentRequest struct {

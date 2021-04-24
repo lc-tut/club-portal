@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubVideo struct {
 	VideoID  uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
@@ -8,7 +8,7 @@ type ClubVideo struct {
 
 type Videos []ClubVideo
 
-func (v Videos) ToVideoResponse() *[]VideoResponse {
+func (v Videos) ToVideoResponse() []VideoResponse {
 	res := make([]VideoResponse, len(v))
 
 	for i, video := range v {
@@ -18,7 +18,7 @@ func (v Videos) ToVideoResponse() *[]VideoResponse {
 		res[i] = videoRes
 	}
 
-	return &res
+	return res
 }
 
 type VideoRequest struct {

@@ -1,7 +1,7 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -13,16 +13,16 @@ type ClubTimeArgs struct {
 }
 
 type ClubTimeRepo interface {
-	GetTimeByID(timeID uint32) (*models.ClubTime, error)
+	GetTimeByID(timeID uint32) (*clubs.ClubTime, error)
 
-	GetTimesByClubUUID(uuid string) ([]models.ClubTime, error)
+	GetTimesByClubUUID(uuid string) ([]clubs.ClubTime, error)
 
 	CreateTime(args []ClubTimeArgs) error
 	CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error
 }
 
-func (r *Repository) GetTimeByID(timeID uint32) (*models.ClubTime, error) {
-	time := &models.ClubTime{}
+func (r *ClubRepository) GetTimeByID(timeID uint32) (*clubs.ClubTime, error) {
+	time := &clubs.ClubTime{}
 	tx := r.db.Where("time_id = ?", timeID).Take(time)
 
 	if err := tx.Error; err != nil {
@@ -32,9 +32,9 @@ func (r *Repository) GetTimeByID(timeID uint32) (*models.ClubTime, error) {
 	return time, nil
 }
 
-func (r *Repository) GetTimesByClubUUID(uuid string) ([]models.ClubTime, error) {
-	times := make([]models.ClubTime, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find([]models.ActivityDetail{}).Joins("inner join club_times on activity_details.time_id = club_times.time_id").Scan(times)
+func (r *ClubRepository) GetTimesByClubUUID(uuid string) ([]clubs.ClubTime, error) {
+	times := make([]clubs.ClubTime, 0)
+	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_times on activity_details.time_id = club_times.time_id").Scan(times)
 
 	if err := tx.Error; err != nil {
 		return nil, err
@@ -43,11 +43,11 @@ func (r *Repository) GetTimesByClubUUID(uuid string) ([]models.ClubTime, error) 
 	return times, nil
 }
 
-func (r *Repository) CreateTime(args []ClubTimeArgs) error {
-	timeModels := make([]models.ClubTime, len(args))
+func (r *ClubRepository) CreateTime(args []ClubTimeArgs) error {
+	timeModels := make([]clubs.ClubTime, len(args))
 
 	for i, arg := range args {
-		t := models.ClubTime{
+		t := clubs.ClubTime{
 			TimeID: arg.TimeID,
 			Date:   arg.Date,
 			Time:   arg.Time,
@@ -64,11 +64,11 @@ func (r *Repository) CreateTime(args []ClubTimeArgs) error {
 	return nil
 }
 
-func (r *Repository) CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error {
-	timeModels := make([]models.ClubTime, len(args))
+func (r *ClubRepository) CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) error {
+	timeModels := make([]clubs.ClubTime, len(args))
 
 	for i, arg := range args {
-		t := models.ClubTime{
+		t := clubs.ClubTime{
 			TimeID: arg.TimeID,
 			Date:   arg.Date,
 			Time:   arg.Time,

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/lc-tut/club-portal/models"
-	"github.com/lc-tut/club-portal/repos"
+	models "github.com/lc-tut/club-portal/models/users"
+	repos "github.com/lc-tut/club-portal/repos/users"
 	"github.com/spf13/viper"
 	"strings"
 )

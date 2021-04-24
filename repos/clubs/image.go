@@ -1,14 +1,14 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
 
 type ClubImageRepo interface {
-	GetImageByID(imageID uint32) (*models.ClubImage, error)
+	GetImageByID(imageID uint32) (*clubs.ClubImage, error)
 
-	GetImagesByClubUUID(uuid string) ([]models.ClubImage, error)
+	GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error)
 
 	CreateImage(clubUUID string, path []string) error
 	CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
@@ -17,8 +17,8 @@ type ClubImageRepo interface {
 	UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
 }
 
-func (r *Repository) GetImageByID(imageID uint32) (*models.ClubImage, error) {
-	image := &models.ClubImage{}
+func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) {
+	image := &clubs.ClubImage{}
 	tx := r.db.Where("image_id = ?", imageID).Take(image)
 
 	if err := tx.Error; err != nil {
@@ -28,8 +28,8 @@ func (r *Repository) GetImageByID(imageID uint32) (*models.ClubImage, error) {
 	return image, nil
 }
 
-func (r *Repository) GetImagesByClubUUID(uuid string) ([]models.ClubImage, error) {
-	image := make([]models.ClubImage, 0)
+func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error) {
+	image := make([]clubs.ClubImage, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(image)
 
 	if err := tx.Error; err != nil {
@@ -39,17 +39,17 @@ func (r *Repository) GetImagesByClubUUID(uuid string) ([]models.ClubImage, error
 	return image, nil
 }
 
-func (r *Repository) CreateImage(clubUUID string, path []string) error {
+func (r *ClubRepository) CreateImage(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	imageModels := make([]models.ClubImage, length)
+	imageModels := make([]clubs.ClubImage, length)
 
 	for i, p := range path {
-		image := models.ClubImage{
+		image := clubs.ClubImage{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
@@ -65,17 +65,17 @@ func (r *Repository) CreateImage(clubUUID string, path []string) error {
 	return nil
 }
 
-func (r *Repository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	imageModels := make([]models.ClubImage, length)
+	imageModels := make([]clubs.ClubImage, length)
 
 	for i, p := range path {
-		image := models.ClubImage{
+		image := clubs.ClubImage{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
@@ -89,24 +89,24 @@ func (r *Repository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []stri
 	return nil
 }
 
-func (r *Repository) UpdateImage(clubUUID string, path []string) error {
+func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	imageModels := make([]models.ClubImage, length)
+	imageModels := make([]clubs.ClubImage, length)
 
 	for i, p := range path {
-		image := models.ClubImage{
+		image := clubs.ClubImage{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
 		imageModels[i] = image
 	}
 
-	tx := r.db.Model(&models.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(imageModels)
+	tx := r.db.Model(&clubs.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(imageModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -115,14 +115,14 @@ func (r *Repository) UpdateImage(clubUUID string, path []string) error {
 	return nil
 }
 
-func (r *Repository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubImage{}).Error; err != nil {
+	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubImage{}).Error; err != nil {
 		return err
 	}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/router/utils"
 	"gorm.io/gorm"
 	"net/http"
@@ -100,8 +100,8 @@ func parseJWT(token string) (*jwtData, error) {
 	return jd, nil
 }
 
-func (h *Handler) getUserOrCreate(data *jwtData) (models.UserInfo, error) {
-	var user models.UserInfo
+func (h *Handler) getUserOrCreate(data *jwtData) (users.UserInfo, error) {
+	var user users.UserInfo
 	var err error
 
 	email := data.Email

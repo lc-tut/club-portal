@@ -1,7 +1,7 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
 
@@ -11,10 +11,10 @@ type ClubLinkArgs struct {
 }
 
 type ClubLinkRepo interface {
-	GetAllLinks() ([]models.ClubLink, error)
-	GetLinkByID(linkID uint32) (*models.ClubLink, error)
+	GetAllLinks() ([]clubs.ClubLink, error)
+	GetLinkByID(linkID uint32) (*clubs.ClubLink, error)
 
-	GetLinksByClubUUID(uuid string) ([]models.ClubLink, error)
+	GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, error)
 
 	CreateLink(clubUUID string, args []ClubLinkArgs) error
 	CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
@@ -23,8 +23,8 @@ type ClubLinkRepo interface {
 	UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
 }
 
-func (r *Repository) GetAllLinks() ([]models.ClubLink, error) {
-	links := make([]models.ClubLink, 0)
+func (r *ClubRepository) GetAllLinks() ([]clubs.ClubLink, error) {
+	links := make([]clubs.ClubLink, 0)
 	tx := r.db.Find(&links)
 
 	if err := tx.Error; err != nil {
@@ -34,8 +34,8 @@ func (r *Repository) GetAllLinks() ([]models.ClubLink, error) {
 	return links, nil
 }
 
-func (r *Repository) GetLinkByID(linkID uint32) (*models.ClubLink, error) {
-	link := &models.ClubLink{}
+func (r *ClubRepository) GetLinkByID(linkID uint32) (*clubs.ClubLink, error) {
+	link := &clubs.ClubLink{}
 	tx := r.db.Where("link_id = ?", linkID).Take(link)
 
 	if err := tx.Error; err != nil {
@@ -45,8 +45,8 @@ func (r *Repository) GetLinkByID(linkID uint32) (*models.ClubLink, error) {
 	return link, nil
 }
 
-func (r *Repository) GetLinksByClubUUID(uuid string) ([]models.ClubLink, error) {
-	link := make([]models.ClubLink, 0)
+func (r *ClubRepository) GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, error) {
+	link := make([]clubs.ClubLink, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(link)
 
 	if err := tx.Error; err != nil {
@@ -56,11 +56,11 @@ func (r *Repository) GetLinksByClubUUID(uuid string) ([]models.ClubLink, error) 
 	return link, nil
 }
 
-func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
-	links := make([]models.ClubLink, len(args))
+func (r *ClubRepository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
+	links := make([]clubs.ClubLink, len(args))
 
 	for i, arg := range args {
-		link := models.ClubLink{
+		link := clubs.ClubLink{
 			ClubUUID: clubUUID,
 			Label:    arg.Label,
 			URL:      arg.URL,
@@ -77,11 +77,11 @@ func (r *Repository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
 	return nil
 }
 
-func (r *Repository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
-	links := make([]models.ClubLink, len(args))
+func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+	links := make([]clubs.ClubLink, len(args))
 
 	for i, arg := range args {
-		link := models.ClubLink{
+		link := clubs.ClubLink{
 			ClubUUID: clubUUID,
 			Label:    arg.Label,
 			URL:      arg.URL,
@@ -96,17 +96,17 @@ func (r *Repository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubL
 	return nil
 }
 
-func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 	length := len(args)
 
 	if length == 0 {
 		return nil
 	}
 
-	links := make([]models.ClubLink, length)
+	links := make([]clubs.ClubLink, length)
 
 	for i, arg := range args {
-		link := models.ClubLink{
+		link := clubs.ClubLink{
 			ClubUUID: clubUUID,
 			Label:    arg.Label,
 			URL:      arg.URL,
@@ -114,7 +114,7 @@ func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 		links[i] = link
 	}
 
-	tx := r.db.Model(&models.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(links)
+	tx := r.db.Model(&clubs.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(links)
 
 	if err := tx.Error; err == nil {
 		return err
@@ -123,14 +123,14 @@ func (r *Repository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 	return nil
 }
 
-func (r *Repository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
 	length := len(args)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubLink{}).Error; err != nil {
+	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubLink{}).Error; err != nil {
 		return err
 	}
 

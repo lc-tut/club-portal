@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubAchievement struct {
 	AchievementID uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
@@ -8,7 +8,7 @@ type ClubAchievement struct {
 
 type Achievements []ClubAchievement
 
-func (ac Achievements) ToAchievementResponse() *[]AchievementResponse {
+func (ac Achievements) ToAchievementResponse() []AchievementResponse {
 	res := make([]AchievementResponse, len(ac))
 
 	for i, achieve := range ac {
@@ -18,7 +18,7 @@ func (ac Achievements) ToAchievementResponse() *[]AchievementResponse {
 		res[i] = achieveRes
 	}
 
-	return &res
+	return res
 }
 
 type AchievementRequest struct {

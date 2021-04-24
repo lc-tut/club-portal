@@ -1,14 +1,14 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
 
 type ClubVideoRepo interface {
-	GetVideoByID(videoID uint32) (*models.ClubVideo, error)
+	GetVideoByID(videoID uint32) (*clubs.ClubVideo, error)
 
-	GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error)
+	GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, error)
 
 	CreateVideo(clubUUID string, path []string) error
 	CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
@@ -17,8 +17,8 @@ type ClubVideoRepo interface {
 	UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 }
 
-func (r *Repository) GetVideoByID(videoID uint32) (*models.ClubVideo, error) {
-	video := &models.ClubVideo{}
+func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) {
+	video := &clubs.ClubVideo{}
 	tx := r.db.Where("video_id = ?", videoID).Take(video)
 
 	if err := tx.Error; err != nil {
@@ -28,8 +28,8 @@ func (r *Repository) GetVideoByID(videoID uint32) (*models.ClubVideo, error) {
 	return video, nil
 }
 
-func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error) {
-	video := make([]models.ClubVideo, 0)
+func (r *ClubRepository) GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, error) {
+	video := make([]clubs.ClubVideo, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(video)
 
 	if err := tx.Error; err != nil {
@@ -39,17 +39,17 @@ func (r *Repository) GetVideosByClubUUID(uuid string) ([]models.ClubVideo, error
 	return video, nil
 }
 
-func (r *Repository) CreateVideo(clubUUID string, path []string) error {
+func (r *ClubRepository) CreateVideo(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	videos := make([]models.ClubVideo, length)
+	videos := make([]clubs.ClubVideo, length)
 
 	for i, p := range path {
-		video := models.ClubVideo{
+		video := clubs.ClubVideo{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
@@ -65,17 +65,17 @@ func (r *Repository) CreateVideo(clubUUID string, path []string) error {
 	return nil
 }
 
-func (r *Repository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	videos := make([]models.ClubVideo, length)
+	videos := make([]clubs.ClubVideo, length)
 
 	for i, p := range path {
-		video := models.ClubVideo{
+		video := clubs.ClubVideo{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
@@ -89,23 +89,23 @@ func (r *Repository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []stri
 	return nil
 }
 
-func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
+func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	videos := make([]models.ClubVideo, length)
+	videos := make([]clubs.ClubVideo, length)
 
 	for i, p := range path {
-		video := models.ClubVideo{
+		video := clubs.ClubVideo{
 			ClubUUID: clubUUID,
 			Path:     p,
 		}
 		videos[i] = video
 	}
-	tx := r.db.Model(&models.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(videos)
+	tx := r.db.Model(&clubs.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(videos)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -114,14 +114,14 @@ func (r *Repository) UpdateVideo(clubUUID string, path []string) error {
 	return nil
 }
 
-func (r *Repository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
+func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&models.ClubVideo{}).Error; err != nil {
+	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{}).Error; err != nil {
 		return err
 	}
 

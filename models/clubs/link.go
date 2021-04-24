@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubLink struct {
 	LinkID   uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
@@ -9,7 +9,7 @@ type ClubLink struct {
 
 type Links []ClubLink
 
-func (l Links) ToLinkResponse() *[]LinkResponse {
+func (l Links) ToLinkResponse() []LinkResponse {
 	res := make([]LinkResponse, len(l))
 
 	for i, link := range l {
@@ -20,7 +20,7 @@ func (l Links) ToLinkResponse() *[]LinkResponse {
 		res[i] = linkRes
 	}
 
-	return &res
+	return res
 }
 
 type LinkRequest struct {

@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/lc-tut/club-portal/models"
-	"github.com/lc-tut/club-portal/repos"
+	models "github.com/lc-tut/club-portal/models/clubs"
+	repos "github.com/lc-tut/club-portal/repos/clubs"
 	"github.com/lc-tut/club-portal/utils"
 )
 

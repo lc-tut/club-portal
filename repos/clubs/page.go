@@ -1,8 +1,8 @@
-package repos
+package clubs
 
 import (
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"github.com/lc-tut/club-portal/utils"
 	"gorm.io/gorm"
 )
@@ -40,9 +40,9 @@ type ClubPageUpdateArgs struct {
 }
 
 type ClubPageRepo interface {
-	GetAllPages() ([]models.ClubPageExternalInfo, error)
-	GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error)
-	GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error)
+	GetAllPages() ([]clubs.ClubPageExternalInfo, error)
+	GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error)
+	GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error)
 
 	CreatePage(uuid string, args ClubPageCreateArgs) error
 
@@ -53,21 +53,21 @@ type ClubPageRepo interface {
 	DeletePageByClubSlug(slug string) error
 }
 
-func (r *Repository) GetAllPages() ([]models.ClubPageExternalInfo, error) {
-	page := make([]models.ClubPage, 0)
+func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
+	page := make([]clubs.ClubPage, 0)
 	tx := r.db.Where("visible is true").Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
-	typedPage := models.Pages(page)
+	typedPage := clubs.Pages(page)
 
 	return typedPage.ToExternalInfo(), nil
 }
 
-func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInfo, error) {
-	page := models.ClubPage{}
+func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error) {
+	page := clubs.ClubPage{}
 	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
 
 	if err := tx.Error; err != nil {
@@ -80,30 +80,30 @@ func (r *Repository) GetPageByClubUUID(uuid string) (*models.ClubPageInternalInf
 		return nil, err
 	}
 
-	typedRels := models.Relations(rels)
+	typedRels := clubs.Relations(rels)
 
-	info := &models.ClubPageInternalInfo{
+	info := &clubs.ClubPageInternalInfo{
 		ClubUUID:     uuid,
 		Name:         page.Name,
 		Description:  page.Description,
 		Campus:       page.Campus,
 		ClubType:     page.ClubType,
 		UpdatedAt:    page.UpdatedAt,
-		Contents:     *page.Contents.ToContentResponse(),
-		Links:        *page.Links.ToLinkResponse(),
-		Schedules:    *page.Schedules.ToScheduleResponse(),
-		Achievements: *page.Achievements.ToAchievementResponse(),
-		Images:       *page.Images.ToImageResponse(),
-		Videos:       *page.Videos.ToVideoResponse(),
-		Times:        *models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       *models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		Contents:     page.Contents.ToContentResponse(),
+		Links:        page.Links.ToLinkResponse(),
+		Schedules:    page.Schedules.ToScheduleResponse(),
+		Achievements: page.Achievements.ToAchievementResponse(),
+		Images:       page.Images.ToImageResponse(),
+		Videos:       page.Videos.ToVideoResponse(),
+		Times:        clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
 }
 
-func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInternalInfo, error) {
-	page := &models.ClubPage{}
+func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error) {
+	page := &clubs.ClubPage{}
 	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
@@ -116,32 +116,32 @@ func (r *Repository) GetPageByClubSlug(clubSlug string) (*models.ClubPageInterna
 		return nil, err
 	}
 
-	typedRels := models.Relations(rels)
+	typedRels := clubs.Relations(rels)
 
-	info := &models.ClubPageInternalInfo{
+	info := &clubs.ClubPageInternalInfo{
 		ClubUUID:     page.ClubUUID,
 		Name:         page.Name,
 		Description:  page.Description,
 		Campus:       page.Campus,
 		ClubType:     page.ClubType,
 		UpdatedAt:    page.UpdatedAt,
-		Contents:     *page.Contents.ToContentResponse(),
-		Links:        *page.Links.ToLinkResponse(),
-		Schedules:    *page.Schedules.ToScheduleResponse(),
-		Achievements: *page.Achievements.ToAchievementResponse(),
-		Images:       *page.Images.ToImageResponse(),
-		Videos:       *page.Videos.ToVideoResponse(),
-		Times:        *models.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       *models.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		Contents:     page.Contents.ToContentResponse(),
+		Links:        page.Links.ToLinkResponse(),
+		Schedules:    page.Schedules.ToScheduleResponse(),
+		Achievements: page.Achievements.ToAchievementResponse(),
+		Images:       page.Images.ToImageResponse(),
+		Videos:       page.Videos.ToVideoResponse(),
+		Times:        clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:       clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
 }
 
-func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
+func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 	slug := utils.GenerateSlug(uuid)
 
-	page := &models.ClubPage{
+	page := &clubs.ClubPage{
 		ClubUUID:    uuid,
 		ClubSlug:    slug,
 		Name:        args.Name,
@@ -206,8 +206,8 @@ func (r *Repository) CreatePage(uuid string, args ClubPageCreateArgs) error {
 	return nil
 }
 
-func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
-	page := models.ClubPage{
+func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
+	page := clubs.ClubPage{
 		Description: args.Desc,
 	}
 
@@ -262,8 +262,8 @@ func (r *Repository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) 
 	return nil
 }
 
-func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
-	page := models.ClubPage{}
+func (r *ClubRepository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
+	page := clubs.ClubPage{}
 
 	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
 
@@ -278,8 +278,8 @@ func (r *Repository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateAr
 	return nil
 }
 
-func (r *Repository) DeletePageByClubUUID(uuid string) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
+func (r *ClubRepository) DeletePageByClubUUID(uuid string) error {
+	tx := r.db.Model(&clubs.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -288,8 +288,8 @@ func (r *Repository) DeletePageByClubUUID(uuid string) error {
 	return nil
 }
 
-func (r *Repository) DeletePageByClubSlug(slug string) error {
-	tx := r.db.Model(&models.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
+func (r *ClubRepository) DeletePageByClubSlug(slug string) error {
+	tx := r.db.Model(&clubs.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
 
 	if err := tx.Error; err != nil {
 		return err
