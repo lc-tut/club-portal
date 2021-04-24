@@ -1,14 +1,14 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
 
 type ClubAchievementRepo interface {
-	GetAchievementByID(achievementID uint32) (*models.ClubAchievement, error)
+	GetAchievementByID(achievementID uint32) (*clubs.ClubAchievement, error)
 
-	GetAchievementsByClubUUID(uuid string) ([]models.ClubAchievement, error)
+	GetAchievementsByClubUUID(uuid string) ([]clubs.ClubAchievement, error)
 
 	CreateAchievement(clubUUID string, achievements []string) error
 	CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error
@@ -17,8 +17,8 @@ type ClubAchievementRepo interface {
 	UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error
 }
 
-func (r *Repository) GetAchievementByID(achievementID uint32) (*models.ClubAchievement, error) {
-	achievement := &models.ClubAchievement{}
+func (r *ClubRepository) GetAchievementByID(achievementID uint32) (*clubs.ClubAchievement, error) {
+	achievement := &clubs.ClubAchievement{}
 	tx := r.db.Where("achievement_id = ?", achievementID).Take(achievement)
 
 	if err := tx.Error; err != nil {
@@ -28,8 +28,8 @@ func (r *Repository) GetAchievementByID(achievementID uint32) (*models.ClubAchie
 	return achievement, nil
 }
 
-func (r *Repository) GetAchievementsByClubUUID(uuid string) ([]models.ClubAchievement, error) {
-	achievement := make([]models.ClubAchievement, 0)
+func (r *ClubRepository) GetAchievementsByClubUUID(uuid string) ([]clubs.ClubAchievement, error) {
+	achievement := make([]clubs.ClubAchievement, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(achievement)
 
 	if err := tx.Error; err != nil {
@@ -39,17 +39,17 @@ func (r *Repository) GetAchievementsByClubUUID(uuid string) ([]models.ClubAchiev
 	return achievement, nil
 }
 
-func (r *Repository) CreateAchievement(clubUUID string, achievements []string) error {
+func (r *ClubRepository) CreateAchievement(clubUUID string, achievements []string) error {
 	length := len(achievements)
 
 	if length == 0 {
 		return nil
 	}
 
-	achieveModels := make([]models.ClubAchievement, length)
+	achieveModels := make([]clubs.ClubAchievement, length)
 
 	for i, achieve := range achievements {
-		ach := models.ClubAchievement{
+		ach := clubs.ClubAchievement{
 			ClubUUID:    clubUUID,
 			Achievement: achieve,
 		}
@@ -65,17 +65,17 @@ func (r *Repository) CreateAchievement(clubUUID string, achievements []string) e
 	return nil
 }
 
-func (r *Repository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
+func (r *ClubRepository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
 	length := len(achievements)
 
 	if length == 0 {
 		return nil
 	}
 
-	achieveModels := make([]models.ClubAchievement, length)
+	achieveModels := make([]clubs.ClubAchievement, length)
 
 	for i, achieve := range achievements {
-		ach := models.ClubAchievement{
+		ach := clubs.ClubAchievement{
 			ClubUUID:    clubUUID,
 			Achievement: achieve,
 		}
@@ -89,24 +89,24 @@ func (r *Repository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, achie
 	return nil
 }
 
-func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) error {
+func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []string) error {
 	length := len(achievements)
 
 	if length == 0 {
 		return nil
 	}
 
-	achieveModels := make([]models.ClubAchievement, length)
+	achieveModels := make([]clubs.ClubAchievement, length)
 
 	for i, achieve := range achievements {
-		ach := models.ClubAchievement{
+		ach := clubs.ClubAchievement{
 			ClubUUID:    clubUUID,
 			Achievement: achieve,
 		}
 		achieveModels[i] = ach
 	}
 
-	tx := r.db.Model(&models.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(achieveModels)
+	tx := r.db.Model(&clubs.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(achieveModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -115,14 +115,14 @@ func (r *Repository) UpdateAchievement(clubUUID string, achievements []string) e
 	return nil
 }
 
-func (r *Repository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
+func (r *ClubRepository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
 	length := len(achievements)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&models.Achievements{}).Error; err != nil {
+	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{}).Error; err != nil {
 		return err
 	}
 

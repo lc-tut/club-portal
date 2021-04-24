@@ -1,4 +1,4 @@
-package models
+package clubs
 
 import (
 	"time"

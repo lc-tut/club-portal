@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubLink struct {
 	LinkID   uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`

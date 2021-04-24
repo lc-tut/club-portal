@@ -1,14 +1,14 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
 
 type ClubContentRepo interface {
-	GetContentByID(contentID uint32) (*models.ClubContent, error)
+	GetContentByID(contentID uint32) (*clubs.ClubContent, error)
 
-	GetContentsByClubUUID(uuid string) ([]models.ClubContent, error)
+	GetContentsByClubUUID(uuid string) ([]clubs.ClubContent, error)
 
 	CreateContent(clubUUID string, content []string) error
 	CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
@@ -17,8 +17,8 @@ type ClubContentRepo interface {
 	UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 }
 
-func (r *Repository) GetContentByID(contentID uint32) (*models.ClubContent, error) {
-	content := &models.ClubContent{}
+func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, error) {
+	content := &clubs.ClubContent{}
 	tx := r.db.Where("content_id = ?", contentID).Take(content)
 
 	if err := tx.Error; err != nil {
@@ -28,8 +28,8 @@ func (r *Repository) GetContentByID(contentID uint32) (*models.ClubContent, erro
 	return content, nil
 }
 
-func (r *Repository) GetContentsByClubUUID(uuid string) ([]models.ClubContent, error) {
-	content := make([]models.ClubContent, 0)
+func (r *ClubRepository) GetContentsByClubUUID(uuid string) ([]clubs.ClubContent, error) {
+	content := make([]clubs.ClubContent, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(content)
 
 	if err := tx.Error; err != nil {
@@ -39,11 +39,11 @@ func (r *Repository) GetContentsByClubUUID(uuid string) ([]models.ClubContent, e
 	return content, nil
 }
 
-func (r *Repository) CreateContent(clubUUID string, contents []string) error {
-	contModels := make([]models.ClubContent, len(contents))
+func (r *ClubRepository) CreateContent(clubUUID string, contents []string) error {
+	contModels := make([]clubs.ClubContent, len(contents))
 
 	for i, c := range contents {
-		cont := models.ClubContent{
+		cont := clubs.ClubContent{
 			ClubUUID: clubUUID,
 			Content:  c,
 		}
@@ -59,11 +59,11 @@ func (r *Repository) CreateContent(clubUUID string, contents []string) error {
 	return nil
 }
 
-func (r *Repository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
-	contModels := make([]models.ClubContent, len(contents))
+func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
+	contModels := make([]clubs.ClubContent, len(contents))
 
 	for i, c := range contents {
-		cont := models.ClubContent{
+		cont := clubs.ClubContent{
 			ClubUUID: clubUUID,
 			Content:  c,
 		}
@@ -77,24 +77,24 @@ func (r *Repository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents 
 	return nil
 }
 
-func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
+func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error {
 	length := len(contents)
 
 	if length == 0 {
 		return nil
 	}
 
-	contModels := make([]models.ClubContent, length)
+	contModels := make([]clubs.ClubContent, length)
 
 	for i, c := range contents {
-		cont := models.ClubContent{
+		cont := clubs.ClubContent{
 			ClubUUID: clubUUID,
 			Content:  c,
 		}
 		contModels[i] = cont
 	}
 
-	tx := r.db.Model(&models.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(contModels)
+	tx := r.db.Model(&clubs.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(contModels)
 
 	if err := tx.Error; err != nil {
 		return err
@@ -103,14 +103,14 @@ func (r *Repository) UpdateContent(clubUUID string, contents []string) error {
 	return nil
 }
 
-func (r *Repository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
+func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
 	length := len(contents)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&models.ClubContent{}).Error; err != nil {
+	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{}).Error; err != nil {
 		return err
 	}
 

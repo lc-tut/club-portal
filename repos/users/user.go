@@ -1,8 +1,8 @@
-package repos
+package users
 
 import (
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
 )
 
@@ -12,20 +12,20 @@ type UpdateUserArgs struct {
 }
 
 type UserRepo interface {
-	GetAllGeneralUser() ([]models.GeneralUser, error)
+	GetAllGeneralUser() ([]users.GeneralUser, error)
 
-	GetDomainUserByUUID(uuid string) (*models.DomainUser, error)
-	GetDomainUserByEmail(email string) (*models.DomainUser, error)
-	GetGeneralUserByUUID(uuid string) (*models.GeneralUser, error)
-	GetGeneralUserByEmail(email string) (*models.GeneralUser, error)
-	GetAdminUserByUUID(uuid string) (*models.AdminUser, error)
-	GetAdminUserByEmail(email string) (*models.AdminUser, error)
-	GetUserByUUIDFromRole(uuid string, role string) (models.UserInfo, error)
-	GetUserByEmailFromRole(email string, role string) (models.UserInfo, error)
+	GetDomainUserByUUID(uuid string) (*users.DomainUser, error)
+	GetDomainUserByEmail(email string) (*users.DomainUser, error)
+	GetGeneralUserByUUID(uuid string) (*users.GeneralUser, error)
+	GetGeneralUserByEmail(email string) (*users.GeneralUser, error)
+	GetAdminUserByUUID(uuid string) (*users.AdminUser, error)
+	GetAdminUserByEmail(email string) (*users.AdminUser, error)
+	GetUserByUUIDFromRole(uuid string, role string) (users.UserInfo, error)
+	GetUserByEmailFromRole(email string, role string) (users.UserInfo, error)
 
-	CreateDomainUser(uuid string, email string, name string) (*models.DomainUser, error)
-	CreateGeneralUser(uuid string, email string, name string) (*models.GeneralUser, error)
-	CreateAdminUser(uuid string, email string, name string) (*models.AdminUser, error)
+	CreateDomainUser(uuid string, email string, name string) (*users.DomainUser, error)
+	CreateGeneralUser(uuid string, email string, name string) (*users.GeneralUser, error)
+	CreateAdminUser(uuid string, email string, name string) (*users.AdminUser, error)
 
 	UpdateDomainUser(uuid string, name string) error
 	UpdateGeneralUser(uuid string, name string, clubUUID string) error
@@ -33,19 +33,19 @@ type UserRepo interface {
 	UpdateUserFromRole(uuid string, role string, args UpdateUserArgs) error
 }
 
-func (r *Repository) GetAllGeneralUser() ([]models.GeneralUser, error) {
-	users := make([]models.GeneralUser, 0)
-	tx := r.db.Find(&users)
+func (r *UserRepository) GetAllGeneralUser() ([]users.GeneralUser, error) {
+	generalUsers := make([]users.GeneralUser, 0)
+	tx := r.db.Find(&generalUsers)
 
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	return generalUsers, nil
 }
 
-func (r *Repository) GetDomainUserByUUID(uuid string) (*models.DomainUser, error) {
-	user := &models.DomainUser{}
+func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, error) {
+	user := &users.DomainUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -55,8 +55,8 @@ func (r *Repository) GetDomainUserByUUID(uuid string) (*models.DomainUser, error
 	return user, nil
 }
 
-func (r *Repository) GetDomainUserByEmail(email string) (*models.DomainUser, error) {
-	user := &models.DomainUser{}
+func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, error) {
+	user := &users.DomainUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -66,8 +66,8 @@ func (r *Repository) GetDomainUserByEmail(email string) (*models.DomainUser, err
 	return user, nil
 }
 
-func (r *Repository) GetGeneralUserByUUID(uuid string) (*models.GeneralUser, error) {
-	user := &models.GeneralUser{}
+func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, error) {
+	user := &users.GeneralUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -77,8 +77,8 @@ func (r *Repository) GetGeneralUserByUUID(uuid string) (*models.GeneralUser, err
 	return user, nil
 }
 
-func (r *Repository) GetGeneralUserByEmail(email string) (*models.GeneralUser, error) {
-	user := &models.GeneralUser{}
+func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser, error) {
+	user := &users.GeneralUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -88,8 +88,8 @@ func (r *Repository) GetGeneralUserByEmail(email string) (*models.GeneralUser, e
 	return user, nil
 }
 
-func (r *Repository) GetAdminUserByUUID(uuid string) (*models.AdminUser, error) {
-	user := &models.AdminUser{}
+func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, error) {
+	user := &users.AdminUser{}
 	tx := r.db.Where("user_uuid", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -99,8 +99,8 @@ func (r *Repository) GetAdminUserByUUID(uuid string) (*models.AdminUser, error) 
 	return user, nil
 }
 
-func (r *Repository) GetAdminUserByEmail(email string) (*models.AdminUser, error) {
-	user := &models.AdminUser{}
+func (r *UserRepository) GetAdminUserByEmail(email string) (*users.AdminUser, error) {
+	user := &users.AdminUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
@@ -110,7 +110,7 @@ func (r *Repository) GetAdminUserByEmail(email string) (*models.AdminUser, error
 	return user, nil
 }
 
-func (r *Repository) GetUserByUUIDFromRole(uuid string, role string) (models.UserInfo, error) {
+func (r *UserRepository) GetUserByUUIDFromRole(uuid string, role string) (users.UserInfo, error) {
 	userType, err := utils.ToUserType(role)
 
 	if err != nil {
@@ -126,7 +126,7 @@ func (r *Repository) GetUserByUUIDFromRole(uuid string, role string) (models.Use
 	}
 }
 
-func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.UserInfo, error) {
+func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (users.UserInfo, error) {
 	userType, err := utils.ToUserType(role)
 
 	if err != nil {
@@ -142,8 +142,8 @@ func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.U
 	}
 }
 
-func (r *Repository) CreateDomainUser(uuid string, email string, name string) (*models.DomainUser, error) {
-	user := &models.DomainUser{
+func (r *UserRepository) CreateDomainUser(uuid string, email string, name string) (*users.DomainUser, error) {
+	user := &users.DomainUser{
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
@@ -158,8 +158,8 @@ func (r *Repository) CreateDomainUser(uuid string, email string, name string) (*
 	return user, nil
 }
 
-func (r *Repository) CreateGeneralUser(uuid string, email string, name string) (*models.GeneralUser, error) {
-	user := &models.GeneralUser{
+func (r *UserRepository) CreateGeneralUser(uuid string, email string, name string) (*users.GeneralUser, error) {
+	user := &users.GeneralUser{
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
@@ -175,8 +175,8 @@ func (r *Repository) CreateGeneralUser(uuid string, email string, name string) (
 	return user, nil
 }
 
-func (r *Repository) CreateAdminUser(uuid string, email string, name string) (*models.AdminUser, error) {
-	user := &models.AdminUser{
+func (r *UserRepository) CreateAdminUser(uuid string, email string, name string) (*users.AdminUser, error) {
+	user := &users.AdminUser{
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
@@ -191,8 +191,8 @@ func (r *Repository) CreateAdminUser(uuid string, email string, name string) (*m
 	return user, nil
 }
 
-func (r *Repository) UpdateDomainUser(uuid string, name string) error {
-	user := models.DomainUser{
+func (r *UserRepository) UpdateDomainUser(uuid string, name string) error {
+	user := users.DomainUser{
 		Name: name,
 	}
 
@@ -205,8 +205,8 @@ func (r *Repository) UpdateDomainUser(uuid string, name string) error {
 	return nil
 }
 
-func (r *Repository) UpdateGeneralUser(uuid string, name string, clubUUID string) error {
-	user := models.GeneralUser{
+func (r *UserRepository) UpdateGeneralUser(uuid string, name string, clubUUID string) error {
+	user := users.GeneralUser{
 		Name:     name,
 		ClubUUID: utils.ToNullString(clubUUID),
 	}
@@ -220,8 +220,8 @@ func (r *Repository) UpdateGeneralUser(uuid string, name string, clubUUID string
 	return nil
 }
 
-func (r *Repository) UpdateAdminUser(uuid string, name string) error {
-	user := models.AdminUser{
+func (r *UserRepository) UpdateAdminUser(uuid string, name string) error {
+	user := users.AdminUser{
 		Name: name,
 	}
 
@@ -234,7 +234,7 @@ func (r *Repository) UpdateAdminUser(uuid string, name string) error {
 	return nil
 }
 
-func (r *Repository) UpdateUserFromRole(uuid string, role string, args UpdateUserArgs) error {
+func (r *UserRepository) UpdateUserFromRole(uuid string, role string, args UpdateUserArgs) error {
 	userType, err := utils.ToUserType(role)
 
 	if err != nil {

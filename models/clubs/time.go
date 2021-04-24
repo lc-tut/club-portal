@@ -1,4 +1,4 @@
-package models
+package clubs
 
 import "github.com/lc-tut/club-portal/utils"
 

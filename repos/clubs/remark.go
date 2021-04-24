@@ -1,7 +1,7 @@
-package repos
+package clubs
 
 import (
-	"github.com/lc-tut/club-portal/models"
+	"github.com/lc-tut/club-portal/models/clubs"
 	"github.com/lc-tut/club-portal/utils"
 	"gorm.io/gorm"
 )
@@ -14,7 +14,7 @@ type ClubRemarkArgs struct {
 }
 
 type ClubRemarkRepo interface {
-	GetRemarksByClubUUID(uuid string) ([]models.ClubRemark, error)
+	GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error)
 
 	CreateRemark(uuid string, args []ClubRemarkArgs) error
 	CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
@@ -22,8 +22,8 @@ type ClubRemarkRepo interface {
 	UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
 }
 
-func (r *Repository) GetRemarksByClubUUID(uuid string) ([]models.ClubRemark, error) {
-	remarks := make([]models.ClubRemark, 0)
+func (r *ClubRepository) GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error) {
+	remarks := make([]clubs.ClubRemark, 0)
 
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
 
@@ -34,11 +34,11 @@ func (r *Repository) GetRemarksByClubUUID(uuid string) ([]models.ClubRemark, err
 	return remarks, nil
 }
 
-func (r *Repository) CreateRemark(uuid string, args []ClubRemarkArgs) error {
-	remarks := make([]models.ClubRemark, len(args))
+func (r *ClubRepository) CreateRemark(uuid string, args []ClubRemarkArgs) error {
+	remarks := make([]clubs.ClubRemark, len(args))
 
 	for i, arg := range args {
-		remark := models.ClubRemark{
+		remark := clubs.ClubRemark{
 			ClubUUID:    uuid,
 			TimeID:      arg.TimeID,
 			PlaceID:     arg.PlaceID,
@@ -57,11 +57,11 @@ func (r *Repository) CreateRemark(uuid string, args []ClubRemarkArgs) error {
 	return nil
 }
 
-func (r *Repository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
-	remarks := make([]models.ClubRemark, len(args))
+func (r *ClubRepository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+	remarks := make([]clubs.ClubRemark, len(args))
 
 	for i, arg := range args {
-		remark := models.ClubRemark{
+		remark := clubs.ClubRemark{
 			ClubUUID:    uuid,
 			TimeID:      arg.TimeID,
 			PlaceID:     arg.PlaceID,
@@ -78,12 +78,12 @@ func (r *Repository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRem
 	return nil
 }
 
-func (r *Repository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+func (r *ClubRepository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
 	if len(args) == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", uuid).Delete(&models.ClubRemark{}).Error; err != nil {
+	if err := tx.Where("club_uuid = ?", uuid).Delete(&clubs.ClubRemark{}).Error; err != nil {
 		return err
 	}
 

@@ -1,4 +1,4 @@
-package models
+package clubs
 
 type ClubAchievement struct {
 	AchievementID uint32 `gorm:"type:int unsigned not null auto_increment;primaryKey"`
