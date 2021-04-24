@@ -44,7 +44,7 @@ type ClubPageRepo interface {
 	GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error)
 	GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error)
 
-	CreatePage(uuid string, args ClubPageCreateArgs) error
+	CreatePage(uuid string, args ClubPageCreateArgs) (*clubs.ClubPage, error)
 
 	UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error
 	UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error
@@ -138,7 +138,7 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 	return info, nil
 }
 
-func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) error {
+func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*clubs.ClubPage, error) {
 	slug := utils.GenerateSlug(uuid)
 
 	page := &clubs.ClubPage{
@@ -200,10 +200,10 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) error 
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return page, nil
 }
 
 func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
