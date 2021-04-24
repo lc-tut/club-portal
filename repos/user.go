@@ -122,7 +122,7 @@ func (r *Repository) GetUserByUUIDFromRole(uuid string, role string) (models.Use
 	} else if userType == consts.GeneralUser {
 		return r.GetGeneralUserByUUID(uuid)
 	} else {
-		return r.GetAdminUserByUUID(uuid)
+		return r.GetDomainUserByUUID(uuid)
 	}
 }
 
@@ -138,7 +138,7 @@ func (r *Repository) GetUserByEmailFromRole(email string, role string) (models.U
 	} else if userType == consts.GeneralUser {
 		return r.GetGeneralUserByEmail(email)
 	} else {
-		return r.GetAdminUserByEmail(email)
+		return r.GetDomainUserByEmail(email)
 	}
 }
 
