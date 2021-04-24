@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
@@ -51,6 +52,11 @@ type ClubCreatePostData struct {
 
 func (h *Handler) CreateClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if err := h.checkDuplication(ctx); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
 		pd := &ClubCreatePostData{}
 
 		pageArgs, err := h.makeCreateArgs(ctx, pd)
@@ -60,12 +66,34 @@ func (h *Handler) CreateClub() gin.HandlerFunc {
 			return
 		}
 
-		if err := h.createPage(*pageArgs); err != nil {
+		if err := h.createPage(ctx, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
+}
+
+// Check duplication if general users create new page
+func (h *Handler) checkDuplication(ctx *gin.Context) error {
+	email := ctx.GetString(consts.SessionUserEmail)
+
+	if h.config.WhitelistUsers.IsGeneralUser(email) {
+		userUUID := ctx.GetString(consts.SessionUserUUID)
+		gUserModel, err := h.repo.GetGeneralUserByUUID(userUUID)
+
+		if err != nil {
+			return err
+		}
+
+		clubUUID := utils.ToNilOrString(gUserModel.ClubUUID)
+
+		if clubUUID != nil {
+			return errors.New("already have a club")
+		}
+	}
+
+	return nil
 }
 
 func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos.ClubPageCreateArgs, error) {
@@ -106,15 +134,26 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 	return pageArgs, nil
 }
 
-func (h *Handler) createPage(args repos.ClubPageCreateArgs) error {
+func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) error {
 	clubUUID, err := uuid.NewRandom()
 
 	if err != nil {
 		return err
 	}
 
-	if err := h.repo.CreatePage(clubUUID.String(), args); err != nil {
+	page, err := h.repo.CreatePage(clubUUID.String(), args)
+
+	if err != nil {
 		return err
+	}
+
+	email := ctx.GetString(consts.SessionUserEmail)
+
+	if h.config.WhitelistUsers.IsGeneralUser(email) {
+		userUUID := ctx.GetString(consts.SessionUserUUID)
+		if err := h.repo.UpdateGeneralUser(userUUID, "", page.ClubUUID); err != nil {
+			return err
+		}
 	}
 
 	return nil
