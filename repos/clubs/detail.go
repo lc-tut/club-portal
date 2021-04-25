@@ -26,6 +26,7 @@ func (r *ClubRepository) GetActivityDetail(uuid string) ([]clubs.ActivityDetail,
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&details)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -41,15 +42,18 @@ func (r *ClubRepository) GetAllRelations(uuid string) ([]clubs.DetailRelations, 
 	rows, err := r.db.Table("activity_details as ad").Select(selectQuery).Where("ad.club_uuid = ?", uuid).Joins(joinQuery1).Joins(joinQuery2).Joins(joinQuery3).Rows()
 
 	if err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
 	relations := make([]clubs.DetailRelations, 0)
+	// TODO: remove `i` because of an unused variable.
 	i := 0
 
 	for rows.Next() {
 		var relation clubs.DetailRelations
 		if err := r.db.ScanRows(rows, &relation); err != nil {
+			r.logger.Error(err.Error())
 			return nil, err
 		}
 		relations = append(relations, relation)
@@ -74,6 +78,7 @@ func (r *ClubRepository) CreateActivityDetail(uuid string, args []ActivityDetail
 	tx := r.db.Create(&adModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -93,6 +98,7 @@ func (r *ClubRepository) CreateActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 	}
 
 	if err := tx.Create(&adModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -105,6 +111,7 @@ func (r *ClubRepository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 	}
 
 	if err := tx.Where("club_uuid = ?", uuid).Delete(&clubs.ActivityDetail{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

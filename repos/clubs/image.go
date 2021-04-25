@@ -22,6 +22,7 @@ func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) 
 	tx := r.db.Where("image_id = ?", imageID).Take(image)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -30,9 +31,10 @@ func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) 
 
 func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error) {
 	image := make([]clubs.ClubImage, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(image)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&image)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -59,6 +61,7 @@ func (r *ClubRepository) CreateImage(clubUUID string, path []string) error {
 	tx := r.db.Create(&imageModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -83,11 +86,14 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []
 	}
 
 	if err := tx.Create(&imageModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update images.
 
 func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 	length := len(path)
@@ -109,6 +115,7 @@ func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 	tx := r.db.Model(&clubs.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(imageModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

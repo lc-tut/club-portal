@@ -25,6 +25,7 @@ func (r *ClubRepository) GetPlaceByID(placeID uint32) (*clubs.ClubPlace, error) 
 	tx := r.db.Where("place_id = ?", placeID).Take(place)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -33,9 +34,10 @@ func (r *ClubRepository) GetPlaceByID(placeID uint32) (*clubs.ClubPlace, error) 
 
 func (r *ClubRepository) GetPlacesByClubUUID(uuid string) ([]clubs.ClubPlace, error) {
 	places := make([]clubs.ClubPlace, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_places on activity_details.place_id = club_places.place_id").Scan(places)
+	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_places on activity_details.place_id = club_places.place_id").Scan(&places)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -56,6 +58,7 @@ func (r *ClubRepository) CreatePlace(args []ClubPlaceArgs) error {
 	tx := r.db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&placeModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -74,6 +77,7 @@ func (r *ClubRepository) CreatePlaceWithTx(tx *gorm.DB, args []ClubPlaceArgs) er
 	}
 
 	if err := tx.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&placeModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

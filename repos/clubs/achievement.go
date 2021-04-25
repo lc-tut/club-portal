@@ -22,6 +22,7 @@ func (r *ClubRepository) GetAchievementByID(achievementID uint32) (*clubs.ClubAc
 	tx := r.db.Where("achievement_id = ?", achievementID).Take(achievement)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -33,6 +34,7 @@ func (r *ClubRepository) GetAchievementsByClubUUID(uuid string) ([]clubs.ClubAch
 	tx := r.db.Where("club_uuid = ?", uuid).Find(achievement)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -59,6 +61,7 @@ func (r *ClubRepository) CreateAchievement(clubUUID string, achievements []strin
 	tx := r.db.Create(&achieveModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -83,11 +86,14 @@ func (r *ClubRepository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, a
 	}
 
 	if err := tx.Create(&achieveModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update achievements.
 
 func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []string) error {
 	length := len(achievements)
@@ -109,6 +115,7 @@ func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []strin
 	tx := r.db.Model(&clubs.ClubAchievement{}).Where("club_uuid = ?", clubUUID).Updates(achieveModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -123,6 +130,7 @@ func (r *ClubRepository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, a
 	}
 
 	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

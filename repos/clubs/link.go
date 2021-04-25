@@ -28,6 +28,7 @@ func (r *ClubRepository) GetAllLinks() ([]clubs.ClubLink, error) {
 	tx := r.db.Find(&links)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -39,6 +40,7 @@ func (r *ClubRepository) GetLinkByID(linkID uint32) (*clubs.ClubLink, error) {
 	tx := r.db.Where("link_id = ?", linkID).Take(link)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -47,9 +49,10 @@ func (r *ClubRepository) GetLinkByID(linkID uint32) (*clubs.ClubLink, error) {
 
 func (r *ClubRepository) GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, error) {
 	link := make([]clubs.ClubLink, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(link)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&link)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -71,6 +74,7 @@ func (r *ClubRepository) CreateLink(clubUUID string, args []ClubLinkArgs) error 
 	tx := r.db.Create(&links)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -90,11 +94,14 @@ func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 	}
 
 	if err := tx.Create(&links).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update links.
 
 func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 	length := len(args)
@@ -116,7 +123,8 @@ func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error 
 
 	tx := r.db.Model(&clubs.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(links)
 
-	if err := tx.Error; err == nil {
+	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -134,7 +142,7 @@ func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 		return err
 	}
 
-	if err := r.CreateLinkWithTx(tx, clubUUID, args); err == nil {
+	if err := r.CreateLinkWithTx(tx, clubUUID, args); err != nil {
 		return err
 	}
 

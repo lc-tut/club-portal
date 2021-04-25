@@ -22,6 +22,7 @@ func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) 
 	tx := r.db.Where("video_id = ?", videoID).Take(video)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -30,9 +31,10 @@ func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) 
 
 func (r *ClubRepository) GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, error) {
 	video := make([]clubs.ClubVideo, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(video)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&video)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -59,6 +61,7 @@ func (r *ClubRepository) CreateVideo(clubUUID string, path []string) error {
 	tx := r.db.Create(&videos)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -83,11 +86,14 @@ func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 	}
 
 	if err := tx.Create(&videos).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update videos.
 
 func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 	length := len(path)
@@ -108,6 +114,7 @@ func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 	tx := r.db.Model(&clubs.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(videos)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -122,6 +129,7 @@ func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 	}
 
 	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
