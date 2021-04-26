@@ -42,6 +42,7 @@ func newRedisStore(opt sessions.Options) (redis.Store, error) {
 }
 
 func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
+	logger.Debug("initializing gin engine")
 	if utils.IsProd() {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -56,6 +57,9 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 }
 
 func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logger, repo repos.IRepository) *Server {
+	logger.Debug("initializing registerRouter")
+
+	logger.Debug("initializing middleware")
 	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger)
 
 	apiGroup := engine.Group("/api")
@@ -75,6 +79,7 @@ func addRouter(routers ...IRouter) {
 }
 
 func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
+	logger.Debug("initializing server")
 	server, err := newServer(logger, db)
 
 	if err != nil {

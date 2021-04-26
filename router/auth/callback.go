@@ -10,6 +10,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/router/utils"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"net/http"
 	"strings"
@@ -17,19 +18,29 @@ import (
 
 func (h *Handler) Callback() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		defer utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
+		defer func() {
+			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
+			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
+		}()
 
 		data, err := h.checkValidState(ctx)
 
 		if err != nil || !h.config.WhitelistUsers.IsUser(data.Email) {
+			if err != nil {
+				h.logger.Error(err.Error())
+			} else {
+				h.logger.Warn("invalid user", zap.String("email", data.Email))
+			}
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
 		if err := h.createSession(ctx, data); err != nil {
+			h.logger.Warn("failed to create session")
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時にキャッシュが削除されない
+			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
+			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時に Cookie が削除されない
 			ctx.Redirect(http.StatusFound, "/")
 		}
 	}
@@ -73,6 +84,8 @@ func (h *Handler) checkValidState(ctx *gin.Context) (*jwtData, error) {
 
 	idToken := token.Extra("id_token").(string)
 
+	h.logger.Debug("get id_token from Google OAuth", zap.String("id_token", idToken))
+
 	data, err := parseJWT(idToken)
 
 	if err != nil {
@@ -98,45 +111,6 @@ func parseJWT(token string) (*jwtData, error) {
 	}
 
 	return jd, nil
-}
-
-func (h *Handler) getUserOrCreate(data *jwtData) (users.UserInfo, error) {
-	var user users.UserInfo
-	var err error
-
-	email := data.Email
-
-	if h.config.WhitelistUsers.IsAdminUser(email) {
-		user, err = h.repo.GetAdminUserByEmail(email)
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUserUUID, _err := uuid.NewRandom()
-
-			if _err != nil {
-				return nil, _err
-			}
-
-			user, err = h.repo.CreateAdminUser(newUserUUID.String(), email, data.Name)
-		}
-	} else if h.config.WhitelistUsers.IsGeneralUser(email) {
-		user, err = h.repo.GetGeneralUserByEmail(email)
-	} else {
-		user, err = h.repo.GetDomainUserByEmail(email)
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUserUUID, _err := uuid.NewRandom() // err のオーバライドを回避するために _err とする
-
-			if _err != nil {
-				return nil, _err
-			}
-
-			user, err = h.repo.CreateDomainUser(newUserUUID.String(), email, data.Name)
-		}
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }
 
 func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
@@ -168,5 +142,57 @@ func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
 		return err
 	}
 
+	h.logger.Info("created session data",
+		zap.String("session_uuid", sessionUUID.String()),
+		zap.String("user_uuid", user.GetUserID()),
+		zap.String("email", user.GetEmail()),
+		zap.String("name", user.GetName()),
+		zap.String("role", user.GetRole()),
+	)
+
 	return nil
+}
+
+func (h *Handler) getUserOrCreate(data *jwtData) (users.UserInfo, error) {
+	var user users.UserInfo
+	var err error
+
+	email := data.Email
+
+	if h.config.WhitelistUsers.IsAdminUser(email) {
+		h.logger.Info("logged in as admin user", zap.String("email", email))
+		user, err = h.repo.GetAdminUserByEmail(email)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			h.logger.Info("create admin user because of no data in db")
+			newUserUUID, _err := uuid.NewRandom()
+
+			if _err != nil {
+				return nil, _err
+			}
+
+			user, err = h.repo.CreateAdminUser(newUserUUID.String(), email, data.Name)
+		}
+	} else if h.config.WhitelistUsers.IsGeneralUser(email) {
+		h.logger.Info("logged in as general user", zap.String("email", email))
+		user, err = h.repo.GetGeneralUserByEmail(email)
+	} else {
+		h.logger.Info("logged in as domain user", zap.String("email", email))
+		user, err = h.repo.GetDomainUserByEmail(email)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			h.logger.Info("create domain user because of no data in db")
+			newUserUUID, _err := uuid.NewRandom() // err のオーバライドを回避するために _err とする
+
+			if _err != nil {
+				return nil, _err
+			}
+
+			user, err = h.repo.CreateDomainUser(newUserUUID.String(), email, data.Name)
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
