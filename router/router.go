@@ -42,6 +42,10 @@ func newRedisStore(opt sessions.Options) (redis.Store, error) {
 }
 
 func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
+	if utils.IsProd() {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	engine := gin.New()
 
 	engine.Use(middlewares.LoggerMiddleware(logger))
@@ -74,6 +78,7 @@ func NewServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 	server, err := newServer(logger, db)
 
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
