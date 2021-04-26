@@ -26,6 +26,7 @@ func (r *ClubRepository) GetTimeByID(timeID uint32) (*clubs.ClubTime, error) {
 	tx := r.db.Where("time_id = ?", timeID).Take(time)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -34,9 +35,10 @@ func (r *ClubRepository) GetTimeByID(timeID uint32) (*clubs.ClubTime, error) {
 
 func (r *ClubRepository) GetTimesByClubUUID(uuid string) ([]clubs.ClubTime, error) {
 	times := make([]clubs.ClubTime, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_times on activity_details.time_id = club_times.time_id").Scan(times)
+	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_times on activity_details.time_id = club_times.time_id").Scan(&times)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -58,6 +60,7 @@ func (r *ClubRepository) CreateTime(args []ClubTimeArgs) error {
 	tx := r.db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&timeModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -77,6 +80,7 @@ func (r *ClubRepository) CreateTimeWithTx(tx *gorm.DB, args []ClubTimeArgs) erro
 	}
 
 	if err := tx.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&timeModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

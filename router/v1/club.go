@@ -53,6 +53,7 @@ type ClubCreatePostData struct {
 func (h *Handler) CreateClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if err := h.checkDuplication(ctx); err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
@@ -62,6 +63,7 @@ func (h *Handler) CreateClub() gin.HandlerFunc {
 		pageArgs, err := h.makeCreateArgs(ctx, pd)
 
 		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
@@ -177,6 +179,7 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 		pageArgs, err := h.makeUpdateArgs(ctx, pd)
 
 		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}

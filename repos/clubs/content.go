@@ -22,6 +22,7 @@ func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, e
 	tx := r.db.Where("content_id = ?", contentID).Take(content)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -30,9 +31,10 @@ func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, e
 
 func (r *ClubRepository) GetContentsByClubUUID(uuid string) ([]clubs.ClubContent, error) {
 	content := make([]clubs.ClubContent, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(content)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&content)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -53,6 +55,7 @@ func (r *ClubRepository) CreateContent(clubUUID string, contents []string) error
 	tx := r.db.Create(&contModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -71,11 +74,14 @@ func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, conte
 	}
 
 	if err := tx.Create(&contModels).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update contents.
 
 func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error {
 	length := len(contents)
@@ -97,6 +103,7 @@ func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error
 	tx := r.db.Model(&clubs.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(contModels)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -111,6 +118,7 @@ func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, conte
 	}
 
 	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

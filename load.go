@@ -27,9 +27,9 @@ func loadConfig() error {
 
 func newZapLogger() (*zap.Logger, error) {
 	if utils.IsProd() {
-		return zap.NewProduction()
+		return newZapProdConfig()
 	} else {
-		return zap.NewDevelopment()
+		return newZapDevConfig()
 	}
 }
 

@@ -51,6 +51,7 @@ func (h *Handler) CreateGeneralUser() gin.HandlerFunc {
 		pd := &GUserCreatePostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
@@ -84,6 +85,7 @@ func (h *Handler) UpdateUser() gin.HandlerFunc {
 		pd := &UserUpdatePostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}

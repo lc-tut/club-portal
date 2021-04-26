@@ -28,6 +28,7 @@ func (r *ClubRepository) GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, 
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -51,6 +52,7 @@ func (r *ClubRepository) CreateRemark(uuid string, args []ClubRemarkArgs) error 
 	tx := r.db.Create(&remarks)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -72,6 +74,7 @@ func (r *ClubRepository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 	}
 
 	if err := tx.Create(&remarks).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -84,6 +87,7 @@ func (r *ClubRepository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 	}
 
 	if err := tx.Where("club_uuid = ?", uuid).Delete(&clubs.ClubRemark{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

@@ -29,6 +29,7 @@ func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule
 	tx := r.db.Where("schedule_id = ?", scheduleID).Take(schedule)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -37,9 +38,10 @@ func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule
 
 func (r *ClubRepository) GetSchedulesByClubUUID(uuid string) ([]clubs.ClubSchedule, error) {
 	schedule := make([]clubs.ClubSchedule, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(schedule)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&schedule)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -62,6 +64,7 @@ func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs
 	tx := r.db.Create(&schedules)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -82,11 +85,14 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 	}
 
 	if err := tx.Create(&schedules).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
+
+// FIXME: use delete -> create to update schedules.
 
 func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
 	length := len(args)
@@ -110,6 +116,7 @@ func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs
 	tx := r.db.Model(&clubs.ClubSchedule{}).Where("club_uuid = ?", clubUUID).Updates(schedules)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -124,6 +131,7 @@ func (r *ClubRepository) UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 	}
 
 	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubSchedule{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

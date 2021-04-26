@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/utils"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -19,8 +20,16 @@ func (h *Handler) Auth() gin.HandlerFunc {
 				ctx.Status(http.StatusInternalServerError)
 				return
 			}
+			h.logger.Info("session user accessed",
+				zap.String("session_uuid", s.SessionUUID),
+				zap.String("user_uuid", s.UserUUID),
+				zap.String("email", s.Email),
+				zap.String("name", s.Name),
+				zap.String("role", s.Role),
+			)
 			ctx.JSON(http.StatusOK, s)
 		} else {
+			h.logger.Warn("no session user accessed")
 			ctx.Status(http.StatusUnauthorized)
 		}
 	}

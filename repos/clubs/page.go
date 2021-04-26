@@ -58,6 +58,7 @@ func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 	tx := r.db.Where("visible is true").Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -71,6 +72,7 @@ func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternal
 	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -107,6 +109,7 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -268,6 +271,7 @@ func (r *ClubRepository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpda
 	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -282,6 +286,7 @@ func (r *ClubRepository) DeletePageByClubUUID(uuid string) error {
 	tx := r.db.Model(&clubs.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
@@ -292,6 +297,7 @@ func (r *ClubRepository) DeletePageByClubSlug(slug string) error {
 	tx := r.db.Model(&clubs.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
 
 	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 

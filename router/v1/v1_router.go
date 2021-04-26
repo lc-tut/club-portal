@@ -31,6 +31,7 @@ type Router struct {
 }
 
 func (r *Router) AddRouter() {
+	r.logger.Debug("initializing v1 router")
 	h := newHandler(r.config, r.logger, r.repo)
 
 	v1Group := r.rg.Group("/v1")
