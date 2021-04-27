@@ -81,8 +81,6 @@ func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, conte
 	return nil
 }
 
-// FIXME: use delete -> create to update contents.
-
 func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error {
 	length := len(contents)
 
@@ -90,20 +88,14 @@ func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error
 		return nil
 	}
 
-	contModels := make([]clubs.ClubContent, length)
-
-	for i, c := range contents {
-		cont := clubs.ClubContent{
-			ClubUUID: clubUUID,
-			Content:  c,
-		}
-		contModels[i] = cont
-	}
-
-	tx := r.db.Model(&clubs.ClubContent{}).Where("club_uuid = ?", clubUUID).Updates(contModels)
+	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
+		return err
+	}
+
+	if err := r.CreateContent(clubUUID, contents); err != nil {
 		return err
 	}
 

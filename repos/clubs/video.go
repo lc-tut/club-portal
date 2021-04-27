@@ -93,8 +93,6 @@ func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 	return nil
 }
 
-// FIXME: use delete -> create to update videos.
-
 func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 	length := len(path)
 
@@ -102,19 +100,14 @@ func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 		return nil
 	}
 
-	videos := make([]clubs.ClubVideo, length)
-
-	for i, p := range path {
-		video := clubs.ClubVideo{
-			ClubUUID: clubUUID,
-			Path:     p,
-		}
-		videos[i] = video
-	}
-	tx := r.db.Model(&clubs.ClubVideo{}).Where("club_uuid = ?", clubUUID).Updates(videos)
+	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubVideo{})
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
+		return err
+	}
+
+	if err := r.CreateVideo(clubUUID, path); err != nil {
 		return err
 	}
 

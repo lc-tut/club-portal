@@ -47,8 +47,6 @@ func (r *ClubRepository) GetAllRelations(uuid string) ([]clubs.DetailRelations, 
 	}
 
 	relations := make([]clubs.DetailRelations, 0)
-	// TODO: remove `i` because of an unused variable.
-	i := 0
 
 	for rows.Next() {
 		var relation clubs.DetailRelations
@@ -57,7 +55,6 @@ func (r *ClubRepository) GetAllRelations(uuid string) ([]clubs.DetailRelations, 
 			return nil, err
 		}
 		relations = append(relations, relation)
-		i++
 	}
 
 	return relations, nil
