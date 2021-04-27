@@ -92,8 +92,6 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 	return nil
 }
 
-// FIXME: use delete -> create to update schedules.
-
 func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
 	length := len(args)
 
@@ -101,22 +99,14 @@ func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs
 		return nil
 	}
 
-	schedules := make([]clubs.ClubSchedule, length)
-
-	for i, arg := range args {
-		sch := clubs.ClubSchedule{
-			ClubUUID: clubUUID,
-			Month:    arg.Month,
-			Schedule: arg.Schedule,
-			Remarks:  utils.ToNullString(arg.Remarks),
-		}
-		schedules[i] = sch
-	}
-
-	tx := r.db.Model(&clubs.ClubSchedule{}).Where("club_uuid = ?", clubUUID).Updates(schedules)
+	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubSchedule{})
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
+		return err
+	}
+
+	if err := r.CreateSchedule(clubUUID, args); err != nil {
 		return err
 	}
 

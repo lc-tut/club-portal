@@ -101,8 +101,6 @@ func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 	return nil
 }
 
-// FIXME: use delete -> create to update links.
-
 func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
 	length := len(args)
 
@@ -110,21 +108,14 @@ func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error 
 		return nil
 	}
 
-	links := make([]clubs.ClubLink, length)
-
-	for i, arg := range args {
-		link := clubs.ClubLink{
-			ClubUUID: clubUUID,
-			Label:    arg.Label,
-			URL:      arg.URL,
-		}
-		links[i] = link
-	}
-
-	tx := r.db.Model(&clubs.ClubLink{}).Where("club_uuid = ?", clubUUID).Updates(links)
+	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubLink{})
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
+		return err
+	}
+
+	if err := r.CreateLink(clubUUID, args); err != nil {
 		return err
 	}
 

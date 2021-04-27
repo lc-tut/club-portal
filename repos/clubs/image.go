@@ -93,8 +93,6 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []
 	return nil
 }
 
-// FIXME: use delete -> create to update images.
-
 func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 	length := len(path)
 
@@ -102,20 +100,14 @@ func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 		return nil
 	}
 
-	imageModels := make([]clubs.ClubImage, length)
-
-	for i, p := range path {
-		image := clubs.ClubImage{
-			ClubUUID: clubUUID,
-			Path:     p,
-		}
-		imageModels[i] = image
-	}
-
-	tx := r.db.Model(&clubs.ClubImage{}).Where("club_uuid = ?", clubUUID).Updates(imageModels)
+	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{})
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
+		return err
+	}
+
+	if err := r.CreateImage(clubUUID, path); err != nil {
 		return err
 	}
 
