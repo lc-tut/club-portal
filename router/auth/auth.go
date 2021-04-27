@@ -29,8 +29,8 @@ func (h *Handler) Auth() gin.HandlerFunc {
 			)
 			ctx.JSON(http.StatusOK, s)
 		} else {
-			h.logger.Warn("no session user accessed")
-			ctx.Status(http.StatusUnauthorized)
+			h.logger.Info("no session user accessed")
+			ctx.JSON(http.StatusOK, nil)
 		}
 	}
 }
