@@ -51,6 +51,10 @@ func (r *Router) AddRouter() {
 			clubGroup.PUT("/:clubslug", r.middleware.CheckSession(), r.middleware.SetClubIDKey(), r.middleware.OverGeneralOnly(), h.UpdateClub())
 			clubGroup.DELETE("/:clubslug", r.middleware.CheckSession(), r.middleware.SetClubIDKey(), r.middleware.AdminOnly(), h.DeleteClub())
 		}
+		uploadGroup := v1Group.Group("/upload", r.middleware.CheckSession())
+		{
+			uploadGroup.POST("/image", h.UploadImage())
+		}
 	}
 }
 

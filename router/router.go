@@ -53,6 +53,8 @@ func newGinEngine(logger *zap.Logger, ss redis.Store) *gin.Engine {
 	engine.Use(ginzap.RecoveryWithZap(logger, !utils.IsProd()))
 	engine.Use(sessions.Sessions(consts.SessionCookieName, ss))
 
+	engine.MaxMultipartMemory = consts.UploadSize
+
 	return engine
 }
 
