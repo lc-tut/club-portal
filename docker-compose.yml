@@ -31,6 +31,7 @@ services:
     volumes:
       - ./cfg/mariadb/conf:/etc/mysql/conf.d
       - ./cfg/mariadb/sql:/docker-entrypoint-initdb.d
+      - ./images:/root/images
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_pass
       MYSQL_DATABASE: club_portal

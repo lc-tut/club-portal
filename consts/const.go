@@ -52,3 +52,5 @@ const (
 func (ut UserType) ToPrimitive() string {
 	return string(ut)
 }
+
+const UploadSize = 2 << 18 // 2MiB
