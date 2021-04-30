@@ -5,8 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
+	"image"
+	"mime/multipart"
 	"net/http"
 	"path/filepath"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 )
 
 func (h *Handler) UploadImage() gin.HandlerFunc {
@@ -20,10 +26,16 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 
 		files := form.File["images"]
 
+		if err := h.checkImage(files); err != nil {
+			h.logger.Error(err.Error())
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
 		var isError bool
 
-		for _, image := range files {
-			filename := filepath.Base(image.Filename)
+		for _, f := range files {
+			filename := filepath.Base(f.Filename)
 			h.logger.Info("uploaded image", zap.String("filename", filename))
 			newFn, err := utils.GenerateFileName(filename)
 
@@ -33,7 +45,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 				break
 			}
 
-			if err := ctx.SaveUploadedFile(image, fmt.Sprintf("images/%s", newFn)); err != nil {
+			if err := ctx.SaveUploadedFile(f, fmt.Sprintf("images/%s", newFn)); err != nil {
 				h.logger.Error(err.Error())
 				isError = true
 				break
@@ -46,4 +58,26 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 			ctx.Status(http.StatusCreated)
 		}
 	}
+}
+
+func (h *Handler) checkImage(files []*multipart.FileHeader) error {
+	for _, f := range files {
+		im, err := f.Open()
+
+		if err != nil {
+			return err
+		}
+
+		_, _, err = image.Decode(im)
+
+		if err != nil {
+			return err
+		}
+
+		if err := im.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
