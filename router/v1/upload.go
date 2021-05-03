@@ -3,11 +3,13 @@ package v1
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"image"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	_ "image/gif"
@@ -34,6 +36,8 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 
 		var isError bool
 
+		userUUID := ctx.GetString(consts.SessionUserName)
+
 		for _, f := range files {
 			filename := filepath.Base(f.Filename)
 			h.logger.Info("uploaded image", zap.String("filename", filename))
@@ -45,8 +49,16 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 				break
 			}
 
-			if err := ctx.SaveUploadedFile(f, fmt.Sprintf("images/%s", newFn)); err != nil {
+			dst := fmt.Sprintf("images/%s", newFn)
+
+			if err := ctx.SaveUploadedFile(f, dst); err != nil {
 				h.logger.Error(err.Error())
+				isError = true
+				break
+			}
+
+			if err := h.repo.CreateUploadedImage(userUUID, dst); err != nil {
+				_ = h.deleteImage(dst)
 				isError = true
 				break
 			}
@@ -77,6 +89,15 @@ func (h *Handler) checkImage(files []*multipart.FileHeader) error {
 		if err := im.Close(); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (h *Handler) deleteImage(file string) error {
+	if err := os.Remove(file); err != nil {
+		h.logger.Error(err.Error())
+		return err
 	}
 
 	return nil
