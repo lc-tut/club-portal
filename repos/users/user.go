@@ -4,6 +4,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
+	"gorm.io/gorm"
 )
 
 type UpdateUserArgs struct {
@@ -151,6 +152,19 @@ func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (user
 	}
 }
 
+func (r *UserRepository) createUser(tx *gorm.DB, uuid string) error {
+	user := &users.User{
+		UserUUID: uuid,
+	}
+
+	if err := tx.Create(user).Error; err != nil {
+		r.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (r *UserRepository) CreateDomainUser(uuid string, email string, name string) (*users.DomainUser, error) {
 	user := &users.DomainUser{
 		UserUUID: uuid,
@@ -158,10 +172,20 @@ func (r *UserRepository) CreateDomainUser(uuid string, email string, name string
 		Name:     name,
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -176,10 +200,20 @@ func (r *UserRepository) CreateGeneralUser(uuid string, email string, name strin
 		ClubUUID: utils.ToNullString(""),
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -193,10 +227,20 @@ func (r *UserRepository) CreateAdminUser(uuid string, email string, name string)
 		Name:     name,
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 

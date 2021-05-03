@@ -28,7 +28,8 @@ create table if not exists `club_images` (
     `club_uuid` char(36) not null,
     `path` text not null,
     unique (`path`) using hash,
-    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict,
+    foreign key (`image_id`, `path`) references `uploaded_images` (`image_id`, `path`) on delete restrict on update cascade
 );
 
 create table if not exists `club_videos` (
@@ -90,11 +91,16 @@ create table if not exists `club_remarks` (
     foreign key (`place_id`) references `activity_details` (`place_id`) on delete cascade on update restrict
 );
 
+create table if not exists `users` (
+    `user_uuid` char(36) not null primary key
+);
+
 create table if not exists `domain_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
     `name` varchar(32) not null,
-    unique (`email`, `name`)
+    unique (`email`, `name`),
+    foreign key (`user_uuid`) references `users` (`user_uuid`) on delete cascade on update restrict
 );
 
 create table if not exists `general_users` (
@@ -103,6 +109,7 @@ create table if not exists `general_users` (
     `name` varchar(32) not null,
     `club_uuid` char(36),
     unique (`email`, `name`),
+    foreign key (`user_uuid`) references `users` (`user_uuid`) on delete cascade on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete set null on update restrict
 );
 
@@ -110,5 +117,21 @@ create table if not exists `admin_users` (
     `user_uuid` char(36) not null primary key,
     `email` varchar(255) not null,
     `name` varchar(32) not null,
-    unique (`email`, `name`)
-)
+    unique (`email`, `name`),
+    foreign key (`user_uuid`) references `users` (`user_uuid`) on delete cascade on update restrict
+);
+
+create table if not exists `uploaded_images` (
+    `image_id` int unsigned not null primary key auto_increment,
+    `path` varchar(255) not null,
+    `owner` char(36) not null,
+    `created_at` datetime not null,
+    foreign key (`owner`) references `users` (`user_uuid`) on delete cascade on update restrict
+);
+
+create table if not exists `favorite_clubs` (
+    `user_uuid` char(36) not null primary key,
+    `club_uuid` char(36) not null primary key,
+    foreign key (`user_uuid`) references `users` (`user_uuid`) on delete cascade on update restrict,
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
+);

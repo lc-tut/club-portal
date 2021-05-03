@@ -1,6 +1,8 @@
 package users
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type UserInfo interface {
 	GetUserID() string
@@ -10,10 +12,19 @@ type UserInfo interface {
 	ToUserResponse() *UserResponse
 }
 
+type User struct {
+	UserUUID       string          `gorm:"type:char(36);not null;primaryKey"`
+	AdminUsers     []AdminUser     `gorm:"foreignKey:UserUUID;references:UserUUID"`
+	GeneralUsers   []GeneralUser   `gorm:"foreignKey:UserUUID;references:UserUUID"`
+	DomainUsers    []DomainUser    `gorm:"foreignKey:UserUUID;references:UserUUID"`
+	UploadedImages []UploadedImage `gorm:"foreignKey:UserUUID;references:UserUUID"`
+}
+
 type DomainUser struct {
-	UserUUID string `gorm:"type:char(36);not null;primaryKey"`
-	Email    string `gorm:"type:varchar(255);not null;unique"`
-	Name     string `gorm:"type:varchar(32);not null;unique"`
+	UserUUID  string         `gorm:"type:char(36);not null;primaryKey"`
+	Email     string         `gorm:"type:varchar(255);not null;unique"`
+	Name      string         `gorm:"type:varchar(32);not null;unique"`
+	Favorites []FavoriteClub `gorm:"foreignKey:UserUUID;references:UserUUID"`
 }
 
 func (u *DomainUser) GetUserID() string {
