@@ -53,7 +53,13 @@ func (r *Router) AddRouter() {
 		}
 		uploadGroup := v1Group.Group("/upload", r.middleware.CheckSession())
 		{
-			uploadGroup.POST("/image", h.UploadImage())
+			imageGroup := uploadGroup.Group("/images")
+			{
+				imageGroup.GET("/", h.GetImages())
+				imageGroup.POST("/", h.UploadImage())
+				imageGroup.GET("/:imageid", r.middleware.SetImageIDKey(), h.GetSpecificImage())
+				imageGroup.DELETE("/:imageid", r.middleware.SetImageIDKey(), h.DeleteImage())
+			}
 		}
 	}
 }

@@ -23,3 +23,12 @@ func (mw *Middleware) SetUserUUIDKey() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func (mw *Middleware) SetImageIDKey() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		v := ctx.Param("imageid")
+		ctx.Set(consts.ImageIDKeyName, v)
+		mw.logger.Debug("set imageid value to context", zap.String("image_id", v))
+		ctx.Next()
+	}
+}

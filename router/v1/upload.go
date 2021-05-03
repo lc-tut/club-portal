@@ -1,11 +1,13 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"image"
 	"mime/multipart"
 	"net/http"
@@ -16,6 +18,20 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 )
+
+func (h *Handler) GetImages() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userUUID := ctx.GetString(consts.SessionUserUUID)
+
+		im, err := h.repo.GetImagesByUserUUID(userUUID)
+
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusOK, im)
+		}
+	}
+}
 
 func (h *Handler) UploadImage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -58,7 +74,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 			}
 
 			if err := h.repo.CreateUploadedImage(userUUID, dst); err != nil {
-				_ = h.deleteImage(dst)
+				_ = h.deleteSavedImage(dst)
 				isError = true
 				break
 			}
@@ -94,11 +110,54 @@ func (h *Handler) checkImage(files []*multipart.FileHeader) error {
 	return nil
 }
 
-func (h *Handler) deleteImage(file string) error {
+func (h *Handler) deleteSavedImage(file string) error {
 	if err := os.Remove(file); err != nil {
 		h.logger.Error(err.Error())
 		return err
 	}
 
 	return nil
+}
+
+func (h *Handler) GetSpecificImage() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		imageID := ctx.GetUint(consts.ImageIDKeyName)
+
+		im, err := h.repo.GetUploadedImageByID(uint32(imageID))
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.Status(http.StatusBadRequest)
+		} else if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusOK, im)
+		}
+	}
+}
+
+func (h *Handler) DeleteImage() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		imageID := ctx.GetUint(consts.ImageIDKeyName)
+
+		im, err := h.repo.GetUploadedImageByID(uint32(imageID))
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.Status(http.StatusBadRequest)
+			return
+		} else if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return
+		}
+
+		if err := h.repo.DeleteImageByID(uint32(imageID)); err != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return
+		}
+
+		if err := h.deleteSavedImage(im.Path); err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.Status(http.StatusOK)
+		}
+	}
 }

@@ -14,6 +14,7 @@ const (
 	SessionUserRole     = "sess_user_role"
 	ClubSlugKeyName     = "club_slug_key"
 	UserUUIDKeyName     = "user_uuid_key"
+	ImageIDKeyName      = "image_id_key"
 )
 
 // CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)
