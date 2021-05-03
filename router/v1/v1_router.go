@@ -40,8 +40,14 @@ func (r *Router) AddRouter() {
 		{
 			userGroup.GET("/", h.GetUser())
 			userGroup.POST("/", r.middleware.AdminOnly(), h.CreateGeneralUser())
-			userGroup.GET("/:uuid", r.middleware.SetUserUUIDKey(), r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
-			userGroup.PUT("/:uuid", r.middleware.SetUserUUIDKey(), r.middleware.OverGeneralOnly(), h.UpdateUser())
+			personalGroup := userGroup.Group("/:uuid", r.middleware.SetUserUUIDKey())
+			{
+				personalGroup.GET("/", r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
+				personalGroup.PUT("/", r.middleware.OverGeneralOnly(), h.UpdateUser())
+				personalGroup.GET("/favs", r.middleware.PersonalOrAdminOnly(), h.GetFavoriteClubs())
+				personalGroup.POST("/favs", r.middleware.PersonalOrAdminOnly(), h.CreateFavoriteClub())
+				personalGroup.POST("/unfav", r.middleware.PersonalOrAdminOnly(), h.UnFavoriteClub())
+			}
 		}
 		clubGroup := v1Group.Group("/clubs")
 		{
