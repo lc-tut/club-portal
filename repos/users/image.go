@@ -28,7 +28,7 @@ func (r *UserRepository) GetUploadedImageByID(imageID uint32) (*users.UploadedIm
 
 func (r *UserRepository) GetImagesByUserUUID(userUUID string) ([]users.UploadedImage, error) {
 	images := make([]users.UploadedImage, 0)
-	tx := r.db.Where("user_uuid = ?", userUUID).Find(&images)
+	tx := r.db.Where("owner = ?", userUUID).Find(&images)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
