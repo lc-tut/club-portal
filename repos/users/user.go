@@ -197,7 +197,7 @@ func (r *UserRepository) CreateGeneralUser(uuid string, email string, name strin
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
-		ClubUUID: utils.ToNullString(""),
+		ClubUUID: utils.StringToNullString(""),
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -265,7 +265,7 @@ func (r *UserRepository) UpdateDomainUser(uuid string, name string) error {
 func (r *UserRepository) UpdateGeneralUser(uuid string, name string, clubUUID string) error {
 	user := users.GeneralUser{
 		Name:     name,
-		ClubUUID: utils.ToNullString(clubUUID),
+		ClubUUID: utils.StringToNullString(clubUUID),
 	}
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
@@ -304,7 +304,7 @@ func (r *UserRepository) UpdateUserFromRole(uuid string, role string, args Updat
 	if userType == consts.AdminUser {
 		err = r.UpdateAdminUser(uuid, args.Name)
 	} else if userType == consts.GeneralUser {
-		err = r.UpdateGeneralUser(uuid, args.Name, utils.NilToEmptyString(args.ClubUUID))
+		err = r.UpdateGeneralUser(uuid, args.Name, utils.StringPToString(args.ClubUUID))
 	} else {
 		err = r.UpdateDomainUser(uuid, args.Name)
 	}

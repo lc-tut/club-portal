@@ -6,7 +6,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 )
 
-func ToNullString(s string) sql.NullString {
+func StringToNullString(s string) sql.NullString {
 	var ns sql.NullString
 
 	if s == "" {
@@ -24,7 +24,7 @@ func ToNullString(s string) sql.NullString {
 	return ns
 }
 
-func NilToEmptyString(s *string) string {
+func StringPToString(s *string) string {
 	if s == nil {
 		return ""
 	} else {
@@ -32,7 +32,7 @@ func NilToEmptyString(s *string) string {
 	}
 }
 
-func ToNilOrString(s sql.NullString) *string {
+func NullStringToStringP(s sql.NullString) *string {
 	if s.Valid {
 		return &s.String
 	} else {

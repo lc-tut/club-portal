@@ -126,7 +126,7 @@ func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
 		return err
 	}
 
-	sessionData := utils.NewSessionData(sessionUUID.String(), user.GetUserID(), user.GetEmail(), user.GetName(), user.GetRole())
+	sessionData := utils.NewSessionData(sessionUUID.String(), user.GetUserID(), user.GetEmail(), user.GetName(), user.GetRole().ToPrimitive())
 
 	b, err := json.Marshal(sessionData)
 
@@ -147,7 +147,7 @@ func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
 		zap.String("user_uuid", user.GetUserID()),
 		zap.String("email", user.GetEmail()),
 		zap.String("name", user.GetName()),
-		zap.String("role", user.GetRole()),
+		zap.String("role", user.GetRole().ToPrimitive()),
 	)
 
 	return nil

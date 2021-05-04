@@ -56,7 +56,7 @@ func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.ToNullString(arg.Remarks),
+			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}
@@ -79,7 +79,7 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.ToNullString(arg.Remarks),
+			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}

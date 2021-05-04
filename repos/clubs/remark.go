@@ -43,8 +43,8 @@ func (r *ClubRepository) CreateRemark(uuid string, args []ClubRemarkArgs) error 
 			ClubUUID:    uuid,
 			TimeID:      arg.TimeID,
 			PlaceID:     arg.PlaceID,
-			TimeRemark:  utils.ToNullString(arg.TimeRemarks),
-			PlaceRemark: utils.ToNullString(arg.PlaceRemarks),
+			TimeRemark:  utils.StringToNullString(arg.TimeRemarks),
+			PlaceRemark: utils.StringToNullString(arg.PlaceRemarks),
 		}
 		remarks[i] = remark
 	}
@@ -67,8 +67,8 @@ func (r *ClubRepository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 			ClubUUID:    uuid,
 			TimeID:      arg.TimeID,
 			PlaceID:     arg.PlaceID,
-			TimeRemark:  utils.ToNullString(arg.TimeRemarks),
-			PlaceRemark: utils.ToNullString(arg.PlaceRemarks),
+			TimeRemark:  utils.StringToNullString(arg.TimeRemarks),
+			PlaceRemark: utils.StringToNullString(arg.PlaceRemarks),
 		}
 		remarks[i] = remark
 	}

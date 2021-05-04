@@ -2,13 +2,14 @@ package users
 
 import (
 	"database/sql"
+	"github.com/lc-tut/club-portal/consts"
 )
 
 type UserInfo interface {
 	GetUserID() string
 	GetEmail() string
 	GetName() string
-	GetRole() string
+	GetRole() consts.UserType
 	ToUserResponse() *UserResponse
 }
 
@@ -42,8 +43,8 @@ func (u *DomainUser) GetName() string {
 	return name
 }
 
-func (u *DomainUser) GetRole() string {
-	role := "domain"
+func (u *DomainUser) GetRole() consts.UserType {
+	role := consts.DomainUser
 	return role
 }
 
@@ -52,7 +53,7 @@ func (u *DomainUser) ToUserResponse() *UserResponse {
 		UserUUID: u.UserUUID,
 		Email:    u.Email,
 		Name:     u.Name,
-		Role:     u.GetRole(),
+		Role:     u.GetRole().ToPrimitive(),
 	}
 
 	return res
@@ -80,8 +81,8 @@ func (u *GeneralUser) GetName() string {
 	return name
 }
 
-func (u *GeneralUser) GetRole() string {
-	role := "general"
+func (u *GeneralUser) GetRole() consts.UserType {
+	role := consts.GeneralUser
 	return role
 }
 
@@ -90,7 +91,7 @@ func (u *GeneralUser) ToUserResponse() *UserResponse {
 		UserUUID: u.UserUUID,
 		Email:    u.Email,
 		Name:     u.Name,
-		Role:     u.GetRole(),
+		Role:     u.GetRole().ToPrimitive(),
 	}
 
 	return res
@@ -117,8 +118,8 @@ func (u *AdminUser) GetName() string {
 	return name
 }
 
-func (u *AdminUser) GetRole() string {
-	role := "admin"
+func (u *AdminUser) GetRole() consts.UserType {
+	role := consts.AdminUser
 	return role
 }
 
@@ -127,7 +128,7 @@ func (u *AdminUser) ToUserResponse() *UserResponse {
 		UserUUID: u.UserUUID,
 		Email:    u.Email,
 		Name:     u.Name,
-		Role:     u.GetRole(),
+		Role:     u.GetRole().ToPrimitive(),
 	}
 
 	return res

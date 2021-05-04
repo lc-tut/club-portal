@@ -24,7 +24,7 @@ func (p Places) ToPlaceResponse(remarks []ClubRemark) []PlaceResponse {
 	for i, place := range p {
 		placeRes := PlaceResponse{
 			Place:   place.Place,
-			Remarks: utils.ToNilOrString(remarks[i].PlaceRemark),
+			Remarks: utils.NullStringToStringP(remarks[i].PlaceRemark),
 		}
 		res[i] = placeRes
 	}

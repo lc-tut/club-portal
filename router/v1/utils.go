@@ -37,7 +37,7 @@ func validateToScheduleArgs(models []models.ScheduleRequest) []repos.ClubSchedul
 		schedule := repos.ClubScheduleArgs{
 			Month:    m.Month,
 			Schedule: m.Schedule,
-			Remarks:  utils.NilToEmptyString(m.Remarks),
+			Remarks:  utils.StringPToString(m.Remarks),
 		}
 		schedules[i] = schedule
 	}
@@ -115,8 +115,8 @@ func validateToRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubRem
 		remark := repos.ClubRemarkArgs{
 			TimeID:       m.TimeID,
 			PlaceID:      m.PlaceID,
-			TimeRemarks:  utils.NilToEmptyString(m.TimeRemark),
-			PlaceRemarks: utils.NilToEmptyString(m.PlaceRemark),
+			TimeRemarks:  utils.StringPToString(m.TimeRemark),
+			PlaceRemarks: utils.StringPToString(m.PlaceRemark),
 		}
 		remarks[i] = remark
 	}

@@ -88,7 +88,7 @@ func (h *Handler) checkDuplication(ctx *gin.Context) error {
 			return err
 		}
 
-		clubUUID := utils.ToNilOrString(gUserModel.ClubUUID)
+		clubUUID := utils.NullStringToStringP(gUserModel.ClubUUID)
 
 		if clubUUID != nil {
 			return errors.New("already have a club")
