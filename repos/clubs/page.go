@@ -17,7 +17,7 @@ type ClubPageCreateArgs struct {
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
 	Achievements    []string
-	Images          []string
+	Images          []ClubImageArgs
 	Videos          []string
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs
@@ -31,7 +31,7 @@ type ClubPageUpdateArgs struct {
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
 	Achievements    []string
-	Images          []string
+	Images          []ClubImageArgs
 	Videos          []string
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs

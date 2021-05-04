@@ -12,7 +12,10 @@ func (im Images) ToImageResponse() []ImageResponse {
 	res := make([]ImageResponse, len(im))
 
 	for i, image := range im {
-		imageRes := ImageResponse{Path: image.Path}
+		imageRes := ImageResponse{
+			ImageID: image.ImageID,
+			Path:    image.Path,
+		}
 		res[i] = imageRes
 	}
 
@@ -20,9 +23,11 @@ func (im Images) ToImageResponse() []ImageResponse {
 }
 
 type ImageRequest struct {
-	Path string `json:"path"`
+	ImageID uint32 `json:"image_id"`
+	Path    string `json:"path"`
 }
 
 type ImageResponse struct {
-	Path string `json:"path"`
+	ImageID uint32 `json:"image_id"`
+	Path    string `json:"path"`
 }
