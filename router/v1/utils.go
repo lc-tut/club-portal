@@ -55,11 +55,15 @@ func validateToAchievementArgs(models []models.AchievementRequest) []string {
 	return achieves
 }
 
-func validateToImageArgs(models []models.ImageRequest) []string {
-	images := make([]string, len(models))
+func validateToImageArgs(models []models.ImageRequest) []repos.ClubImageArgs {
+	images := make([]repos.ClubImageArgs, len(models))
 
 	for i, m := range models {
-		images[i] = m.Path
+		arg := repos.ClubImageArgs{
+			ImageID: m.ImageID,
+			Path:    m.Path,
+		}
+		images[i] = arg
 	}
 
 	return images
