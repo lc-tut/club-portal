@@ -41,7 +41,7 @@ func (h *Handler) Callback() gin.HandlerFunc {
 		} else {
 			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
 			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時に Cookie が削除されない
-			ctx.Redirect(http.StatusFound, "/")
+			ctx.Redirect(http.StatusFound, "/")                // TODO: Redirect to Frontend
 		}
 	}
 }
