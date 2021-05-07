@@ -40,8 +40,8 @@ func (r *UserRepository) GetImagesByUserUUID(userUUID string) ([]users.UploadedI
 
 func (r *UserRepository) CreateUploadedImage(userUUID string, path string) error {
 	image := &users.UploadedImage{
-		UserUUID: userUUID,
-		Path:     path,
+		Owner: userUUID,
+		Path:  path,
 	}
 	tx := r.db.Create(image)
 

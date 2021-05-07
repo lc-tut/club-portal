@@ -121,7 +121,7 @@ func (h *Handler) deleteSavedImage(file string) error {
 
 func (h *Handler) GetSpecificImage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		imageID := ctx.GetUint(consts.ImageIDKeyName)
+		imageID := ctx.GetUint64(consts.ImageIDKeyName)
 
 		im, err := h.repo.GetUploadedImageByID(uint32(imageID))
 
