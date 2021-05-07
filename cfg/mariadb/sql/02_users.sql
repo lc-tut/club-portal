@@ -34,8 +34,9 @@ create table if not exists `favorite_clubs` (
 
 create table if not exists `uploaded_images` (
     `image_id` int unsigned not null primary key auto_increment,
-    `path` varchar(255) not null unique,
+    `path` varchar(255) not null,
     `owner` char(36) not null,
     `created_at` datetime not null,
+    unique (`path`) using hash,
     foreign key (`owner`) references `users` (`user_uuid`) on delete cascade on update restrict
 );

@@ -5,26 +5,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type ClubImageArgs struct {
-	ImageID uint32
-	Path    string
-}
-
 type ClubImageRepo interface {
 	GetImageByID(imageID uint32) (*clubs.ClubImage, error)
 
 	GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error)
 
-	CreateImage(clubUUID string, args []ClubImageArgs) error
-	CreateImageWithTx(tx *gorm.DB, clubUUID string, args []ClubImageArgs) error
+	CreateImage(clubUUID string, imageIDs []uint32) error
+	CreateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error
 
-	UpdateImage(clubUUID string, args []ClubImageArgs) error
-	UpdateImageWithTx(tx *gorm.DB, clubUUID string, args []ClubImageArgs) error
+	UpdateImage(clubUUID string, imageIDs []uint32) error
+	UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error
 }
 
 func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) {
 	image := &clubs.ClubImage{}
-	tx := r.db.Where("image_id = ?", imageID).Take(image)
+	selectQuery := "ci.image_id, ci.club_uuid, ui.path"
+	joinQuery := "inner join uploaded_images as ui using (image_id)"
+	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("image_id = ?", imageID).Find(image)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -36,7 +33,9 @@ func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) 
 
 func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error) {
 	image := make([]clubs.ClubImage, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(&image)
+	selectQuery := "ci.image_id, ci.club_uuid, ui.path"
+	joinQuery := "inner join uploaded_images as ui using (image_id)"
+	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("club_uuid = ?", uuid).Find(&image)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -46,8 +45,8 @@ func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, er
 	return image, nil
 }
 
-func (r *ClubRepository) CreateImage(clubUUID string, args []ClubImageArgs) error {
-	length := len(args)
+func (r *ClubRepository) CreateImage(clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -55,11 +54,10 @@ func (r *ClubRepository) CreateImage(clubUUID string, args []ClubImageArgs) erro
 
 	imageModels := make([]clubs.ClubImage, length)
 
-	for i, arg := range args {
+	for i, imID := range imageIDs {
 		image := clubs.ClubImage{
-			ImageID:  arg.ImageID,
+			ImageID:  imID,
 			ClubUUID: clubUUID,
-			Path:     arg.Path,
 		}
 		imageModels[i] = image
 	}
@@ -74,8 +72,8 @@ func (r *ClubRepository) CreateImage(clubUUID string, args []ClubImageArgs) erro
 	return nil
 }
 
-func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, args []ClubImageArgs) error {
-	length := len(args)
+func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -83,11 +81,10 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, args []
 
 	imageModels := make([]clubs.ClubImage, length)
 
-	for i, arg := range args {
+	for i, imID := range imageIDs {
 		image := clubs.ClubImage{
-			ImageID:  arg.ImageID,
+			ImageID:  imID,
 			ClubUUID: clubUUID,
-			Path:     arg.Path,
 		}
 		imageModels[i] = image
 	}
@@ -100,8 +97,8 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, args []
 	return nil
 }
 
-func (r *ClubRepository) UpdateImage(clubUUID string, args []ClubImageArgs) error {
-	length := len(args)
+func (r *ClubRepository) UpdateImage(clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -114,15 +111,15 @@ func (r *ClubRepository) UpdateImage(clubUUID string, args []ClubImageArgs) erro
 		return err
 	}
 
-	if err := r.CreateImage(clubUUID, args); err != nil {
+	if err := r.CreateImage(clubUUID, imageIDs); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, args []ClubImageArgs) error {
-	length := len(args)
+func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -133,7 +130,7 @@ func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, args []
 		return err
 	}
 
-	if err := r.CreateImageWithTx(tx, clubUUID, args); err != nil {
+	if err := r.CreateImageWithTx(tx, clubUUID, imageIDs); err != nil {
 		return err
 	}
 
