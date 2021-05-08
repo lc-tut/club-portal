@@ -76,3 +76,11 @@ create table if not exists `club_remarks` (
     foreign key (`time_id`) references `activity_details` (`time_id`) on delete cascade on update restrict,
     foreign key (`place_id`) references `activity_details` (`place_id`) on delete cascade on update restrict
 );
+
+create table if not exists `club_thumbnails` (
+    `thumbnail_id` int unsigned not null primary key auto_increment,
+    `club_uuid` char(36) not null,
+    `path` varchar(255) not null,
+    unique (`path`) using hash,
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
+)
