@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (mw *Middleware) SetClubSlugKey() gin.HandlerFunc {
+func (mw *Middleware) SetClubIDKey() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		v := ctx.Param("clubslug")
 		ctx.Set(consts.ClubSlugKeyName, v)
@@ -19,9 +19,9 @@ func (mw *Middleware) SetClubSlugKey() gin.HandlerFunc {
 
 func (mw *Middleware) SetUserUUIDKey() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		v := ctx.Param("useruuid")
+		v := ctx.Param("uuid")
 		ctx.Set(consts.UserUUIDKeyName, v)
-		mw.logger.Debug("set user uuid value to context", zap.String("user_uuid", v))
+		mw.logger.Debug("set uuid value to context", zap.String("user_uuid", v))
 		ctx.Next()
 	}
 }
@@ -38,15 +38,6 @@ func (mw *Middleware) SetImageIDKey() gin.HandlerFunc {
 
 		ctx.Set(consts.ImageIDKeyName, u)
 		mw.logger.Debug("set imageid value to context", zap.Uint64("image_id", u))
-		ctx.Next()
-	}
-}
-
-func (mw *Middleware) SetClubUUIDKey() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		v := ctx.Param("clubuuid")
-		ctx.Set(consts.ClubUUIDKeyName, v)
-		mw.logger.Debug("set club uuid value to context", zap.String("club_uuid", v))
 		ctx.Next()
 	}
 }
