@@ -15,6 +15,7 @@ const (
 	ClubSlugKeyName     = "club_slug_key"
 	UserUUIDKeyName     = "user_uuid_key"
 	ImageIDKeyName      = "image_id_key"
+	ClubUUIDKeyName     = "club_uuid_key"
 )
 
 // CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)
@@ -55,3 +56,7 @@ func (ut UserType) ToPrimitive() string {
 }
 
 const UploadSize = 2 << 18 // 2MiB
+
+const DummyUUID = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa"
+
+const DefaultThumbnailPath = "thumbnails/default.png"

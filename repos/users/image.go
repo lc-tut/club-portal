@@ -4,7 +4,7 @@ import (
 	"github.com/lc-tut/club-portal/models/users"
 )
 
-type UserImageRepo interface {
+type UploadedImageRepo interface {
 	GetUploadedImageByID(imageID uint32) (*users.UploadedImage, error)
 
 	GetImagesByUserUUID(userUUID string) ([]users.UploadedImage, error)

@@ -15,7 +15,7 @@ create table if not exists `club_contents` (
 create table if not exists `club_images` (
     `image_id` int unsigned not null primary key,
     `club_uuid` char(36) not null,
-    foreign key (`image_id`) references `uploaded_images` (`image_id`) on delete restrict on update cascade,
+    foreign key (`image_id`) references `uploaded_images` (`image_id`) on delete restrict on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -80,7 +80,7 @@ create table if not exists `club_remarks` (
 create table if not exists `club_thumbnails` (
     `thumbnail_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
-    `path` varchar(255) not null,
-    unique (`path`) using hash,
+    primary key (`thumbnail_id`, `club_uuid`),
+    foreign key (`thumbnail_id`) references `uploaded_thumbnails` (`thumbnail_id`) on delete restrict on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 )

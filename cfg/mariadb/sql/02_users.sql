@@ -40,3 +40,9 @@ create table if not exists `uploaded_images` (
     unique (`path`) using hash,
     foreign key (`owner`) references `users` (`user_uuid`) on delete cascade on update restrict
 );
+
+create table if not exists `uploaded_thumbnails` (
+    `thumbnail_id` int unsigned not null primary key auto_increment,
+    `path` varchar(255) not null,
+    unique (`path`) using hash
+)

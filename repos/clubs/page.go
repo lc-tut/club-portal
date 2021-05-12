@@ -55,7 +55,7 @@ type ClubPageRepo interface {
 
 func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 	page := make([]clubs.ClubPage, 0)
-	tx := r.db.Where("visible is true").Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(&page)
+	tx := r.db.Where("visible is true").Preload("Thumbnail").Find(&page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

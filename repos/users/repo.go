@@ -8,7 +8,8 @@ import (
 type IUserRepository interface {
 	UserRepo
 	UserFavoriteRepo
-	UserImageRepo
+	UploadedImageRepo
+	UploadedThumbnailRepo
 }
 
 type UserRepository struct {

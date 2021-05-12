@@ -14,6 +14,7 @@ type ClubPage struct {
 	ClubType        uint8            `gorm:"type:tinyint;not null"`
 	Visible         bool             `gorm:"type:tinyint(1);not null"`
 	UpdatedAt       time.Time        `gorm:"type:datetime;not null"`
+	Thumbnail       ClubThumbnail    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Contents        Contents         `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Links           Links            `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
 	Schedules       Schedules        `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
@@ -47,7 +48,7 @@ func (p Pages) ToExternalInfo() []ClubPageExternalInfo {
 			Campus:      page.Campus,
 			ClubType:    page.ClubType,
 			UpdatedAt:   page.UpdatedAt,
-			Images:      page.Images.ToImageResponse(),
+			Thumbnail:   page.Thumbnail.ToThumbnailResponse(),
 		}
 		exInfo[i] = info
 	}
@@ -56,14 +57,14 @@ func (p Pages) ToExternalInfo() []ClubPageExternalInfo {
 }
 
 type ClubPageExternalInfo struct {
-	ClubUUID    string          `json:"club_uuid"`
-	ClubSlug    string          `json:"club_slug"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	Campus      uint8           `json:"campus"`
-	ClubType    uint8           `json:"club_type"`
-	UpdatedAt   time.Time       `json:"updated_at"`
-	Images      []ImageResponse `json:"images"`
+	ClubUUID    string            `json:"club_uuid"`
+	ClubSlug    string            `json:"club_slug"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Campus      uint8             `json:"campus"`
+	ClubType    uint8             `json:"club_type"`
+	UpdatedAt   time.Time         `json:"updated_at"`
+	Thumbnail   ThumbnailResponse `json:"thumbnail"`
 }
 
 type ClubPageInternalInfo struct {
