@@ -80,7 +80,6 @@ create table if not exists `club_remarks` (
 create table if not exists `club_thumbnails` (
     `thumbnail_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
-    primary key (`thumbnail_id`, `club_uuid`),
     foreign key (`thumbnail_id`) references `uploaded_thumbnails` (`thumbnail_id`) on delete restrict on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 )

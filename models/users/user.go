@@ -18,7 +18,7 @@ type User struct {
 	AdminUsers     []AdminUser     `gorm:"foreignKey:UserUUID;references:UserUUID"`
 	GeneralUsers   []GeneralUser   `gorm:"foreignKey:UserUUID;references:UserUUID"`
 	DomainUsers    []DomainUser    `gorm:"foreignKey:UserUUID;references:UserUUID"`
-	UploadedImages []UploadedImage `gorm:"foreignKey:UserUUID;references:UserUUID"`
+	UploadedImages []UploadedImage `gorm:"foreignKey:Owner;references:UserUUID"`
 }
 
 type DomainUser struct {

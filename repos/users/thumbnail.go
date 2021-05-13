@@ -5,7 +5,7 @@ import "github.com/lc-tut/club-portal/models/users"
 type UploadedThumbnailRepo interface {
 	GetThumbnail(thumbnailID uint32) (*users.UploadedThumbnail, error)
 
-	CreateThumbnail(path string) error
+	CreateThumbnail(path string) (*users.UploadedThumbnail, error)
 
 	UpdateThumbnail(thumbnailID uint32, path string) error
 
@@ -24,7 +24,7 @@ func (r *UserRepository) GetThumbnail(thumbnailID uint32) (*users.UploadedThumbn
 	return thumbnail, nil
 }
 
-func (r *UserRepository) CreateThumbnail(path string) error {
+func (r *UserRepository) CreateThumbnail(path string) (*users.UploadedThumbnail, error) {
 	thumbnail := &users.UploadedThumbnail{
 		Path: path,
 	}
@@ -32,10 +32,10 @@ func (r *UserRepository) CreateThumbnail(path string) error {
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return thumbnail, nil
 }
 
 func (r *UserRepository) UpdateThumbnail(thumbnailID uint32, path string) error {

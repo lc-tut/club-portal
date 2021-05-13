@@ -54,6 +54,7 @@ type ClubPageRepo interface {
 }
 
 func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
+	// TODO: get path of thumbnail
 	page := make([]clubs.ClubPage, 0)
 	tx := r.db.Where("visible is true").Preload("Thumbnail").Find(&page)
 
@@ -68,8 +69,9 @@ func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 }
 
 func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error) {
-	page := clubs.ClubPage{}
-	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(&page)
+	// TODO: get path of images
+	page := &clubs.ClubPage{}
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -105,6 +107,7 @@ func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternal
 }
 
 func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error) {
+	// TODO: get path of images
 	page := &clubs.ClubPage{}
 	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 

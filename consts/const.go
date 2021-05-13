@@ -16,6 +16,7 @@ const (
 	UserUUIDKeyName     = "user_uuid_key"
 	ImageIDKeyName      = "image_id_key"
 	ClubUUIDKeyName     = "club_uuid_key"
+	ThumbnailIDKeyName  = "thumbnail_id_key"
 )
 
 // CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)

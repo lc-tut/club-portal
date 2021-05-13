@@ -38,11 +38,18 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 		form, err := ctx.MultipartForm()
 
 		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusInternalServerError)
 			return
 		}
 
-		files := form.File["images"]
+		files, ok := form.File["images"]
+
+		if !ok {
+			h.logger.Error("name of form should be `images`")
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
 
 		if err := h.checkImage(files); err != nil {
 			h.logger.Error(err.Error())
@@ -52,7 +59,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 
 		var isError bool
 
-		userUUID := ctx.GetString(consts.SessionUserName)
+		userUUID := ctx.GetString(consts.SessionUserUUID)
 
 		for _, f := range files {
 			filename := filepath.Base(f.Filename)
@@ -78,6 +85,8 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 				isError = true
 				break
 			}
+
+			h.logger.Info("successfully saved image", zap.String("path", dst))
 		}
 
 		if isError {

@@ -20,7 +20,7 @@ func (mw *Middleware) PersonalOrAdminOnly() gin.HandlerFunc {
 		paramUUID := ctx.GetString(consts.UserUUIDKeyName)
 
 		if sessUUID != paramUUID {
-			mw.logger.Warn("invalid user", zap.String("session_uuid", sessUUID), zap.String("param_uuid", paramUUID), zap.String("email", email))
+			mw.logger.Warn("invalid user", zap.String("session_user_uuid", sessUUID), zap.String("param_uuid", paramUUID), zap.String("email", email))
 			ctx.AbortWithStatus(http.StatusForbidden)
 			return
 		}
@@ -63,6 +63,21 @@ func (mw *Middleware) AdminOnly() gin.HandlerFunc {
 
 		if !mw.config.WhitelistUsers.IsAdminUser(email) {
 			mw.logger.Warn("invalid user", zap.String("email", email))
+			ctx.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+
+		ctx.Next()
+	}
+}
+
+func (mw *Middleware) IdentifyClubUUID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		sessUUID := ctx.GetString(consts.SessionUserUUID)
+		paramUUID := ctx.GetString(consts.ClubUUIDKeyName)
+
+		if sessUUID != paramUUID {
+			mw.logger.Warn("invalid user", zap.String("session_user_uuid", sessUUID), zap.String("param_uuid", paramUUID))
 			ctx.AbortWithStatus(http.StatusForbidden)
 			return
 		}
