@@ -73,6 +73,13 @@ func (mw *Middleware) AdminOnly() gin.HandlerFunc {
 
 func (mw *Middleware) IdentifyClubUUID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		email := ctx.GetString(consts.SessionUserEmail)
+
+		if mw.config.WhitelistUsers.IsAdminUser(email) {
+			ctx.Next()
+			return
+		}
+
 		sessUUID := ctx.GetString(consts.SessionUserUUID)
 		paramUUID := ctx.GetString(consts.ClubUUIDKeyName)
 

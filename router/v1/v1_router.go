@@ -53,9 +53,9 @@ func (r *Router) AddRouter() {
 		{
 			clubGroup.GET("/", h.GetAllClub())
 			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.OverGeneralOnly(), h.CreateClub())
+			clubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.IdentifyClubUUID(), r.middleware.OverGeneralOnly(), h.UpdateClub())
+			clubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.AdminOnly(), h.DeleteClub())
 			clubGroup.GET("/:clubslug", r.middleware.SetClubSlugKey(), h.GetClub())
-			clubGroup.PUT("/:clubslug", r.middleware.CheckSession(), r.middleware.SetClubSlugKey(), r.middleware.OverGeneralOnly(), h.UpdateClub()) // TODO: Identify Club
-			clubGroup.DELETE("/:clubslug", r.middleware.CheckSession(), r.middleware.SetClubSlugKey(), r.middleware.AdminOnly(), h.DeleteClub())
 		}
 		uploadGroup := v1Group.Group("/upload", r.middleware.CheckSession())
 		{
