@@ -149,3 +149,4 @@ cfg/config.toml
 cfg/db_pass
 dist/
 ./images
+./thumbnails
