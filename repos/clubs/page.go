@@ -69,45 +69,24 @@ func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 }
 
 func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error) {
-	// TODO: get path of images
 	page := &clubs.ClubPage{}
-	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Videos").Preload("ActivityDetails").Take(page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
 
-	rels, err := r.GetAllRelations(page.ClubUUID)
+	info, err := r.getPage(page)
 
 	if err != nil {
 		return nil, err
-	}
-
-	typedRels := clubs.Relations(rels)
-
-	info := &clubs.ClubPageInternalInfo{
-		ClubUUID:     uuid,
-		Name:         page.Name,
-		Description:  page.Description,
-		Campus:       page.Campus,
-		ClubType:     page.ClubType,
-		UpdatedAt:    page.UpdatedAt,
-		Contents:     page.Contents.ToContentResponse(),
-		Links:        page.Links.ToLinkResponse(),
-		Schedules:    page.Schedules.ToScheduleResponse(),
-		Achievements: page.Achievements.ToAchievementResponse(),
-		Images:       page.Images.ToImageResponse(),
-		Videos:       page.Videos.ToVideoResponse(),
-		Times:        clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
 }
 
 func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error) {
-	// TODO: get path of images
 	page := &clubs.ClubPage{}
 	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
@@ -116,13 +95,31 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 		return nil, err
 	}
 
+	info, err := r.getPage(page)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
+
+func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalInfo, error) {
 	rels, err := r.GetAllRelations(page.ClubUUID)
 
 	if err != nil {
 		return nil, err
 	}
 
+	images, err := r.GetImagesByClubUUID(page.ClubUUID)
+
+	if err != nil {
+		return nil, err
+	}
+
 	typedRels := clubs.Relations(rels)
+
+	typedImages := clubs.Images(images)
 
 	info := &clubs.ClubPageInternalInfo{
 		ClubUUID:     page.ClubUUID,
@@ -135,7 +132,7 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 		Links:        page.Links.ToLinkResponse(),
 		Schedules:    page.Schedules.ToScheduleResponse(),
 		Achievements: page.Achievements.ToAchievementResponse(),
-		Images:       page.Images.ToImageResponse(),
+		Images:       typedImages.ToImageResponse(),
 		Videos:       page.Videos.ToVideoResponse(),
 		Times:        clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
 		Places:       clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
