@@ -77,7 +77,7 @@ func (r *Router) AddRouter() {
 				}
 				thumbnailIDGroup := thumbnailGroup.Group("/ids")
 				{
-					thumbnailIDGroup.GET("/:thumbnailid", r.middleware.SetThumbnailIDKey()) // TODO: implement
+					thumbnailIDGroup.GET("/:thumbnailid", r.middleware.SetThumbnailIDKey(), h.GetThumbnail())
 				}
 			}
 		}

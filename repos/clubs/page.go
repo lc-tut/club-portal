@@ -54,7 +54,6 @@ type ClubPageRepo interface {
 }
 
 func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
-	// TODO: get path of thumbnail
 	page := make([]clubs.ClubPage, 0)
 	tx := r.db.Where("visible is true").Preload("Thumbnail", func(db *gorm.DB) *gorm.DB {
 		selectQuery := "club_thumbnails.thumbnail_id, club_thumbnails.club_uuid, ut.path"
