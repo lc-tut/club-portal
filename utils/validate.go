@@ -46,7 +46,7 @@ func ToCampusType(i uint8) (consts.CampusType, error) {
 	case consts.CampusKamata, consts.CampusHachioji:
 		return typed, nil
 	default:
-		return 0, nil
+		return 0, errors.New("invalid CampusType")
 	}
 }
 
