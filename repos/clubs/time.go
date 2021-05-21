@@ -23,7 +23,7 @@ type ClubTimeRepo interface {
 
 func (r *ClubRepository) GetTimeByID(timeID uint32) (*clubs.ClubTime, error) {
 	time := &clubs.ClubTime{}
-	tx := r.db.Where("time_id = ?", timeID).Take(time)
+	tx := r.db.Where("time_id = ?", timeID).Find(time)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

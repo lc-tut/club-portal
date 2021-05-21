@@ -19,7 +19,7 @@ type ClubAchievementRepo interface {
 
 func (r *ClubRepository) GetAchievementByID(achievementID uint32) (*clubs.ClubAchievement, error) {
 	achievement := &clubs.ClubAchievement{}
-	tx := r.db.Where("achievement_id = ?", achievementID).Take(achievement)
+	tx := r.db.Where("achievement_id = ?", achievementID).Find(achievement)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

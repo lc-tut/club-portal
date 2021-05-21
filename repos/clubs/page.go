@@ -73,7 +73,7 @@ func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 
 func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error) {
 	page := &clubs.ClubPage{}
-	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Videos").Preload("ActivityDetails").Find(page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -91,7 +91,7 @@ func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternal
 
 func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error) {
 	page := &clubs.ClubPage{}
-	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
+	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Find(page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -271,7 +271,7 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 func (r *ClubRepository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpdateArgs) error {
 	page := clubs.ClubPage{}
 
-	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
+	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Find(&page)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

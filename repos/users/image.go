@@ -16,7 +16,7 @@ type UploadedImageRepo interface {
 
 func (r *UserRepository) GetUploadedImageByID(imageID uint32) (*users.UploadedImage, error) {
 	image := &users.UploadedImage{}
-	tx := r.db.Where("image_id = ?", imageID).Take(image)
+	tx := r.db.Where("image_id = ?", imageID).Find(image)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
