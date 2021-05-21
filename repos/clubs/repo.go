@@ -17,6 +17,7 @@ type IClubRepository interface {
 	ClubPlaceRepo
 	ClubActivityDetailRepo
 	ClubRemarkRepo
+	ClubThumbnailRepo
 }
 
 type ClubRepository struct {

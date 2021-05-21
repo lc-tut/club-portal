@@ -4,6 +4,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
+	"gorm.io/gorm"
 )
 
 type UpdateUserArgs struct {
@@ -47,7 +48,7 @@ func (r *UserRepository) GetAllGeneralUser() ([]users.GeneralUser, error) {
 
 func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, error) {
 	user := &users.DomainUser{}
-	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -59,7 +60,7 @@ func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, er
 
 func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, error) {
 	user := &users.DomainUser{}
-	tx := r.db.Where("email = ?", email).Take(user)
+	tx := r.db.Where("email = ?", email).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -71,7 +72,7 @@ func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, 
 
 func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, error) {
 	user := &users.GeneralUser{}
-	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -83,7 +84,7 @@ func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, 
 
 func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser, error) {
 	user := &users.GeneralUser{}
-	tx := r.db.Where("email = ?", email).Take(user)
+	tx := r.db.Where("email = ?", email).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -95,7 +96,7 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 
 func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("user_uuid", uuid).Take(user)
+	tx := r.db.Where("user_uuid", uuid).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -107,7 +108,7 @@ func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, erro
 
 func (r *UserRepository) GetAdminUserByEmail(email string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("email = ?", email).Take(user)
+	tx := r.db.Where("email = ?", email).Find(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -151,6 +152,19 @@ func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (user
 	}
 }
 
+func (r *UserRepository) createUser(tx *gorm.DB, uuid string) error {
+	user := &users.User{
+		UserUUID: uuid,
+	}
+
+	if err := tx.Create(user).Error; err != nil {
+		r.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (r *UserRepository) CreateDomainUser(uuid string, email string, name string) (*users.DomainUser, error) {
 	user := &users.DomainUser{
 		UserUUID: uuid,
@@ -158,10 +172,20 @@ func (r *UserRepository) CreateDomainUser(uuid string, email string, name string
 		Name:     name,
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -173,13 +197,23 @@ func (r *UserRepository) CreateGeneralUser(uuid string, email string, name strin
 		UserUUID: uuid,
 		Email:    email,
 		Name:     name,
-		ClubUUID: utils.ToNullString(""),
+		ClubUUID: utils.StringToNullString(""),
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -193,10 +227,20 @@ func (r *UserRepository) CreateAdminUser(uuid string, email string, name string)
 		Name:     name,
 	}
 
-	tx := r.db.Create(user)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.createUser(tx, uuid); err != nil {
+			return err
+		}
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+		if err := tx.Create(user).Error; err != nil {
+			r.logger.Error(err.Error())
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -221,7 +265,7 @@ func (r *UserRepository) UpdateDomainUser(uuid string, name string) error {
 func (r *UserRepository) UpdateGeneralUser(uuid string, name string, clubUUID string) error {
 	user := users.GeneralUser{
 		Name:     name,
-		ClubUUID: utils.ToNullString(clubUUID),
+		ClubUUID: utils.StringToNullString(clubUUID),
 	}
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
@@ -260,7 +304,7 @@ func (r *UserRepository) UpdateUserFromRole(uuid string, role string, args Updat
 	if userType == consts.AdminUser {
 		err = r.UpdateAdminUser(uuid, args.Name)
 	} else if userType == consts.GeneralUser {
-		err = r.UpdateGeneralUser(uuid, args.Name, utils.NilToEmptyString(args.ClubUUID))
+		err = r.UpdateGeneralUser(uuid, args.Name, utils.StringPToString(args.ClubUUID))
 	} else {
 		err = r.UpdateDomainUser(uuid, args.Name)
 	}

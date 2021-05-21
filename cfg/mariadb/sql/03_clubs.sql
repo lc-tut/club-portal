@@ -1,14 +1,3 @@
-create table if not exists `club_pages` (
-    `club_uuid` char(36) not null primary key,
-    `club_slug` char(15) not null,
-    `name` varchar(63) not null,
-    `description` text not null,
-    `campus` tinyint not null,
-    `club_type` tinyint not null,
-    `visible` tinyint(1) not null,
-    `updated_at` datetime not null
-);
-
 create table if not exists `club_achievements` (
     `achievement_id` int unsigned not null primary key auto_increment,
     `club_uuid` char(36) not null,
@@ -24,19 +13,17 @@ create table if not exists `club_contents` (
 );
 
 create table if not exists `club_images` (
-    `image_id` int unsigned not null primary key auto_increment,
+    `image_id` int unsigned not null primary key,
     `club_uuid` char(36) not null,
-    `path` text not null,
-    unique (`path`) using hash,
+    foreign key (`image_id`) references `uploaded_images` (`image_id`) on delete restrict on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
 create table if not exists `club_videos` (
-     `video_id` int unsigned not null primary key auto_increment,
-     `club_uuid` char(36) not null,
-     `path` text not null,
-     unique (`path`) using hash,
-     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
+    `video_id` int unsigned not null primary key auto_increment,
+    `club_uuid` char(36) not null,
+    `path` varchar(255) not null unique,
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
 create table if not exists `club_schedules` (
@@ -90,25 +77,9 @@ create table if not exists `club_remarks` (
     foreign key (`place_id`) references `activity_details` (`place_id`) on delete cascade on update restrict
 );
 
-create table if not exists `domain_users` (
-    `user_uuid` char(36) not null primary key,
-    `email` varchar(255) not null,
-    `name` varchar(32) not null,
-    unique (`email`, `name`)
-);
-
-create table if not exists `general_users` (
-    `user_uuid` char(36) not null primary key,
-    `email` varchar(255) not null,
-    `name` varchar(32) not null,
-    `club_uuid` char(36),
-    unique (`email`, `name`),
-    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete set null on update restrict
-);
-
-create table if not exists `admin_users` (
-    `user_uuid` char(36) not null primary key,
-    `email` varchar(255) not null,
-    `name` varchar(32) not null,
-    unique (`email`, `name`)
+create table if not exists `club_thumbnails` (
+    `thumbnail_id` int unsigned not null primary key auto_increment,
+    `club_uuid` char(36) not null,
+    foreign key (`thumbnail_id`) references `uploaded_thumbnails` (`thumbnail_id`) on delete restrict on update restrict,
+    foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 )

@@ -26,7 +26,7 @@ type ClubScheduleRepo interface {
 
 func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule, error) {
 	schedule := &clubs.ClubSchedule{}
-	tx := r.db.Where("schedule_id = ?", scheduleID).Take(schedule)
+	tx := r.db.Where("schedule_id = ?", scheduleID).Find(schedule)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -56,7 +56,7 @@ func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.ToNullString(arg.Remarks),
+			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}
@@ -79,7 +79,7 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.ToNullString(arg.Remarks),
+			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}

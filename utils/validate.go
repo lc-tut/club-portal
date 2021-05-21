@@ -6,7 +6,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 )
 
-func ToNullString(s string) sql.NullString {
+func StringToNullString(s string) sql.NullString {
 	var ns sql.NullString
 
 	if s == "" {
@@ -24,7 +24,7 @@ func ToNullString(s string) sql.NullString {
 	return ns
 }
 
-func NilToEmptyString(s *string) string {
+func StringPToString(s *string) string {
 	if s == nil {
 		return ""
 	} else {
@@ -32,7 +32,7 @@ func NilToEmptyString(s *string) string {
 	}
 }
 
-func ToNilOrString(s sql.NullString) *string {
+func NullStringToStringP(s sql.NullString) *string {
 	if s.Valid {
 		return &s.String
 	} else {
@@ -42,26 +42,29 @@ func ToNilOrString(s sql.NullString) *string {
 
 func ToCampusType(i uint8) (consts.CampusType, error) {
 	typed := consts.CampusType(i)
-	if typed > consts.CampusHachioji {
-		return 0, errors.New("invalid argument")
-	} else {
+	switch typed {
+	case consts.CampusKamata, consts.CampusHachioji:
 		return typed, nil
+	default:
+		return 0, errors.New("invalid CampusType")
 	}
 }
 
 func ToClubType(i uint8) (consts.ClubType, error) {
 	typed := consts.ClubType(i)
-	if typed > consts.KokasaiType {
-		return 0, errors.New("invalid argument")
-	} else {
+	switch typed {
+	case consts.SportsType, consts.CultureType, consts.KokasaiType:
 		return typed, nil
+	default:
+		return 0, errors.New("invalid ClubType")
 	}
 }
 
 func ToUserType(s string) (consts.UserType, error) {
-	switch s {
-	case "admin", "general", "domain":
-		return consts.UserType(s), nil
+	typed := consts.UserType(s)
+	switch typed {
+	case consts.AdminUser, consts.GeneralUser, consts.DomainUser:
+		return typed, nil
 	default:
 		return "", errors.New("no role: " + s)
 	}

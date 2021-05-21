@@ -10,16 +10,18 @@ type ClubImageRepo interface {
 
 	GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error)
 
-	CreateImage(clubUUID string, path []string) error
-	CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
+	CreateImage(clubUUID string, imageIDs []uint32) error
+	CreateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error
 
-	UpdateImage(clubUUID string, path []string) error
-	UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error
+	UpdateImage(clubUUID string, imageIDs []uint32) error
+	UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error
 }
 
 func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) {
 	image := &clubs.ClubImage{}
-	tx := r.db.Where("image_id = ?", imageID).Take(image)
+	selectQuery := "ci.image_id, ci.club_uuid, ui.path"
+	joinQuery := "inner join uploaded_images as ui using (image_id)"
+	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("image_id = ?", imageID).Find(image)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -31,7 +33,9 @@ func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) 
 
 func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, error) {
 	image := make([]clubs.ClubImage, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(&image)
+	selectQuery := "ci.image_id, ci.club_uuid, ui.path"
+	joinQuery := "inner join uploaded_images as ui using (image_id)"
+	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("club_uuid = ?", uuid).Find(&image)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -41,8 +45,8 @@ func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, er
 	return image, nil
 }
 
-func (r *ClubRepository) CreateImage(clubUUID string, path []string) error {
-	length := len(path)
+func (r *ClubRepository) CreateImage(clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -50,10 +54,10 @@ func (r *ClubRepository) CreateImage(clubUUID string, path []string) error {
 
 	imageModels := make([]clubs.ClubImage, length)
 
-	for i, p := range path {
+	for i, imID := range imageIDs {
 		image := clubs.ClubImage{
+			ImageID:  imID,
 			ClubUUID: clubUUID,
-			Path:     p,
 		}
 		imageModels[i] = image
 	}
@@ -68,8 +72,8 @@ func (r *ClubRepository) CreateImage(clubUUID string, path []string) error {
 	return nil
 }
 
-func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
-	length := len(path)
+func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -77,10 +81,10 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []
 
 	imageModels := make([]clubs.ClubImage, length)
 
-	for i, p := range path {
+	for i, imID := range imageIDs {
 		image := clubs.ClubImage{
+			ImageID:  imID,
 			ClubUUID: clubUUID,
-			Path:     p,
 		}
 		imageModels[i] = image
 	}
@@ -93,8 +97,8 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, path []
 	return nil
 }
 
-func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
-	length := len(path)
+func (r *ClubRepository) UpdateImage(clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
@@ -107,25 +111,26 @@ func (r *ClubRepository) UpdateImage(clubUUID string, path []string) error {
 		return err
 	}
 
-	if err := r.CreateImage(clubUUID, path); err != nil {
+	if err := r.CreateImage(clubUUID, imageIDs); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, path []string) error {
-	length := len(path)
+func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error {
+	length := len(imageIDs)
 
 	if length == 0 {
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubImage{}).Error; err != nil {
+	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{}).Error; err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
-	if err := r.CreateImageWithTx(tx, clubUUID, path); err != nil {
+	if err := r.CreateImageWithTx(tx, clubUUID, imageIDs); err != nil {
 		return err
 	}
 

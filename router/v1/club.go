@@ -88,7 +88,7 @@ func (h *Handler) checkDuplication(ctx *gin.Context) error {
 			return err
 		}
 
-		clubUUID := utils.ToNilOrString(gUserModel.ClubUUID)
+		clubUUID := utils.NullStringToStringP(gUserModel.ClubUUID)
 
 		if clubUUID != nil {
 			return errors.New("already have a club")
@@ -184,9 +184,9 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 			return
 		}
 
-		slug := ctx.GetString(consts.ClubSlugKeyName)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.updatePage(slug, *pageArgs); err != nil {
+		if err := h.repo.UpdatePageByClubUUID(clubUUID, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusOK, pd)
@@ -216,19 +216,11 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 	return pageArgs, nil
 }
 
-func (h *Handler) updatePage(slug string, args repos.ClubPageUpdateArgs) error {
-	if err := h.repo.UpdatePageByClubSlug(slug, args); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (h *Handler) DeleteClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		slug := ctx.GetString(consts.ClubSlugKeyName)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.repo.DeletePageByClubSlug(slug); err != nil {
+		if err := h.repo.DeletePageByClubUUID(clubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.Status(http.StatusOK)

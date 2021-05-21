@@ -30,7 +30,7 @@ func (t Times) ToTimeResponse(remarks []ClubRemark) []TimeResponse {
 		timeRes := TimeResponse{
 			Date:    time.Date,
 			Time:    time.Time,
-			Remarks: utils.ToNilOrString(remarks[i].TimeRemark),
+			Remarks: utils.NullStringToStringP(remarks[i].TimeRemark),
 		}
 		res[i] = timeRes
 	}

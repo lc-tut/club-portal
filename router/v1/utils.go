@@ -37,7 +37,7 @@ func validateToScheduleArgs(models []models.ScheduleRequest) []repos.ClubSchedul
 		schedule := repos.ClubScheduleArgs{
 			Month:    m.Month,
 			Schedule: m.Schedule,
-			Remarks:  utils.NilToEmptyString(m.Remarks),
+			Remarks:  utils.StringPToString(m.Remarks),
 		}
 		schedules[i] = schedule
 	}
@@ -55,11 +55,11 @@ func validateToAchievementArgs(models []models.AchievementRequest) []string {
 	return achieves
 }
 
-func validateToImageArgs(models []models.ImageRequest) []string {
-	images := make([]string, len(models))
+func validateToImageArgs(models []models.ImageRequest) []uint32 {
+	images := make([]uint32, len(models))
 
 	for i, m := range models {
-		images[i] = m.Path
+		images[i] = m.ImageID
 	}
 
 	return images
@@ -111,8 +111,8 @@ func validateToRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubRem
 		remark := repos.ClubRemarkArgs{
 			TimeID:       m.TimeID,
 			PlaceID:      m.PlaceID,
-			TimeRemarks:  utils.NilToEmptyString(m.TimeRemark),
-			PlaceRemarks: utils.NilToEmptyString(m.PlaceRemark),
+			TimeRemarks:  utils.StringPToString(m.TimeRemark),
+			PlaceRemarks: utils.StringPToString(m.PlaceRemark),
 		}
 		remarks[i] = remark
 	}

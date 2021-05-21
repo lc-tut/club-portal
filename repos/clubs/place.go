@@ -22,7 +22,7 @@ type ClubPlaceRepo interface {
 
 func (r *ClubRepository) GetPlaceByID(placeID uint32) (*clubs.ClubPlace, error) {
 	place := &clubs.ClubPlace{}
-	tx := r.db.Where("place_id = ?", placeID).Take(place)
+	tx := r.db.Where("place_id = ?", placeID).Find(place)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

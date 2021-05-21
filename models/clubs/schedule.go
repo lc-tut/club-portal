@@ -22,7 +22,7 @@ func (s Schedules) ToScheduleResponse() []ScheduleResponse {
 		scheduleRes := ScheduleResponse{
 			Month:    schedule.Month,
 			Schedule: schedule.Schedule,
-			Remarks:  utils.ToNilOrString(schedule.Remarks),
+			Remarks:  utils.NullStringToStringP(schedule.Remarks),
 		}
 		res[i] = scheduleRes
 	}
