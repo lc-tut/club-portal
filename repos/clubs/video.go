@@ -19,7 +19,7 @@ type ClubVideoRepo interface {
 
 func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) {
 	video := &clubs.ClubVideo{}
-	tx := r.db.Where("video_id = ?", videoID).Find(video)
+	tx := r.db.Where("video_id = ?", videoID).Take(video)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

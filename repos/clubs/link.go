@@ -37,7 +37,7 @@ func (r *ClubRepository) GetAllLinks() ([]clubs.ClubLink, error) {
 
 func (r *ClubRepository) GetLinkByID(linkID uint32) (*clubs.ClubLink, error) {
 	link := &clubs.ClubLink{}
-	tx := r.db.Where("link_id = ?", linkID).Find(link)
+	tx := r.db.Where("link_id = ?", linkID).Take(link)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

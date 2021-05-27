@@ -19,7 +19,7 @@ type ClubContentRepo interface {
 
 func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, error) {
 	content := &clubs.ClubContent{}
-	tx := r.db.Where("content_id = ?", contentID).Find(content)
+	tx := r.db.Where("content_id = ?", contentID).Take(content)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

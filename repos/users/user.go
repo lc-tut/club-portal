@@ -48,7 +48,7 @@ func (r *UserRepository) GetAllGeneralUser() ([]users.GeneralUser, error) {
 
 func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, error) {
 	user := &users.DomainUser{}
-	tx := r.db.Where("user_uuid = ?", uuid).Find(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -60,7 +60,7 @@ func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, er
 
 func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, error) {
 	user := &users.DomainUser{}
-	tx := r.db.Where("email = ?", email).Find(user)
+	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -72,7 +72,7 @@ func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, 
 
 func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, error) {
 	user := &users.GeneralUser{}
-	tx := r.db.Where("user_uuid = ?", uuid).Find(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -84,7 +84,7 @@ func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, 
 
 func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser, error) {
 	user := &users.GeneralUser{}
-	tx := r.db.Where("email = ?", email).Find(user)
+	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -96,7 +96,7 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 
 func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("user_uuid", uuid).Find(user)
+	tx := r.db.Where("user_uuid", uuid).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
@@ -108,7 +108,7 @@ func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, erro
 
 func (r *UserRepository) GetAdminUserByEmail(email string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("email = ?", email).Find(user)
+	tx := r.db.Where("email = ?", email).Take(user)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())

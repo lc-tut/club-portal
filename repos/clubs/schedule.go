@@ -26,7 +26,7 @@ type ClubScheduleRepo interface {
 
 func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule, error) {
 	schedule := &clubs.ClubSchedule{}
-	tx := r.db.Where("schedule_id = ?", scheduleID).Find(schedule)
+	tx := r.db.Where("schedule_id = ?", scheduleID).Take(schedule)
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
