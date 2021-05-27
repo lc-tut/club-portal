@@ -18,9 +18,14 @@ import (
 
 func (h *Handler) Callback() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		isSuccess := false
 		defer func() {
-			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
-			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
+			if !isSuccess {
+				h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
+				h.logger.Info("deleted cookie", zap.String("cookie_name", consts.RedirectURLCookieName))
+				utils.DeleteCookie(ctx, consts.AuthCSRFCookieName)
+				utils.DeleteCookie(ctx, consts.RedirectURLCookieName)
+			}
 		}()
 
 		data, err := h.checkValidState(ctx)
@@ -35,13 +40,24 @@ func (h *Handler) Callback() gin.HandlerFunc {
 			return
 		}
 
+		redirectURL, err := ctx.Cookie(consts.RedirectURLCookieName)
+
+		if err != nil {
+			h.logger.Error(err.Error())
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
 		if err := h.createSession(ctx, data); err != nil {
-			h.logger.Warn("failed to create session")
+			h.logger.Error("failed to create session")
 			ctx.Status(http.StatusInternalServerError)
 		} else {
+			isSuccess = true
 			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.AuthCSRFCookieName))
+			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.RedirectURLCookieName))
 			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時に Cookie が削除されない
-			ctx.Redirect(http.StatusFound, "/")                // TODO: Redirect to Frontend
+			utils.DeleteCookie(ctx, consts.RedirectURLCookieName)
+			ctx.Redirect(http.StatusFound, redirectURL)
 		}
 	}
 }
