@@ -1,22 +1,23 @@
 package consts
 
 const (
-	SessionCookieName   = "cp_sess"
-	AuthCSRFCookieName  = "cp_auth_csrf"
-	SessionKey          = "auth_state"
-	CookiePath          = "/"
-	CookieHttpOnly      = true
-	CookieSessionMaxAge = 60 * 60 * 24 * 7
-	CookieCSRFMaxAge    = 60 * 15
-	SessionUserEmail    = "sess_user_email"
-	SessionUserUUID     = "sess_user_uuid"
-	SessionUserName     = "sess_user_name"
-	SessionUserRole     = "sess_user_role"
-	ClubSlugKeyName     = "club_slug_key"
-	UserUUIDKeyName     = "user_uuid_key"
-	ImageIDKeyName      = "image_id_key"
-	ClubUUIDKeyName     = "club_uuid_key"
-	ThumbnailIDKeyName  = "thumbnail_id_key"
+	SessionCookieName     = "cp_sess"
+	AuthCSRFCookieName    = "cp_auth_csrf"
+	RedirectURLCookieName = "cp_redirect"
+	SessionKey            = "auth_state"
+	CookiePath            = "/"
+	CookieHttpOnly        = true
+	CookieSessionMaxAge   = 60 * 60 * 24 * 7
+	CookieCSRFMaxAge      = 60 * 15
+	SessionUserEmail      = "sess_user_email"
+	SessionUserUUID       = "sess_user_uuid"
+	SessionUserName       = "sess_user_name"
+	SessionUserRole       = "sess_user_role"
+	ClubSlugKeyName       = "club_slug_key"
+	UserUUIDKeyName       = "user_uuid_key"
+	ImageIDKeyName        = "image_id_key"
+	ClubUUIDKeyName       = "club_uuid_key"
+	ThumbnailIDKeyName    = "thumbnail_id_key"
 )
 
 // CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)

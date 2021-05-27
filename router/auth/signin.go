@@ -7,10 +7,27 @@ import (
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"net/http"
+	"net/url"
+	"strings"
 )
+
+type signInQuery struct {
+	RedirectURL string `form:"redirect_url" binding:"required"`
+}
 
 func (h *Handler) SignIn() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		query := &signInQuery{}
+		if err := ctx.ShouldBindQuery(query); err != nil {
+			query.RedirectURL = "/"
+		}
+
+		if !strings.HasPrefix(query.RedirectURL, "/") {
+			h.logger.Error("redirect_url should be started with '/'")
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
 		sess := sessions.Default(ctx)
 		sessionData := sess.Get(consts.SessionKey)
 
@@ -34,9 +51,25 @@ func (h *Handler) SignIn() gin.HandlerFunc {
 		h.logger.Info("created cookie",
 			zap.String("cookie_name", consts.AuthCSRFCookieName),
 		)
+		h.setRedirectURLCookie(ctx, query.RedirectURL, csrfCookie.Path, csrfCookie.Domain, csrfCookie.Secure, csrfCookie.HttpOnly, csrfCookie.SameSite)
 
-		url := h.config.GoogleOAuthConfig.AuthCodeURL(state)
+		redirectUrl := h.config.GoogleOAuthConfig.AuthCodeURL(state)
 
-		ctx.Redirect(http.StatusFound, url)
+		ctx.Redirect(http.StatusFound, redirectUrl)
 	}
+}
+
+func (h *Handler) setRedirectURLCookie(ctx *gin.Context, value, path, domain string, secure, httpOnly bool, sameSite http.SameSite) {
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     consts.RedirectURLCookieName,
+		Value:    url.QueryEscape(value),
+		Path:     path,
+		Domain:   domain,
+		Secure:   secure,
+		HttpOnly: httpOnly,
+		SameSite: sameSite,
+	})
+	h.logger.Info("created cookie",
+		zap.String("cookie_name", consts.RedirectURLCookieName),
+	)
 }
