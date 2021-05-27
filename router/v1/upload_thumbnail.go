@@ -74,7 +74,7 @@ func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
 			return
 		}
 
-		clubUUID := ctx.GetString(consts.SessionUserUUID) // FIXME: cannot change thumbnail if user is admin
+		clubUUID := ctx.GetString(consts.SessionUserUUID)
 
 		if err := h.repo.CreateClubThumbnail(clubUUID, thumbnail.ThumbnailID); err != nil {
 			_ = h.deleteSavedThumbnail(dst)
