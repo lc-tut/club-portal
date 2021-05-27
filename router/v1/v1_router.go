@@ -66,7 +66,7 @@ func (r *Router) AddRouter() {
 				imageGroup.GET("/:imageid", r.middleware.SetImageIDKey(), h.GetSpecificImage())
 				imageGroup.DELETE("/:imageid", r.middleware.SetImageIDKey(), h.DeleteImage())
 			}
-			thumbnailGroup := uploadGroup.Group("/thumbnail", r.middleware.CheckSession())
+			thumbnailGroup := uploadGroup.Group("/thumbnail")
 			{
 				thumbnailClubGroup := thumbnailGroup.Group("/clubs")
 				{
