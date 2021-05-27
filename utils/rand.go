@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"path/filepath"
 )
 
 func GenerateCSRFState() (string, error) {
@@ -27,6 +28,7 @@ func GenerateSlug(uuid string) string {
 }
 
 func GenerateFileName(fn string) (string, error) {
+	ext := filepath.Ext(fn)
 	byteFn := []byte(fn)
 	hashedFile := sha256.Sum256(byteFn)
 	sliceHash := hashedFile[:5]
@@ -38,5 +40,5 @@ func GenerateFileName(fn string) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%x%x", sliceHash, b), nil
+	return fmt.Sprintf("%x%x%s", sliceHash, b, ext), nil
 }
