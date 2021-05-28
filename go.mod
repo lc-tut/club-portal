@@ -12,6 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.4.11
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
 	github.com/google/uuid v1.2.0
 	github.com/google/wire v0.5.0
