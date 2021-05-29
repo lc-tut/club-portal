@@ -30,13 +30,15 @@ func (h *Handler) Callback() gin.HandlerFunc {
 
 		data, err := h.checkValidState(ctx)
 
-		if err != nil || !h.config.WhitelistUsers.IsUser(data.Email) {
-			if err != nil {
-				h.logger.Error(err.Error())
-			} else {
-				h.logger.Warn("invalid user", zap.String("email", data.Email))
-			}
+		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
+		if !h.config.WhitelistUsers.IsUser(data.Email) {
+			h.logger.Warn("invalid user", zap.String("email", data.Email))
+			ctx.Status(http.StatusUnauthorized)
 			return
 		}
 
