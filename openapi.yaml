@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Portal API
+  description: '[club-portal](https://github.com/lc-tut/club-portal) にて使われる API です。'
+  contact:
+    email: linuxclub.tut@gmail.com
+  license:
+    name: MIT
+    url: https://github.com/lc-tut/club-portal/blob/master/LICENSE
+  version: 1.0.0
+servers:
+  - url: 'https://clubs.linux.it.ac.jp/api'
+tags:
+  - name: auth
+    description: 認証関係の API です。
+paths:
+  /auth:
+    get:
+      tags:
+        - auth
+      summary: 認証情報を取得します。
+      responses:
+        200:
+          description: 認証情報を持っているか確認します。持っていない場合 null を返します。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Auth'
+              examples:
+                Success:
+                  $ref: '#/components/examples/AuthExample'
+                Failed:
+                  $ref: '#/components/examples/NullObject'
+  /auth/signin:
+    get:
+      tags:
+        - auth
+      summary: ログイン処理を行います。
+      parameters:
+        - in: query
+          name: redirect_url
+          description: コールバック処理後のリダイレクト先を指定します。クエリがない場合 / へ返されます。
+          example:
+            /clubs
+          schema:
+            type: string
+      responses:
+        204:
+          description: 既にログイン済みの場合返されます。
+        302:
+          description: Google ログイン画面にリダイレクトします。
+        400:
+          description: redirect_url クエリの形式が不正の場合返されます。
+        500:
+          description: 基本的に返されませんが、稀に返すかもしれません。
+  /auth/callback:
+    get:
+      tags:
+        - auth
+      summary: コールバック処理を行います。
+      parameters:
+        - in: query
+          name: code
+          description: Google OAuth から返されるクエリ。
+          schema:
+            type: string
+        - in: query
+          name: state
+          description: Google OAuth から返されるクエリ
+          schema:
+            type: string
+      responses:
+        302:
+          description: 指定先の URL へリダイレクトします。
+        400:
+          description: 不正なクエリなどの場合返されます。
+        401:
+          description: 不正なユーザといった認証不可の場合返されます。
+        500:
+          description: データベースに関するエラーなど。
+  /auth/destroy:
+    post:
+      tags:
+        - auth
+      summary: 認証情報を破棄します。
+      responses:
+        201:
+          description: 認証情報の破棄に成功した場合に返されます。
+        500:
+          description: 認証情報の破棄に失敗した場合に返されます。
+components:
+  schemas:
+    Auth:
+      type: object
+      nullable: true
+      properties:
+        session_uuid:
+          type: string
+          format: uuidv4
+        user_uuid:
+          type: string
+          format: uuidv4
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+            - "domain"
+            - "general"
+            - "admin"
+
+  examples:
+    NullObject:
+      value:
+        null
+    AuthExample:
+      value:
+        session_uuid: 6d960547-af7e-41de-a33a-be52bc811dc6
+        user_uuid: a4966f60-41e5-4534-bd90-1a89bb74fe06
+        email: foo@example.com
+        name: "John Joe"
+        role: "domain"
