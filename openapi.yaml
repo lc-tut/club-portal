@@ -13,6 +13,8 @@ servers:
 tags:
   - name: auth
     description: 認証関係の API です。
+  - name: user
+    description: ユーザ関係の API です。
 paths:
   /auth:
     get:
@@ -88,6 +90,202 @@ paths:
           description: 認証情報の破棄に成功した場合に返されます。
         500:
           description: 認証情報の破棄に失敗した場合に返されます。
+  /v1/users:
+    get:
+      tags:
+        - user
+      summary: 自身のユーザ情報を取得します。 (認証が必要)
+      responses:
+        200:
+          description: 自身のユーザ情報を取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: 基本的に返すことはありませんが、もしかしたら返す場合があります。
+    post:
+      tags:
+        - user
+      summary: 新しくユーザ (General) を作成します。 (Admin Only)
+      requestBody:
+        description: 作成に必要なユーザ情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+              example:
+                email: foo@example.com
+                name: Foo Club
+        required: true
+      responses:
+        201:
+          description: 正常に作成できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: リクエストが不正な場合に返されます。
+        403:
+          description: Admin User 以外のユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/users/{userUUID}:
+    get:
+      tags:
+        - user
+      summary: userUUID のユーザを取得します。 (Personal or Admin Only)
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+            format: uuidv4
+          required: true
+          description: 登録しているユーザの UUID
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - user
+      summary: userUUID のユーザ情報を編集します。 (Personal or Admin Only)
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+            format: uuidv4
+          required: true
+          description: 登録しているユーザの UUID
+      requestBody:
+        description: 編集に必要なユーザ情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                club_uuid:
+                  type: string
+                  format: uuidv4
+      responses:
+        201:
+          description: 正常に編集できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/users/{userUUID}/favs:
+    get:
+      tags:
+        - user
+      summary: userUUID のお気に入りサークルを取得します。 (Personal or Admin Only)
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+            format: uuidv4
+          required: true
+          description: 登録しているユーザの UUID
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClubPage-External'
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    post:
+      tags:
+        - user
+      summary: userUUID のお気に入りサークルを登録します。 (Personal or Admin Only)
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+            format: uuidv4
+          required: true
+          description: 登録しているユーザの UUID
+      requestBody:
+        description: 登録に必要なサークル情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                club_uuid:
+                  type: string
+                  format: uuidv4
+      responses:
+        201:
+          description: 正常に登録できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/users/{userUUID}/unfav:
+    post:
+      tags:
+        - user
+      summary: userUUID のお気に入りサークルを解除します。 (Personal or Admin Only)
+      parameters:
+        - in: path
+          name: userUUID
+          schema:
+            type: string
+            format: uuidv4
+          required: true
+          description: 登録しているユーザの UUID
+      requestBody:
+        description: 解除に必要なサークル情報
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                club_uuid:
+                  type: string
+                  format: uuidv4
+      responses:
+        201:
+          description: 正常に解除できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
 components:
   schemas:
     Auth:
@@ -110,7 +308,59 @@ components:
             - "domain"
             - "general"
             - "admin"
-
+    User:
+      type: object
+      properties:
+        user_uuid:
+          type: string
+          format: uuidv4
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+            - "domain"
+            - "general"
+            - "admin"
+    ClubPage-External:
+      type: object
+      properties:
+        club_uuid:
+          type: string
+          format: uuidv4
+        club_slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        campus:
+          type: integer
+          format: uint8
+          enum:
+            - 0
+            - 1
+        club_type:
+          type: integer
+          format: uint8
+          enum:
+            - 0
+            - 1
+            - 2
+        updated_at:
+          type: string
+        thumbnail:
+          $ref: '#/components/schemas/Thumbnail'
+    Thumbnail:
+      type: object
+      properties:
+        thumbnail_id:
+          type: integer
+          format: uint32
+        path:
+          type: string
   examples:
     NullObject:
       value:
