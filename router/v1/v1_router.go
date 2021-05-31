@@ -43,7 +43,7 @@ func (r *Router) AddRouter() {
 			personalGroup := userGroup.Group("/:useruuid", r.middleware.SetUserUUIDKey())
 			{
 				personalGroup.GET("/", r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
-				personalGroup.PUT("/", r.middleware.OverGeneralOnly(), h.UpdateUser())
+				personalGroup.PUT("/", r.middleware.PersonalOrAdminOnly(), h.UpdateUser())
 				personalGroup.GET("/favs", r.middleware.PersonalOrAdminOnly(), h.GetFavoriteClubs())
 				personalGroup.POST("/favs", r.middleware.PersonalOrAdminOnly(), h.CreateFavoriteClub())
 				personalGroup.POST("/unfav", r.middleware.PersonalOrAdminOnly(), h.UnFavoriteClub())
@@ -53,7 +53,7 @@ func (r *Router) AddRouter() {
 		{
 			clubGroup.GET("/", h.GetAllClub())
 			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.OverGeneralOnly(), h.CreateClub())
-			clubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.IdentifyClubUUID(), r.middleware.OverGeneralOnly(), h.UpdateClub())
+			clubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.OverGeneralOnly(), r.middleware.IdentifyClubUUID(), h.UpdateClub())
 			clubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.AdminOnly(), h.DeleteClub())
 			clubGroup.GET("/:clubslug", r.middleware.SetClubSlugKey(), h.GetClub())
 		}
