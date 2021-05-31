@@ -69,7 +69,7 @@ func (h *Handler) CreateGeneralUser() gin.HandlerFunc {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			h.config.WhitelistUsers.AddGeneralUser(res.GetEmail())
-			ctx.JSON(http.StatusCreated, res)
+			ctx.JSON(http.StatusCreated, res.ToUserResponse())
 		}
 	}
 }
