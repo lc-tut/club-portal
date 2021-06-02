@@ -8,14 +8,6 @@ type ClubPlace struct {
 	ClubTime []ClubTime `gorm:"many2many:activity_details;foreignKey:PlaceID;joinForeignKey:PlaceID;references:TimeID;joinReferences:TimeID"`
 }
 
-func (cp *ClubPlace) GetPlaceID() uint32 {
-	return cp.PlaceID
-}
-
-func (cp *ClubPlace) GetPlace() string {
-	return cp.Place
-}
-
 type Places []ClubPlace
 
 func (p Places) ToPlaceResponse(remarks []ClubRemark) []PlaceResponse {

@@ -9,18 +9,6 @@ type ClubTime struct {
 	ClubPlace []ClubPlace `gorm:"many2many:activity_details;foreignKey:TimeID;joinForeignKey:TimeID;references:PlaceID;joinReferences:PlaceID"`
 }
 
-func (ct *ClubTime) GetTimeID() uint32 {
-	return ct.TimeID
-}
-
-func (ct *ClubTime) GetDate() string {
-	return ct.Date
-}
-
-func (ct *ClubTime) GetTime() string {
-	return ct.Time
-}
-
 type Times []ClubTime
 
 func (t Times) ToTimeResponse(remarks []ClubRemark) []TimeResponse {
