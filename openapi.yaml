@@ -5,7 +5,7 @@ info:
   contact:
     email: linuxclub.tut@gmail.com
   license:
-    name: MIT
+    name: MIT Licence
     url: https://github.com/lc-tut/club-portal/blob/master/LICENSE
   version: 1.0.0
 servers:
@@ -15,12 +15,16 @@ tags:
     description: 認証関係の API です。
   - name: user
     description: ユーザ関係の API です。
+  - name: club
+    description: サークル関係の API です。
 paths:
   /auth:
     get:
       tags:
         - auth
       summary: 認証情報を取得します。
+      security:
+        - session: []
       responses:
         200:
           description: 認証情報を持っているか確認します。持っていない場合 null を返します。
@@ -95,6 +99,8 @@ paths:
       tags:
         - user
       summary: 自身のユーザ情報を取得します。 (認証が必要)
+      security:
+        - session: []
       responses:
         200:
           description: 自身のユーザ情報を取得できた場合に返されます。
@@ -110,8 +116,11 @@ paths:
       tags:
         - user
       summary: 新しくユーザ (General) を作成します。 (Admin Only)
+      security:
+        - session: []
       requestBody:
         description: 作成に必要なユーザ情報
+        required: true
         content:
           application/json:
             schema:
@@ -124,7 +133,6 @@ paths:
               example:
                 email: foo@example.com
                 name: Foo Club
-        required: true
       responses:
         201:
           description: 正常に作成できた場合に返されます。
@@ -143,6 +151,8 @@ paths:
       tags:
         - user
       summary: userUUID のユーザを取得します。 (Personal or Admin Only)
+      security:
+        - session: []
       parameters:
         - in: path
           name: userUUID
@@ -166,6 +176,8 @@ paths:
       tags:
         - user
       summary: userUUID のユーザ情報を編集します。 (Personal or Admin Only)
+      security:
+        - session: []
       parameters:
         - in: path
           name: userUUID
@@ -176,6 +188,7 @@ paths:
           description: 登録しているユーザの UUID
       requestBody:
         description: 編集に必要なユーザ情報
+        required: true
         content:
           application/json:
             schema:
@@ -202,6 +215,8 @@ paths:
       tags:
         - user
       summary: userUUID のお気に入りサークルを取得します。 (Personal or Admin Only)
+      security:
+        - session: []
       parameters:
         - in: path
           name: userUUID
@@ -227,6 +242,8 @@ paths:
       tags:
         - user
       summary: userUUID のお気に入りサークルを登録します。 (Personal or Admin Only)
+      security:
+        - session: []
       parameters:
         - in: path
           name: userUUID
@@ -237,6 +254,7 @@ paths:
           description: 登録しているユーザの UUID
       requestBody:
         description: 登録に必要なサークル情報
+        required: true
         content:
           application/json:
             schema:
@@ -259,6 +277,8 @@ paths:
       tags:
         - user
       summary: userUUID のお気に入りサークルを解除します。 (Personal or Admin Only)
+      security:
+        - session: []
       parameters:
         - in: path
           name: userUUID
@@ -269,6 +289,7 @@ paths:
           description: 登録しているユーザの UUID
       requestBody:
         description: 解除に必要なサークル情報
+        required: true
         content:
           application/json:
             schema:
@@ -284,6 +305,81 @@ paths:
           description: リクエストが不正な場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs:
+    get:
+      tags:
+        - club
+      summary: 全てのサークルを取得します。
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-External'
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    post:
+      tags:
+        - club
+      summary: 新しくサークルを作成します。 (General 以上)
+      security:
+        - session: []
+      requestBody:
+        description: 作成に必要なサークル情報。
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                campus:
+                  $ref: '#/components/schemas/Campus'
+                club_type:
+                  $ref: '#/components/schemas/ClubType'
+                contents:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Content'
+                links:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Link'
+                schedules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Schedule'
+                achievements:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Achievement'
+                images:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ImageRequest'
+                videos:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Video'
+                activity_details:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ActivityDetail'
+      responses:
+        201:
+          description: 正常に作成した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-External'
+        400:
+          description: リクエストが不正な場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
 components:
@@ -337,22 +433,63 @@ components:
         description:
           type: string
         campus:
-          type: integer
-          format: uint8
-          enum:
-            - 0
-            - 1
+          $ref: '#/components/schemas/Campus'
         club_type:
-          type: integer
-          format: uint8
-          enum:
-            - 0
-            - 1
-            - 2
+          $ref: '#/components/schemas/ClubType'
         updated_at:
           type: string
+          format: RFC3339
         thumbnail:
           $ref: '#/components/schemas/Thumbnail'
+    ClubPage-Internal:
+      type: object
+      properties:
+        club_uuid:
+          type: string
+          format: uuidv4
+        name:
+          type: string
+        description:
+          type: string
+        campus:
+          $ref: '#/components/schemas/Campus'
+        club_type:
+          $ref: '#/components/schemas/ClubType'
+        updated_at:
+          type: string
+          format: RFC3339
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Content'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        schedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schedule'
+        achievements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Achievement'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageRequest'
+        videos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Video'
+        times:
+          type: array
+          items:
+            $ref: '#/components/schemas/Time'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Place'
     Thumbnail:
       type: object
       properties:
@@ -361,6 +498,105 @@ components:
           format: uint32
         path:
           type: string
+    Campus:
+      type: integer
+      format: uint8
+      enum:
+        - 0
+        - 1
+    ClubType:
+      type: integer
+      format: uint8
+      enum:
+        - 0
+        - 1
+        - 2
+    Content:
+      type: object
+      properties:
+        content:
+          type: string
+    Link:
+      type: object
+      properties:
+        label:
+          type: string
+        url:
+          type: string
+    Schedule:
+      type: object
+      properties:
+        month:
+          type: integer
+          format: uint8
+        schedule:
+          type: string
+        remarks:
+          type: string
+          nullable: true
+    Achievement:
+      type: object
+      properties:
+        achievement:
+          type: string
+    Time:
+      type: object
+      properties:
+        date:
+          type: string
+        time:
+          type: string
+        remarks:
+          type: string
+          nullable: true
+    Place:
+      type: object
+      properties:
+        place:
+          type: string
+        remarks:
+          type: string
+          nullable: true
+    Video:
+      type: object
+      properties:
+        path:
+          type: string
+    ImageRequest:
+      type: object
+      properties:
+        image_id:
+          type: integer
+          format: uint32
+    ImageResponse:
+      type: object
+      properties:
+        image_id:
+          type: integer
+          format: uint32
+        path:
+          type: string
+    ActivityDetail:
+      type: object
+      properties:
+        time_id:
+          type: integer
+          format: uint32
+        date:
+          type: string
+        time:
+          type: string
+        time_remark:
+          type: string
+          nullable: true
+        place_id:
+          type: integer
+          format: uint32
+        place:
+          type: string
+        place_remark:
+          type: string
+          nullable: true
   examples:
     NullObject:
       value:
@@ -372,3 +608,8 @@ components:
         email: foo@example.com
         name: "John Joe"
         role: "domain"
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: cp_sess
