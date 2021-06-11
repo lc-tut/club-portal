@@ -154,13 +154,7 @@ paths:
       security:
         - session: []
       parameters:
-        - in: path
-          name: userUUID
-          schema:
-            type: string
-            format: uuidv4
-          required: true
-          description: 登録しているユーザの UUID
+        - $ref: '#/components/parameters/UserUUID'
       responses:
         200:
           description: 正常に取得した場合に返されます。
@@ -179,13 +173,7 @@ paths:
       security:
         - session: []
       parameters:
-        - in: path
-          name: userUUID
-          schema:
-            type: string
-            format: uuidv4
-          required: true
-          description: 登録しているユーザの UUID
+        - $ref: '#/components/parameters/UserUUID'
       requestBody:
         description: 編集に必要なユーザ情報
         required: true
@@ -218,13 +206,7 @@ paths:
       security:
         - session: []
       parameters:
-        - in: path
-          name: userUUID
-          schema:
-            type: string
-            format: uuidv4
-          required: true
-          description: 登録しているユーザの UUID
+        - $ref: '#/components/parameters/UserUUID'
       responses:
         200:
           description: 正常に取得できた場合に返されます。
@@ -245,13 +227,7 @@ paths:
       security:
         - session: []
       parameters:
-        - in: path
-          name: userUUID
-          schema:
-            type: string
-            format: uuidv4
-          required: true
-          description: 登録しているユーザの UUID
+        - $ref: '#/components/parameters/UserUUID'
       requestBody:
         description: 登録に必要なサークル情報
         required: true
@@ -280,13 +256,7 @@ paths:
       security:
         - session: []
       parameters:
-        - in: path
-          name: userUUID
-          schema:
-            type: string
-            format: uuidv4
-          required: true
-          description: 登録しているユーザの UUID
+        - $ref: '#/components/parameters/UserUUID'
       requestBody:
         description: 解除に必要なサークル情報
         required: true
@@ -380,6 +350,93 @@ paths:
                 $ref: '#/components/schemas/ClubPage-External'
         400:
           description: リクエストが不正な場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/{clubSlug}:
+    get:
+      tags:
+        - club
+      parameters:
+        - in: path
+          name: clubSlug
+          schema:
+            type: string
+          required: true
+          description: サークルの個別 URL
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-Internal'
+        500:
+                    description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/{clubUUID}:
+    put:
+      tags:
+        - club
+      summary: clubUUID のサークル情報を編集します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      requestBody:
+        description: 編集に必要なサークル情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                contents:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Content'
+                links:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Link'
+                schedules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Schedule'
+                achievements:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Achievement'
+                images:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ImageRequest'
+                videos:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Video'
+                activity_details:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ActivityDetail'
+      responses:
+        200:
+          description: 正常に編集できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    delete:
+      tags:
+        - club
+      summary: clubUUID のサークル情報を非公開にします。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に非公開にした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
 components:
@@ -597,6 +654,23 @@ components:
         place_remark:
           type: string
           nullable: true
+  parameters:
+    ClubUUID:
+      name: clubUUID
+      in: path
+      schema:
+        type: string
+        format: uuidv4
+      required: true
+      description: サークルの個別 UUID
+    UserUUID:
+      name: userUUID
+      in: path
+      schema:
+        type: string
+        format: uuidv4
+      required: true
+      description: 登録しているユーザの UUID
   examples:
     NullObject:
       value:
