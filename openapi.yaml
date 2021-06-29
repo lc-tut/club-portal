@@ -17,6 +17,8 @@ tags:
     description: ユーザ関係の API です。
   - name: club
     description: サークル関係の API です。
+  - name: upload
+    description: 画像などアップロード関係の API です。
 paths:
   /auth:
     get:
@@ -356,6 +358,7 @@ paths:
     get:
       tags:
         - club
+      summary: clubSlug のサークル情報を取得します。
       parameters:
         - in: path
           name: clubSlug
@@ -371,7 +374,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClubPage-Internal'
         500:
-                    description: サーバ側でエラーが発生した場合に返されます。
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/clubs/{clubUUID}:
     put:
       tags:
@@ -439,6 +442,76 @@ paths:
           description: 正常に非公開にした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/upload/images:
+    get:
+      tags:
+        - upload
+      summary: 自身がアップロードした画像を取得します。
+      security:
+        - session: []
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    post:
+      tags:
+        - upload
+      summary: 画像をアップロードします。
+      security:
+        - session: []
+      requestBody:
+        description: アップロードする画像
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: 正常にアップロードされた場合に返されます。
+        400:
+          description: リクエストが不正の場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/upload/images/{imageID}:
+    get:
+      tags:
+        - upload
+      summary: imageID の画像を取得します。
+      security:
+        - session: []
+      parameters:
+        - in: path
+          name: imageID
+          schema:
+            type: integer
+          required: true
+          description: 画像の ID
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+    delete:
+      tags:
+        - upload
+      summary: imageID の画像を削除します。
+      security:
+        - session: []
+      responses:
+        201:
+          description: 削除に成功した場合に返されます。
+        400:
+          description: リクエストが不正の場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/upload/thumbnail/clubs:
+  /v1/upload/thumbnail/clubs/{clubUUID}:
+  /v1/upload/thumbnail/id/{thumbnailID}:
 components:
   schemas:
     Auth:
