@@ -502,6 +502,13 @@ paths:
       summary: imageID の画像を削除します。
       security:
         - session: []
+      parameters:
+        - in: path
+          name: imageID
+          schema:
+            type: integer
+          required: true
+          description: 画像の ID
       responses:
         201:
           description: 削除に成功した場合に返されます。
