@@ -2,7 +2,6 @@ package utils
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/lc-tut/club-portal/consts"
 )
 
@@ -46,7 +45,7 @@ func ToCampusType(i uint8) (consts.CampusType, error) {
 	case consts.CampusKamata, consts.CampusHachioji:
 		return typed, nil
 	default:
-		return 0, errors.New("invalid CampusType")
+		return 0, consts.NewValidateError("invalid CampusType")
 	}
 }
 
@@ -56,7 +55,7 @@ func ToClubType(i uint8) (consts.ClubType, error) {
 	case consts.SportsType, consts.CultureType, consts.KokasaiType:
 		return typed, nil
 	default:
-		return 0, errors.New("invalid ClubType")
+		return 0, consts.NewValidateError("invalid ClubType")
 	}
 }
 
@@ -66,6 +65,6 @@ func ToUserType(s string) (consts.UserType, error) {
 	case consts.AdminUser, consts.GeneralUser, consts.DomainUser:
 		return typed, nil
 	default:
-		return "", errors.New("no role: " + s)
+		return "", consts.NewValidateError("no role: " + s)
 	}
 }
