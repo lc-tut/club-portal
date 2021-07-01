@@ -510,8 +510,104 @@ paths:
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/clubs:
+    post:
+      tags:
+        - upload
+      summary: サークルのサムネイルをアップロードします。 (400*400px)
+      security:
+        - session: []
+      requestBody:
+        description: アップロードするサムネイル
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: 正常にアップロードされた場合に返されます。
+        400:
+          description: リクエストが不正の場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/clubs/{clubUUID}:
+    get:
+      tags:
+        - upload
+      summary: clubUUID のサークルのサムネイルを取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - upload
+      summary: clubUUID のサークルのサムネイルを変更します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      requestBody:
+        description: アップロードするサムネイル
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: 正常に変更できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    delete:
+      tags:
+        - upload
+      summary: clubUUID のサークルのサムネイルを初期化します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        201:
+          description: 正常に初期化できた場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/id/{thumbnailID}:
+    get:
+      tags:
+        - upload
+      summary: thumbnailID のサムネイルを取得します。
+      security:
+        - session: []
+      parameters:
+        - in: path
+          name: thumbnailID
+          schema:
+            type: integer
+          required: true
+          description: サムネイルの ID
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
 components:
   schemas:
     Auth:
