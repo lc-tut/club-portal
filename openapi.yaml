@@ -452,6 +452,10 @@ paths:
       responses:
         200:
           description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageResponse'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     post:
@@ -496,6 +500,10 @@ paths:
       responses:
         200:
           description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageResponse'
     delete:
       tags:
         - upload
@@ -554,6 +562,10 @@ paths:
       responses:
         200:
           description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thumbnail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -613,6 +625,10 @@ paths:
       responses:
         200:
           description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thumbnail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
 components:
