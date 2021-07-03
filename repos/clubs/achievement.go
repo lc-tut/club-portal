@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -21,8 +22,10 @@ func (r *ClubRepository) GetAchievementByID(achievementID uint32) (*clubs.ClubAc
 	achievement := &clubs.ClubAchievement{}
 	tx := r.db.Where("achievement_id = ?", achievementID).Take(achievement)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -33,8 +36,10 @@ func (r *ClubRepository) GetAchievementsByClubUUID(uuid string) ([]clubs.ClubAch
 	achievement := make([]clubs.ClubAchievement, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(achievement)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -102,7 +107,10 @@ func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []strin
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -121,7 +129,12 @@ func (r *ClubRepository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, a
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{}).Error; err != nil {
+	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

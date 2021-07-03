@@ -1,7 +1,9 @@
 package users
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/users"
+	"gorm.io/gorm"
 )
 
 type UploadedImageRepo interface {
@@ -18,8 +20,10 @@ func (r *UserRepository) GetUploadedImageByID(imageID uint32) (*users.UploadedIm
 	image := &users.UploadedImage{}
 	tx := r.db.Where("image_id = ?", imageID).Take(image)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -30,8 +34,10 @@ func (r *UserRepository) GetImagesByUserUUID(userUUID string) ([]users.UploadedI
 	images := make([]users.UploadedImage, 0)
 	tx := r.db.Where("owner = ?", userUUID).Find(&images)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -57,7 +63,10 @@ func (r *UserRepository) DeleteImageByID(imageID uint32) error {
 	image := &users.UploadedImage{}
 	tx := r.db.Where("image_id = ?", imageID).Delete(image)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

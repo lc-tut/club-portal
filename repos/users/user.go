@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
@@ -38,8 +39,10 @@ func (r *UserRepository) GetAllGeneralUser() ([]users.GeneralUser, error) {
 	generalUsers := make([]users.GeneralUser, 0)
 	tx := r.db.Find(&generalUsers)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -50,8 +53,10 @@ func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, er
 	user := &users.DomainUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -62,8 +67,10 @@ func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, 
 	user := &users.DomainUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -74,8 +81,10 @@ func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, 
 	user := &users.GeneralUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -86,8 +95,10 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 	user := &users.GeneralUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -98,8 +109,10 @@ func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, erro
 	user := &users.AdminUser{}
 	tx := r.db.Where("user_uuid", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -110,8 +123,10 @@ func (r *UserRepository) GetAdminUserByEmail(email string) (*users.AdminUser, er
 	user := &users.AdminUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -254,7 +269,11 @@ func (r *UserRepository) UpdateDomainUser(uuid string, name string) error {
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -270,7 +289,11 @@ func (r *UserRepository) UpdateGeneralUser(uuid string, name string, clubUUID st
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -285,7 +308,11 @@ func (r *UserRepository) UpdateAdminUser(uuid string, name string) error {
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

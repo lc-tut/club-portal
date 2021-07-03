@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"github.com/lc-tut/club-portal/utils"
 	"gorm.io/gorm"
@@ -28,7 +29,10 @@ func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule
 	schedule := &clubs.ClubSchedule{}
 	tx := r.db.Where("schedule_id = ?", scheduleID).Take(schedule)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -40,7 +44,10 @@ func (r *ClubRepository) GetSchedulesByClubUUID(uuid string) ([]clubs.ClubSchedu
 	schedule := make([]clubs.ClubSchedule, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&schedule)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -101,7 +108,10 @@ func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubSchedule{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -120,7 +130,12 @@ func (r *ClubRepository) UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubSchedule{}).Error; err != nil {
+	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubSchedule{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

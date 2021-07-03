@@ -1,6 +1,10 @@
 package users
 
-import "github.com/lc-tut/club-portal/models/users"
+import (
+	"errors"
+	"github.com/lc-tut/club-portal/models/users"
+	"gorm.io/gorm"
+)
 
 type UploadedThumbnailRepo interface {
 	GetThumbnail(thumbnailID uint32) (*users.UploadedThumbnail, error)
@@ -16,7 +20,10 @@ func (r *UserRepository) GetThumbnail(thumbnailID uint32) (*users.UploadedThumbn
 	thumbnail := &users.UploadedThumbnail{}
 	tx := r.db.Where("thumbnail_id = ?", thumbnailID).Find(thumbnail)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -41,7 +48,11 @@ func (r *UserRepository) CreateThumbnail(path string) (*users.UploadedThumbnail,
 func (r *UserRepository) UpdateThumbnail(thumbnailID uint32, path string) error {
 	tx := r.db.Model(&users.UploadedThumbnail{}).Where("thumbnail_id = ?", thumbnailID).Update("path", path)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -52,7 +63,10 @@ func (r *UserRepository) UpdateThumbnail(thumbnailID uint32, path string) error 
 func (r *UserRepository) DeleteThumbnail(thumbnailID uint32) error {
 	tx := r.db.Where("thumbnail_id = ?", thumbnailID).Delete(&users.UploadedThumbnail{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
