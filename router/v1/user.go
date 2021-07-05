@@ -30,7 +30,7 @@ func (h *Handler) GetUser() gin.HandlerFunc {
 func (h *Handler) GetUserUUID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userUUID := ctx.GetString(consts.UserUUIDKeyName)
-		role := ctx.GetString(consts.SessionUserRole)
+		role := ctx.GetString(consts.SessionUserRole) // role が Admin の場合↓が正常に動かない可能性
 		user, err := h.repo.GetUserByUUIDFromRole(userUUID, role)
 
 		if err != nil {
