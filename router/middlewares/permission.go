@@ -35,20 +35,6 @@ func (mw *Middleware) GeneralOnly() gin.HandlerFunc {
 	}
 }
 
-func (mw *Middleware) OverGeneralOnly() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		email := ctx.GetString(consts.SessionUserEmail)
-
-		if !mw.config.WhitelistUsers.IsGeneralUser(email) && !mw.config.WhitelistUsers.IsAdminUser(email) {
-			mw.logger.Warn("invalid user", zap.String("email", email))
-			ctx.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-
-		ctx.Next()
-	}
-}
-
 func (mw *Middleware) AdminOnly() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		email := ctx.GetString(consts.SessionUserEmail)
