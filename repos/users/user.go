@@ -112,7 +112,7 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 
 func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("user_uuid", uuid).Take(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())

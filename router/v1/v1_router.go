@@ -6,6 +6,7 @@ import (
 	"github.com/lc-tut/club-portal/repos"
 	"github.com/lc-tut/club-portal/router/config"
 	"github.com/lc-tut/club-portal/router/middlewares"
+	"github.com/lc-tut/club-portal/router/v1/admins"
 	"go.uber.org/zap"
 )
 
@@ -34,6 +35,7 @@ type Router struct {
 func (r *Router) AddRouter() {
 	r.logger.Debug("initializing v1 router")
 	h := newHandler(r.config, r.logger, r.repo)
+	adminH := admins.NewAdminHandler(r.config, r.logger, r.repo)
 
 	v1Group := r.rg.Group("/v1")
 	{
@@ -86,7 +88,7 @@ func (r *Router) AddRouter() {
 		{
 			userGroup := adminGroup.Group("/users/:clubuuid")
 			{
-				userGroup.GET("/")
+				userGroup.GET("/", adminH.GetUserFromAdmin())
 			}
 		}
 	}
