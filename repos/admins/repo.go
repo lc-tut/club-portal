@@ -6,6 +6,7 @@ import (
 )
 
 type IAdminRepository interface {
+	AdminUserRepo
 }
 
 type AdminRepository struct {
