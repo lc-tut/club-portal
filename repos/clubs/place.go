@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -24,7 +25,10 @@ func (r *ClubRepository) GetPlaceByID(placeID uint32) (*clubs.ClubPlace, error) 
 	place := &clubs.ClubPlace{}
 	tx := r.db.Where("place_id = ?", placeID).Take(place)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -36,7 +40,10 @@ func (r *ClubRepository) GetPlacesByClubUUID(uuid string) ([]clubs.ClubPlace, er
 	places := make([]clubs.ClubPlace, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find([]clubs.ActivityDetail{}).Joins("inner join club_places on activity_details.place_id = club_places.place_id").Scan(&places)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}

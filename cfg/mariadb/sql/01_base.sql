@@ -10,5 +10,6 @@ create table if not exists `club_pages` (
 );
 
 create table if not exists `users` (
-    `user_uuid` char(36) not null primary key
+    `user_uuid` char(36) not null primary key,
+    `role` varchar(16) not null
 );

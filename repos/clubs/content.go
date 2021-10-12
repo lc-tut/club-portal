@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,10 @@ func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, e
 	content := &clubs.ClubContent{}
 	tx := r.db.Where("content_id = ?", contentID).Take(content)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -33,7 +37,10 @@ func (r *ClubRepository) GetContentsByClubUUID(uuid string) ([]clubs.ClubContent
 	content := make([]clubs.ClubContent, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&content)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -90,7 +97,10 @@ func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -109,7 +119,12 @@ func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, conte
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{}).Error; err != nil {
+	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -25,7 +26,10 @@ func (r *ClubRepository) GetActivityDetail(uuid string) ([]clubs.ActivityDetail,
 	details := make([]clubs.ActivityDetail, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&details)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -107,7 +111,12 @@ func (r *ClubRepository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", uuid).Delete(&clubs.ActivityDetail{}).Error; err != nil {
+	tx = tx.Where("club_uuid = ?", uuid).Delete(&clubs.ActivityDetail{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

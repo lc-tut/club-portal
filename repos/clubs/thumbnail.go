@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -22,7 +23,10 @@ func (r *ClubRepository) GetClubThumbnailByID(thumbnailID uint32) (*clubs.ClubTh
 	joinQuery := "inner join uploaded_thumbnails as ut using (thumbnail_id)"
 	tx := r.db.Joins(joinQuery).Select(selectQuery).Where("thumbnail_id = ?", thumbnailID).Find(thumbnail)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -36,7 +40,10 @@ func (r *ClubRepository) GetClubThumbnailByUUID(clubUUID string) (*clubs.ClubThu
 	joinQuery := "inner join uploaded_thumbnails as ut using (thumbnail_id)"
 	tx := r.db.Joins(joinQuery).Select(selectQuery).Where("club_uuid = ?", clubUUID).Find(thumbnail)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -76,7 +83,11 @@ func (r *ClubRepository) CreateClubThumbnailWithTx(tx *gorm.DB, clubUUID string,
 func (r *ClubRepository) UpdateClubThumbnail(clubUUID string, thumbnailID uint32) error {
 	tx := r.db.Model(&clubs.ClubThumbnail{}).Where("club_uuid = ?", clubUUID).Update("thumbnail_id", thumbnailID)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -85,7 +96,13 @@ func (r *ClubRepository) UpdateClubThumbnail(clubUUID string, thumbnailID uint32
 }
 
 func (r *ClubRepository) UpdateClubThumbnailWithTx(tx *gorm.DB, clubUUID string, thumbnailID uint32) error {
-	if err := tx.Model(&clubs.ClubThumbnail{}).Where("club_uuid = ?", clubUUID).Update("thumbnail_id", thumbnailID).Error; err != nil {
+	tx = tx.Model(&clubs.ClubThumbnail{}).Where("club_uuid = ?", clubUUID).Update("thumbnail_id", thumbnailID)
+
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

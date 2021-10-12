@@ -15,6 +15,7 @@ type UserInfo interface {
 
 type User struct {
 	UserUUID       string          `gorm:"type:char(36);not null;primaryKey"`
+	Role           string          `gorm:"type:varchar(16);not null"`
 	AdminUsers     []AdminUser     `gorm:"foreignKey:UserUUID;references:UserUUID"`
 	GeneralUsers   []GeneralUser   `gorm:"foreignKey:UserUUID;references:UserUUID"`
 	DomainUsers    []DomainUser    `gorm:"foreignKey:UserUUID;references:UserUUID"`

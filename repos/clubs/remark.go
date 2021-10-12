@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"github.com/lc-tut/club-portal/utils"
 	"gorm.io/gorm"
@@ -27,7 +28,10 @@ func (r *ClubRepository) GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, 
 
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -86,7 +90,12 @@ func (r *ClubRepository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", uuid).Delete(&clubs.ClubRemark{}).Error; err != nil {
+	tx = tx.Where("club_uuid = ?", uuid).Delete(&clubs.ClubRemark{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

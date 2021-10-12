@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"github.com/lc-tut/club-portal/utils"
@@ -61,7 +62,10 @@ func (r *ClubRepository) GetAllPages() ([]clubs.ClubPageExternalInfo, error) {
 		return db.Joins(joinQuery).Select(selectQuery)
 	}).Find(&page)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -75,7 +79,10 @@ func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternal
 	page := &clubs.ClubPage{}
 	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Videos").Preload("ActivityDetails").Take(page)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -93,7 +100,10 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 	page := &clubs.ClubPage{}
 	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Contents").Preload("Links").Preload("Schedules").Preload("Achievements").Preload("Images").Preload("Videos").Preload("ActivityDetails").Take(page)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -273,7 +283,10 @@ func (r *ClubRepository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpda
 
 	tx := r.db.Where("club_slug = ?", clubSlug).Select("club_uuid").Take(&page)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -288,7 +301,11 @@ func (r *ClubRepository) UpdatePageByClubSlug(clubSlug string, args ClubPageUpda
 func (r *ClubRepository) DeletePageByClubUUID(uuid string) error {
 	tx := r.db.Model(&clubs.ClubPage{}).Where("club_uuid = ?", uuid).Update("visible", false)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -299,7 +316,11 @@ func (r *ClubRepository) DeletePageByClubUUID(uuid string) error {
 func (r *ClubRepository) DeletePageByClubSlug(slug string) error {
 	tx := r.db.Model(&clubs.ClubPage{}).Where("club_slug = ?", slug).Update("visible", false)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

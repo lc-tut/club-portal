@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,10 @@ func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) 
 	video := &clubs.ClubVideo{}
 	tx := r.db.Where("video_id = ?", videoID).Take(video)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -33,7 +37,10 @@ func (r *ClubRepository) GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, er
 	video := make([]clubs.ClubVideo, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&video)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -102,7 +109,10 @@ func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubVideo{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -121,7 +131,12 @@ func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{}).Error; err != nil {
+	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
