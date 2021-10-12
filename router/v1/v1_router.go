@@ -89,6 +89,7 @@ func (r *Router) AddRouter() {
 			userGroup := adminGroup.Group("/users/:useruuid", r.middleware.SetUserUUIDKey())
 			{
 				userGroup.GET("/", adminH.GetUserFromAdmin())
+				userGroup.PUT("/", adminH.UpdateDomainUserFromAdmin())
 			}
 			clubGroup := adminGroup.Group("/clubs")
 			{

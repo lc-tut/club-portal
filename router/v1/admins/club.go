@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type UpdatePostData struct {
+type UpdateClubPostData struct {
 	UserUUID string
 	Email    string
 	Name     string
@@ -15,7 +15,7 @@ type UpdatePostData struct {
 
 func (h *handler) UpdateClubUserFromAdmin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pd := &UpdatePostData{}
+		pd := &UpdateClubPostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
 			h.logger.Error(err.Error())

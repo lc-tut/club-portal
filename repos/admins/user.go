@@ -10,6 +10,8 @@ import (
 
 type AdminUserRepo interface {
 	GetSpecifiedUser(userUUID string) (models.UserInfo, error)
+
+	UpdateSpecifiedDomainUser(userUUID string, name string) error
 }
 
 func (r *AdminRepository) GetSpecifiedUser(userUUID string) (models.UserInfo, error) {
@@ -80,5 +82,24 @@ func (r *AdminRepository) getDomainUser(userUUID string) (*models.DomainUser, er
 		return nil, err
 	} else {
 		return user, nil
+	}
+}
+
+func (r *AdminRepository) UpdateSpecifiedDomainUser(userUUID string, name string) error {
+	user := models.DomainUser{
+		UserUUID: userUUID,
+		Name:     name,
+	}
+	tx := r.db.Model(&user).Where("user_uuid = ?", userUUID).Updates(user)
+
+	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
+		return err
+	} else if tx.RowsAffected == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else {
+		return nil
 	}
 }
