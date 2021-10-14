@@ -22,7 +22,8 @@
 - `utils` -> 汎用関数など
 
 ## 開発
-基本的には, 以下のようにブランチを切って作業を行い, Pull Request (PR) を送ってください.
+基本的には, 以下のようにブランチを切って作業を行い, Pull Request (PR) を `dev` ブランチに送ってください.
+`dev` ブランチがメインブランチとなります.
 ```shell
 $ git checkout -b <branch_name>
 ```
