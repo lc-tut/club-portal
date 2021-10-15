@@ -64,10 +64,10 @@ func (r *Router) AddRouter() {
 		{
 			imageGroup := uploadGroup.Group("/images")
 			{
-				imageGroup.GET("/", h.GetImages())
+				imageGroup.GET("/", r.middleware.CheckSession(), h.GetImages())
 				imageGroup.POST("/", r.middleware.CheckSession(), h.UploadImage())
 				imageGroup.GET("/:imageid", r.middleware.SetImageIDKey(), h.GetSpecificImage())
-				imageGroup.DELETE("/:imageid", r.middleware.CheckSession(), r.middleware.SetImageIDKey(), h.DeleteImage())
+				imageGroup.DELETE("/:imageid", r.middleware.CheckSession(), r.middleware.SetImageIDKey(), h.DeleteImage()) // 他ユーザが消せる可能性があるかも
 			}
 			thumbnailGroup := uploadGroup.Group("/thumbnail")
 			{
