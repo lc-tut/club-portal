@@ -63,7 +63,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 
 		for _, f := range files {
 			filename := filepath.Base(f.Filename)
-			h.logger.Info("uploaded image", zap.String("filename", filename))
+			h.logger.Info("uploaded image", zap.String("filename", filename), zap.String("user_uuid", userUUID))
 			newFn, err := utils.GenerateFileName(filename)
 
 			if err != nil {
@@ -86,7 +86,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 				break
 			}
 
-			h.logger.Info("successfully saved image", zap.String("path", dst))
+			h.logger.Info("successfully saved image", zap.String("path", dst), zap.String("user_uuid", userUUID))
 		}
 
 		if isError {

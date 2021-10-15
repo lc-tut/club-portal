@@ -26,6 +26,7 @@ func (h *Handler) Auth() gin.HandlerFunc {
 				zap.String("email", s.Email),
 				zap.String("name", s.Name),
 				zap.String("role", s.Role),
+				zap.String("avatar", s.AvatarURL),
 			)
 			ctx.JSON(http.StatusOK, s)
 		} else {

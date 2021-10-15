@@ -48,8 +48,10 @@ func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
 			return
 		}
 
+		clubUUID := ctx.GetString(consts.SessionUserUUID)
+
 		fn := filepath.Base(file.Filename)
-		h.logger.Info("uploaded image", zap.String("filename", fn))
+		h.logger.Info("uploaded image", zap.String("filename", fn), zap.String("club_uuid", clubUUID))
 		newFn, err := utils.GenerateFileName(fn)
 
 		if err != nil {
@@ -73,8 +75,6 @@ func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
 			ctx.Status(http.StatusInternalServerError)
 			return
 		}
-
-		clubUUID := ctx.GetString(consts.SessionUserUUID)
 
 		if err := h.repo.CreateClubThumbnail(clubUUID, thumbnail.ThumbnailID); err != nil {
 			_ = h.deleteSavedThumbnail(dst)

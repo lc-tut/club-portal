@@ -2,9 +2,11 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/repos"
 	"github.com/lc-tut/club-portal/router/config"
 	"github.com/lc-tut/club-portal/router/middlewares"
+	"github.com/lc-tut/club-portal/router/v1/admins"
 	"go.uber.org/zap"
 )
 
@@ -33,6 +35,7 @@ type Router struct {
 func (r *Router) AddRouter() {
 	r.logger.Debug("initializing v1 router")
 	h := newHandler(r.config, r.logger, r.repo)
+	adminH := admins.NewAdminHandler(r.config, r.logger, r.repo)
 
 	v1Group := r.rg.Group("/v1")
 	{
@@ -40,45 +43,57 @@ func (r *Router) AddRouter() {
 		{
 			userGroup.GET("/", h.GetUser())
 			userGroup.POST("/", r.middleware.AdminOnly(), h.CreateGeneralUser())
-			personalGroup := userGroup.Group("/:useruuid", r.middleware.SetUserUUIDKey())
+			personalGroup := userGroup.Group("/:useruuid", r.middleware.SetUserUUIDKey(), r.middleware.IdentifyUUID(consts.UserUUIDKeyName))
 			{
-				personalGroup.GET("/", r.middleware.PersonalOrAdminOnly(), h.GetUserUUID())
-				personalGroup.PUT("/", r.middleware.OverGeneralOnly(), h.UpdateUser())
-				personalGroup.GET("/favs", r.middleware.PersonalOrAdminOnly(), h.GetFavoriteClubs())
-				personalGroup.POST("/favs", r.middleware.PersonalOrAdminOnly(), h.CreateFavoriteClub())
-				personalGroup.POST("/unfav", r.middleware.PersonalOrAdminOnly(), h.UnFavoriteClub())
+				personalGroup.GET("/", h.GetUserUUID())
+				personalGroup.PUT("/", h.UpdateUser())
+				personalGroup.GET("/favs", h.GetFavoriteClubs())
+				personalGroup.POST("/favs", h.CreateFavoriteClub())
+				personalGroup.POST("/unfav", h.UnFavoriteClub())
 			}
 		}
 		clubGroup := v1Group.Group("/clubs")
 		{
 			clubGroup.GET("/", h.GetAllClub())
-			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.OverGeneralOnly(), h.CreateClub())
-			clubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.IdentifyClubUUID(), r.middleware.OverGeneralOnly(), h.UpdateClub())
+			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.CreateClub())
+			clubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClub())
 			clubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.AdminOnly(), h.DeleteClub())
 			clubGroup.GET("/:clubslug", r.middleware.SetClubSlugKey(), h.GetClub())
 		}
-		uploadGroup := v1Group.Group("/upload", r.middleware.CheckSession())
+		uploadGroup := v1Group.Group("/upload")
 		{
 			imageGroup := uploadGroup.Group("/images")
 			{
-				imageGroup.GET("/", h.GetImages())
-				imageGroup.POST("/", h.UploadImage())
+				imageGroup.GET("/", r.middleware.CheckSession(), h.GetImages())
+				imageGroup.POST("/", r.middleware.CheckSession(), h.UploadImage())
 				imageGroup.GET("/:imageid", r.middleware.SetImageIDKey(), h.GetSpecificImage())
-				imageGroup.DELETE("/:imageid", r.middleware.SetImageIDKey(), h.DeleteImage())
+				imageGroup.DELETE("/:imageid", r.middleware.CheckSession(), r.middleware.SetImageIDKey(), h.DeleteImage()) // 他ユーザが消せる可能性があるかも
 			}
 			thumbnailGroup := uploadGroup.Group("/thumbnail")
 			{
 				thumbnailClubGroup := thumbnailGroup.Group("/clubs")
 				{
-					thumbnailClubGroup.POST("/", r.middleware.GeneralOnly(), h.UploadClubThumbnail())
+					thumbnailClubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
+					thumbnailClubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
 					thumbnailClubGroup.GET("/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetClubThumbnail())
-					thumbnailClubGroup.PUT("/:clubuuid", r.middleware.SetClubUUIDKey(), r.middleware.OverGeneralOnly(), r.middleware.IdentifyClubUUID(), h.UpdateClubThumbnail())
-					thumbnailClubGroup.DELETE("/:clubuuid", r.middleware.SetClubUUIDKey(), r.middleware.OverGeneralOnly(), r.middleware.IdentifyClubUUID(), h.DeleteClubThumbnail())
+					thumbnailClubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.DeleteClubThumbnail())
 				}
-				thumbnailIDGroup := thumbnailGroup.Group("/ids")
+				thumbnailIDGroup := thumbnailGroup.Group("/id")
 				{
 					thumbnailIDGroup.GET("/:thumbnailid", r.middleware.SetThumbnailIDKey(), h.GetThumbnail())
 				}
+			}
+		}
+		adminGroup := v1Group.Group("/admin", r.middleware.CheckSession(), r.middleware.AdminOnly())
+		{
+			userGroup := adminGroup.Group("/users/:useruuid", r.middleware.SetUserUUIDKey())
+			{
+				userGroup.GET("/", adminH.GetUserFromAdmin())
+				userGroup.PUT("/", adminH.UpdateDomainUserFromAdmin())
+			}
+			clubGroup := adminGroup.Group("/clubs")
+			{
+				clubGroup.PUT("/", adminH.UpdateClubUserFromAdmin())
 			}
 		}
 	}

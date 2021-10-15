@@ -6,15 +6,17 @@ type SessionData struct {
 	Email       string `json:"email"`
 	Name        string `json:"name"`
 	Role        string `json:"role"`
+	AvatarURL   string `json:"avatar"`
 }
 
-func NewSessionData(sessionUUID string, userUUID string, email string, name string, role string) *SessionData {
+func NewSessionData(sessionUUID, userUUID, email, name, role, avatarURL string) *SessionData {
 	s := &SessionData{
 		SessionUUID: sessionUUID,
 		UserUUID:    userUUID,
 		Email:       email,
 		Name:        name,
 		Role:        role,
+		AvatarURL:   avatarURL,
 	}
 	return s
 }

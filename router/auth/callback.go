@@ -30,13 +30,15 @@ func (h *Handler) Callback() gin.HandlerFunc {
 
 		data, err := h.checkValidState(ctx)
 
-		if err != nil || !h.config.WhitelistUsers.IsUser(data.Email) {
-			if err != nil {
-				h.logger.Error(err.Error())
-			} else {
-				h.logger.Warn("invalid user", zap.String("email", data.Email))
-			}
+		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
+		if !h.config.WhitelistUsers.IsUser(data.Email) {
+			h.logger.Warn("invalid user", zap.String("email", data.Email))
+			ctx.Status(http.StatusUnauthorized)
 			return
 		}
 
@@ -63,8 +65,9 @@ func (h *Handler) Callback() gin.HandlerFunc {
 }
 
 type jwtData struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
 }
 
 func (h *Handler) checkValidState(ctx *gin.Context) (*jwtData, error) {
@@ -142,7 +145,7 @@ func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
 		return err
 	}
 
-	sessionData := utils.NewSessionData(sessionUUID.String(), user.GetUserID(), user.GetEmail(), user.GetName(), user.GetRole().ToPrimitive())
+	sessionData := utils.NewSessionData(sessionUUID.String(), user.GetUserID(), user.GetEmail(), user.GetName(), user.GetRole().ToPrimitive(), data.Picture)
 
 	b, err := json.Marshal(sessionData)
 
@@ -164,6 +167,7 @@ func (h *Handler) createSession(ctx *gin.Context, data *jwtData) error {
 		zap.String("email", user.GetEmail()),
 		zap.String("name", user.GetName()),
 		zap.String("role", user.GetRole().ToPrimitive()),
+		zap.String("avatar", data.Picture),
 	)
 
 	return nil

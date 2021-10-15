@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
@@ -38,7 +39,10 @@ func (r *UserRepository) GetAllGeneralUser() ([]users.GeneralUser, error) {
 	generalUsers := make([]users.GeneralUser, 0)
 	tx := r.db.Find(&generalUsers)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -50,7 +54,10 @@ func (r *UserRepository) GetDomainUserByUUID(uuid string) (*users.DomainUser, er
 	user := &users.DomainUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -62,7 +69,10 @@ func (r *UserRepository) GetDomainUserByEmail(email string) (*users.DomainUser, 
 	user := &users.DomainUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -74,7 +84,10 @@ func (r *UserRepository) GetGeneralUserByUUID(uuid string) (*users.GeneralUser, 
 	user := &users.GeneralUser{}
 	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -86,7 +99,10 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 	user := &users.GeneralUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -96,9 +112,12 @@ func (r *UserRepository) GetGeneralUserByEmail(email string) (*users.GeneralUser
 
 func (r *UserRepository) GetAdminUserByUUID(uuid string) (*users.AdminUser, error) {
 	user := &users.AdminUser{}
-	tx := r.db.Where("user_uuid", uuid).Take(user)
+	tx := r.db.Where("user_uuid = ?", uuid).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -110,7 +129,10 @@ func (r *UserRepository) GetAdminUserByEmail(email string) (*users.AdminUser, er
 	user := &users.AdminUser{}
 	tx := r.db.Where("email = ?", email).Take(user)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -126,12 +148,15 @@ func (r *UserRepository) GetUserByUUIDFromRole(uuid string, role string) (users.
 		return nil, err
 	}
 
-	if userType == consts.AdminUser {
+	switch userType {
+	case consts.AdminUser:
 		return r.GetAdminUserByUUID(uuid)
-	} else if userType == consts.GeneralUser {
+	case consts.GeneralUser:
 		return r.GetGeneralUserByUUID(uuid)
-	} else {
+	case consts.DomainUser:
 		return r.GetDomainUserByUUID(uuid)
+	default:
+		return nil, consts.UnreachableError
 	}
 }
 
@@ -143,12 +168,15 @@ func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (user
 		return nil, err
 	}
 
-	if userType == consts.AdminUser {
+	switch userType {
+	case consts.AdminUser:
 		return r.GetAdminUserByEmail(email)
-	} else if userType == consts.GeneralUser {
+	case consts.GeneralUser:
 		return r.GetGeneralUserByEmail(email)
-	} else {
+	case consts.DomainUser:
 		return r.GetDomainUserByEmail(email)
+	default:
+		return nil, consts.UnreachableError
 	}
 }
 
@@ -254,7 +282,11 @@ func (r *UserRepository) UpdateDomainUser(uuid string, name string) error {
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -270,7 +302,11 @@ func (r *UserRepository) UpdateGeneralUser(uuid string, name string, clubUUID st
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -285,7 +321,11 @@ func (r *UserRepository) UpdateAdminUser(uuid string, name string) error {
 
 	tx := r.db.Model(&user).Where("user_uuid = ?", uuid).Updates(user)
 
-	if err := tx.Error; err != nil {
+	if rows := tx.RowsAffected; rows == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -301,12 +341,15 @@ func (r *UserRepository) UpdateUserFromRole(uuid string, role string, args Updat
 		return err
 	}
 
-	if userType == consts.AdminUser {
+	switch userType {
+	case consts.AdminUser:
 		err = r.UpdateAdminUser(uuid, args.Name)
-	} else if userType == consts.GeneralUser {
+	case consts.GeneralUser:
 		err = r.UpdateGeneralUser(uuid, args.Name, utils.StringPToString(args.ClubUUID))
-	} else {
+	case consts.DomainUser:
 		err = r.UpdateDomainUser(uuid, args.Name)
+	default:
+		err = consts.UnreachableError
 	}
 
 	if err != nil {

@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -23,7 +24,10 @@ func (r *ClubRepository) GetImageByID(imageID uint32) (*clubs.ClubImage, error) 
 	joinQuery := "inner join uploaded_images as ui using (image_id)"
 	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("image_id = ?", imageID).Find(image)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -37,7 +41,10 @@ func (r *ClubRepository) GetImagesByClubUUID(uuid string) ([]clubs.ClubImage, er
 	joinQuery := "inner join uploaded_images as ui using (image_id)"
 	tx := r.db.Table("club_images as ci").Select(selectQuery).Joins(joinQuery).Where("club_uuid = ?", uuid).Find(&image)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -106,7 +113,10 @@ func (r *ClubRepository) UpdateImage(clubUUID string, imageIDs []uint32) error {
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -125,7 +135,12 @@ func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageID
 		return nil
 	}
 
-	if err := tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{}).Error; err != nil {
+	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}

@@ -1,6 +1,7 @@
 package clubs
 
 import (
+	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
@@ -27,7 +28,10 @@ func (r *ClubRepository) GetAllLinks() ([]clubs.ClubLink, error) {
 	links := make([]clubs.ClubLink, 0)
 	tx := r.db.Find(&links)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -39,7 +43,10 @@ func (r *ClubRepository) GetLinkByID(linkID uint32) (*clubs.ClubLink, error) {
 	link := &clubs.ClubLink{}
 	tx := r.db.Where("link_id = ?", linkID).Take(link)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -51,7 +58,10 @@ func (r *ClubRepository) GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, erro
 	link := make([]clubs.ClubLink, 0)
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&link)
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return nil, err
 	}
@@ -110,7 +120,10 @@ func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error 
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubLink{})
 
-	if err := tx.Error; err != nil {
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
 		r.logger.Error(err.Error())
 		return err
 	}
@@ -129,7 +142,13 @@ func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 		return nil
 	}
 
-	if err := tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubLink{}).Error; err != nil {
+	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubLink{})
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return err
+	} else if err != nil {
+		r.logger.Error(err.Error())
 		return err
 	}
 
