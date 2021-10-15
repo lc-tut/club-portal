@@ -19,6 +19,8 @@ tags:
     description: サークル関係の API です。
   - name: upload
     description: 画像などアップロード関係の API です。
+  - name: admin
+    description: Admin User が使用可能な API です。
 paths:
   /auth:
     get:
@@ -60,7 +62,7 @@ paths:
         400:
           description: redirect_url クエリの形式が不正の場合返されます。
         500:
-          description: 基本的に返されませんが、稀に返すかもしれません。
+          description: サーバ側でエラーが発生した場合に返されます。
   /auth/callback:
     get:
       tags:
@@ -85,7 +87,7 @@ paths:
         401:
           description: 不正なユーザといった認証不可の場合返されます。
         500:
-          description: データベースに関するエラーなど。
+          description: サーバ側でエラーが発生した場合に返されます。
   /auth/destroy:
     post:
       tags:
@@ -113,11 +115,11 @@ paths:
         401:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
-          description: 基本的に返すことはありませんが、もしかしたら返す場合があります。
+          description: サーバ側でエラーが発生した場合に返されます。
     post:
       tags:
         - user
-      summary: 新しくユーザ (General) を作成します。 (Admin Only)
+      summary: 新しくユーザ (General) を作成します。 (Admin のみ)
       security:
         - session: []
       requestBody:
@@ -144,6 +146,8 @@ paths:
                 $ref: '#/components/schemas/User'
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: Admin User 以外のユーザがアクセスした場合に返されます。
         500:
@@ -152,7 +156,7 @@ paths:
     get:
       tags:
         - user
-      summary: userUUID のユーザを取得します。 (Personal or Admin Only)
+      summary: userUUID のユーザを取得します。 (自身の UUID のみ)
       security:
         - session: []
       parameters:
@@ -164,6 +168,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
@@ -171,7 +177,7 @@ paths:
     put:
       tags:
         - user
-      summary: userUUID のユーザ情報を編集します。 (Personal or Admin Only)
+      summary: userUUID のユーザ情報を編集します。 (自身の UUID のみ)
       security:
         - session: []
       parameters:
@@ -196,6 +202,8 @@ paths:
           description: 正常に編集できた場合に返されます。
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
@@ -204,7 +212,7 @@ paths:
     get:
       tags:
         - user
-      summary: userUUID のお気に入りサークルを取得します。 (Personal or Admin Only)
+      summary: userUUID のお気に入りサークルを取得します。 (自身の UUID のみ)
       security:
         - session: []
       parameters:
@@ -218,6 +226,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ClubPage-External'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
@@ -225,7 +235,7 @@ paths:
     post:
       tags:
         - user
-      summary: userUUID のお気に入りサークルを登録します。 (Personal or Admin Only)
+      summary: userUUID のお気に入りサークルを登録します。 (自身の UUID のみ)
       security:
         - session: []
       parameters:
@@ -246,6 +256,8 @@ paths:
           description: 正常に登録できた場合に返されます。
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
@@ -254,7 +266,7 @@ paths:
     post:
       tags:
         - user
-      summary: userUUID のお気に入りサークルを解除します。 (Personal or Admin Only)
+      summary: userUUID のお気に入りサークルを解除します。 (自身の UUID のみ)
       security:
         - session: []
       parameters:
@@ -275,6 +287,8 @@ paths:
           description: 正常に解除できた場合に返されます。
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         403:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
@@ -296,7 +310,7 @@ paths:
     post:
       tags:
         - club
-      summary: 新しくサークルを作成します。 (General 以上)
+      summary: 新しくサークルを作成します。 (General のみ)
       security:
         - session: []
       requestBody:
@@ -352,6 +366,8 @@ paths:
                 $ref: '#/components/schemas/ClubPage-External'
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/clubs/{clubSlug}:
@@ -379,7 +395,7 @@ paths:
     put:
       tags:
         - club
-      summary: clubUUID のサークル情報を編集します。
+      summary: clubUUID のサークル情報を編集します。 (General のみ)
       security:
         - session: []
       parameters:
@@ -427,12 +443,14 @@ paths:
           description: 正常に編集できた場合に返されます。
         400:
           description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     delete:
       tags:
         - club
-      summary: clubUUID のサークル情報を非公開にします。
+      summary: clubUUID のサークル情報を非公開にします。 (Admin のみ)
       security:
         - session: []
       parameters:
@@ -440,6 +458,8 @@ paths:
       responses:
         200:
           description: 正常に非公開にした場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/images:
@@ -456,6 +476,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImageResponse'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     post:
@@ -481,6 +503,8 @@ paths:
           description: 正常にアップロードされた場合に返されます。
         400:
           description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/images/{imageID}:
@@ -504,6 +528,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImageResponse'
+        400:
+          description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
     delete:
       tags:
         - upload
@@ -522,6 +552,8 @@ paths:
           description: 削除に成功した場合に返されます。
         400:
           description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/clubs:
@@ -548,6 +580,35 @@ paths:
           description: 正常にアップロードされた場合に返されます。
         400:
           description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - upload
+      summary: clubUUID のサークルのサムネイルを変更します。
+      security:
+        - session: []
+      requestBody:
+        description: アップロードするサムネイル
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: 正常に変更できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/clubs/{clubUUID}:
@@ -568,33 +629,6 @@ paths:
                 $ref: '#/components/schemas/Thumbnail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
-    put:
-      tags:
-        - upload
-      summary: clubUUID のサークルのサムネイルを変更します。
-      security:
-        - session: []
-      parameters:
-        - $ref: '#/components/parameters/ClubUUID'
-      requestBody:
-        description: アップロードするサムネイル
-        required: true
-        content:
-          image/png:
-            schema:
-              type: string
-              format: binary
-          image/jpeg:
-            schema:
-              type: string
-              format: binary
-      responses:
-        201:
-          description: 正常に変更できた場合に返されます。
-        400:
-          description: リクエストが不正な場合に返されます。
-        500:
-          description: サーバ側でエラーが発生した場合に返されます。
     delete:
       tags:
         - upload
@@ -606,6 +640,12 @@ paths:
       responses:
         201:
           description: 正常に初期化できた場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
   /v1/upload/thumbnail/id/{thumbnailID}:
@@ -629,6 +669,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Thumbnail'
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/admin/users/{userUUID}:
+    get:
+      tags:
+        - admin
+      summary: userUUID のユーザの情報を Admin User 権限で取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/UserUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - admin
+      summary: userUUID のユーザ情報を Admin User 権限で変更します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/UserUUID'
+      responses:
+        201:
+          description: 正常に変更された場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/admin/clubs:
+    put:
+      tags:
+        - admin
+      summary: 特定のサークル情報を Admin User 権限で変更します。
+      security:
+        - session: []
+      requestBody:
+        description: 編集に必要なユーザ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_uuid:
+                  type: string
+                  format: uuidv4
+                emial:
+                  type: string
+                name:
+                  type: string
+                club_uuid:
+                  type: string
+                  format: uuidv4
+      responses:
+        201:
+          description: 正常に変更された場合に返されます。
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
 components:

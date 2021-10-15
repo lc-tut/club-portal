@@ -7,20 +7,6 @@ import (
 	"net/http"
 )
 
-func (mw *Middleware) UserOnly() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		email := ctx.GetString(consts.SessionUserEmail)
-
-		if !mw.config.WhitelistUsers.IsUser(email) {
-			mw.logger.Warn("invalid user", zap.String("email", email))
-			ctx.AbortWithStatus(http.StatusForbidden)
-			return
-		}
-
-		ctx.Next()
-	}
-}
-
 func (mw *Middleware) GeneralOnly() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		email := ctx.GetString(consts.SessionUserEmail)
