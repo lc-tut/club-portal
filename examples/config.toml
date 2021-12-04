@@ -14,14 +14,12 @@ redis_secret=""
 
 domain=""
 
+mode=""
+
 email_domains = [
 
 ]
 
 admin_emails = [
-
-]
-
-general_emails = [
 
 ]

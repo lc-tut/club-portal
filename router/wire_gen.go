@@ -24,13 +24,16 @@ func newServer(logger *zap.Logger, db *gorm.DB) (*Server, error) {
 	engine := newGinEngine(logger, store)
 	csrfCookieOption := config.NewCSRFCookieOption()
 	oauth2Config := config.NewOAuth2Config()
-	whitelistInfo := utils.NewWhitelist()
+	repository := repos.NewRepository(logger, db)
+	whitelistInfo, err := utils.NewWhitelist(repository)
+	if err != nil {
+		return nil, err
+	}
 	configConfig := &config.Config{
 		CSRFCookieOptions: csrfCookieOption,
 		GoogleOAuthConfig: oauth2Config,
 		WhitelistUsers:    whitelistInfo,
 	}
-	repository := repos.NewRepository(logger, db)
 	server := registerRouters(engine, configConfig, logger, repository)
 	return server, nil
 }

@@ -63,7 +63,12 @@ func NewSessionCookieOption() sessions.Options {
 
 func NewOAuth2Config() (conf *oauth2.Config) {
 	domain := viper.GetString("domain")
-	redirectURL := fmt.Sprintf("http://%s:8080/api/auth/callback", domain)
+	var redirectURL string
+	if utils.IsLocal() {
+		redirectURL = "http://localhost:8080/api/auth/callback"
+	} else {
+		redirectURL = fmt.Sprintf("https://%s/api/auth/callback", domain)
+	}
 
 	conf = &oauth2.Config{
 		ClientID:     viper.GetString("client_id"),

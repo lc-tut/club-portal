@@ -29,6 +29,7 @@ type Router struct {
 }
 
 func (r *Router) AddRouter() {
+	r.logger.Debug("initializing auth router")
 	h := newHandler(r.config, r.logger, r.repo)
 
 	authGroup := r.rg.Group("/auth")

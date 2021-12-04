@@ -1,11 +1,12 @@
 package v1
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/models"
-	"github.com/lc-tut/club-portal/repos"
+	models "github.com/lc-tut/club-portal/models/clubs"
+	repos "github.com/lc-tut/club-portal/repos/clubs"
 	"github.com/lc-tut/club-portal/utils"
 	"net/http"
 )
@@ -35,7 +36,7 @@ func (h *Handler) GetClub() gin.HandlerFunc {
 	}
 }
 
-type CreatePostData struct {
+type ClubCreatePostData struct {
 	Name            string                         `json:"name"`
 	Description     string                         `json:"description"`
 	Campus          uint8                          `json:"campus"`
@@ -51,16 +52,23 @@ type CreatePostData struct {
 
 func (h *Handler) CreateClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pd := &CreatePostData{}
-
-		pageArgs, err := h.makeCreateArgs(ctx, pd)
-
-		if err != nil {
+		if err := h.checkDuplication(ctx); err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
-		if err := h.createPage(*pageArgs); err != nil {
+		pd := &ClubCreatePostData{}
+
+		pageArgs, err := h.makeCreateArgs(ctx, pd)
+
+		if err != nil {
+			h.logger.Error(err.Error())
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
+		if err := h.createPage(ctx, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusCreated, pd)
@@ -68,7 +76,29 @@ func (h *Handler) CreateClub() gin.HandlerFunc {
 	}
 }
 
-func (*Handler) makeCreateArgs(ctx *gin.Context, pd *CreatePostData) (*repos.ClubPageCreateArgs, error) {
+// Check duplication if general users create new page
+func (h *Handler) checkDuplication(ctx *gin.Context) error {
+	email := ctx.GetString(consts.SessionUserEmail)
+
+	if h.config.WhitelistUsers.IsGeneralUser(email) {
+		userUUID := ctx.GetString(consts.SessionUserUUID)
+		gUserModel, err := h.repo.GetGeneralUserByUUID(userUUID)
+
+		if err != nil {
+			return err
+		}
+
+		clubUUID := utils.NullStringToStringP(gUserModel.ClubUUID)
+
+		if clubUUID != nil {
+			return errors.New("already have a club")
+		}
+	}
+
+	return nil
+}
+
+func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos.ClubPageCreateArgs, error) {
 	if err := ctx.ShouldBindJSON(pd); err != nil {
 		return nil, err
 	}
@@ -106,15 +136,26 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *CreatePostData) (*repos.Clu
 	return pageArgs, nil
 }
 
-func (h *Handler) createPage(args repos.ClubPageCreateArgs) error {
+func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) error {
 	clubUUID, err := uuid.NewRandom()
 
 	if err != nil {
 		return err
 	}
 
-	if err := h.repo.CreatePage(clubUUID.String(), args); err != nil {
+	page, err := h.repo.CreatePage(clubUUID.String(), args)
+
+	if err != nil {
 		return err
+	}
+
+	email := ctx.GetString(consts.SessionUserEmail)
+
+	if h.config.WhitelistUsers.IsGeneralUser(email) {
+		userUUID := ctx.GetString(consts.SessionUserUUID)
+		if err := h.repo.UpdateGeneralUser(userUUID, "", page.ClubUUID); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -138,13 +179,14 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 		pageArgs, err := h.makeUpdateArgs(ctx, pd)
 
 		if err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
-		slug := ctx.GetString(consts.ClubSlugKeyName)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.updatePage(slug, *pageArgs); err != nil {
+		if err := h.repo.UpdatePageByClubUUID(clubUUID, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusOK, pd)
@@ -174,19 +216,11 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 	return pageArgs, nil
 }
 
-func (h *Handler) updatePage(slug string, args repos.ClubPageUpdateArgs) error {
-	if err := h.repo.UpdatePageByClubSlug(slug, args); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (h *Handler) DeleteClub() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		slug := ctx.GetString(consts.ClubSlugKeyName)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.repo.DeletePageByClubSlug(slug); err != nil {
+		if err := h.repo.DeletePageByClubUUID(clubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.Status(http.StatusOK)

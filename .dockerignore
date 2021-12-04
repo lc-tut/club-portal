@@ -3,3 +3,6 @@ examples/
 *.iml
 .gitignore
 dist/
+cfg/
+images/
+thumbnails/

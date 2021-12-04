@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"time"
 )
 
 func loadConfig() error {
@@ -27,9 +29,9 @@ func loadConfig() error {
 
 func newZapLogger() (*zap.Logger, error) {
 	if utils.IsProd() {
-		return zap.NewProduction()
+		return newZapProdConfig()
 	} else {
-		return zap.NewDevelopment()
+		return newZapDevConfig()
 	}
 }
 
@@ -40,7 +42,13 @@ func newDB() (*gorm.DB, error) {
 	dbPort := viper.GetString("mariadb_port")
 	dbName := viper.GetString("mariadb_dbname")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FTokyo", dbUser, dbPass, dbAddress, dbPort, dbName)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		PrepareStmt:            true,
+		SkipDefaultTransaction: true,
+		NowFunc: func() time.Time {
+			return time.Now().In(consts.JST)
+		},
+	})
 
 	if err != nil {
 		return nil, err

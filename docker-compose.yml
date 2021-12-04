@@ -7,6 +7,9 @@ services:
     container_name: club-portal
     ports:
       - 8080:8080
+    volumes:
+      - ./images:/root/images
+      - ./thumbnails:/root/thumbnails
     networks:
       - redis-network
       - mariadb-network
