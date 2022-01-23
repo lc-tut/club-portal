@@ -3,6 +3,7 @@ create table if not exists `club_pages` (
     `club_slug` char(15) not null,
     `name` varchar(63) not null,
     `description` text not null,
+    `short_description` varchar(50) not null,
     `campus` tinyint unsigned not null,
     `club_type` tinyint unsigned not null,
     `visible` tinyint(1) not null,

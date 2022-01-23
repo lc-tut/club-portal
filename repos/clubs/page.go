@@ -11,6 +11,7 @@ import (
 type ClubPageCreateArgs struct {
 	Name            string
 	Desc            string
+	ShortDesc       string
 	Campus          consts.CampusType
 	ClubType        consts.ClubType
 	Visible         bool
@@ -28,6 +29,7 @@ type ClubPageCreateArgs struct {
 
 type ClubPageUpdateArgs struct {
 	Desc            string
+	ShortDesc       string
 	Contents        []string
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
@@ -135,20 +137,21 @@ func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalI
 	typedImages := clubs.Images(images)
 
 	info := &clubs.ClubPageInternalInfo{
-		ClubUUID:     page.ClubUUID,
-		Name:         page.Name,
-		Description:  page.Description,
-		Campus:       page.Campus,
-		ClubType:     page.ClubType,
-		UpdatedAt:    page.UpdatedAt,
-		Contents:     page.Contents.ToContentResponse(),
-		Links:        page.Links.ToLinkResponse(),
-		Schedules:    page.Schedules.ToScheduleResponse(),
-		Achievements: page.Achievements.ToAchievementResponse(),
-		Images:       typedImages.ToImageResponse(),
-		Videos:       page.Videos.ToVideoResponse(),
-		Times:        clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:       clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		ClubUUID:         page.ClubUUID,
+		Name:             page.Name,
+		Description:      page.Description,
+		ShortDescription: page.ShortDescription,
+		Campus:           page.Campus,
+		ClubType:         page.ClubType,
+		UpdatedAt:        page.UpdatedAt,
+		Contents:         page.Contents.ToContentResponse(),
+		Links:            page.Links.ToLinkResponse(),
+		Schedules:        page.Schedules.ToScheduleResponse(),
+		Achievements:     page.Achievements.ToAchievementResponse(),
+		Images:           typedImages.ToImageResponse(),
+		Videos:           page.Videos.ToVideoResponse(),
+		Times:            clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
+		Places:           clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
 	}
 
 	return info, nil
@@ -158,13 +161,14 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 	slug := utils.GenerateSlug(uuid)
 
 	page := &clubs.ClubPage{
-		ClubUUID:    uuid,
-		ClubSlug:    slug,
-		Name:        args.Name,
-		Description: args.Desc,
-		Campus:      args.Campus.ToPrimitive(),
-		ClubType:    args.ClubType.ToPrimitive(),
-		Visible:     args.Visible,
+		ClubUUID:         uuid,
+		ClubSlug:         slug,
+		Name:             args.Name,
+		Description:      args.Desc,
+		ShortDescription: args.ShortDesc,
+		Campus:           args.Campus.ToPrimitive(),
+		ClubType:         args.ClubType.ToPrimitive(),
+		Visible:          args.Visible,
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -224,7 +228,8 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 
 func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
 	page := clubs.ClubPage{
-		Description: args.Desc,
+		Description:      args.Desc,
+		ShortDescription: args.ShortDesc,
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {

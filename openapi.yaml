@@ -798,6 +798,8 @@ components:
           type: string
         description:
           type: string
+        short_description:
+          type: string
         campus:
           $ref: '#/components/schemas/Campus'
         club_type:
@@ -816,6 +818,8 @@ components:
         name:
           type: string
         description:
+          type: string
+        short_description:
           type: string
         campus:
           $ref: '#/components/schemas/Campus'
