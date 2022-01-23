@@ -37,17 +37,18 @@ func (h *Handler) GetClub() gin.HandlerFunc {
 }
 
 type ClubCreatePostData struct {
-	Name            string                         `json:"name"`
-	Description     string                         `json:"description"`
-	Campus          uint8                          `json:"campus"`
-	ClubType        uint8                          `json:"club_type"`
-	Contents        []models.ContentRequest        `json:"contents"`
-	Links           []models.LinkRequest           `json:"links"`
-	Schedules       []models.ScheduleRequest       `json:"schedules"`
-	Achievements    []models.AchievementRequest    `json:"achievements"`
-	Images          []models.ImageRequest          `json:"images"`
-	Videos          []models.VideoRequest          `json:"videos"`
-	ActivityDetails []models.ActivityDetailRequest `json:"activity_details"`
+	Name             string                         `json:"name"`
+	Description      string                         `json:"description"`
+	ShortDescription string                         `json:"short_description"`
+	Campus           uint8                          `json:"campus"`
+	ClubType         uint8                          `json:"club_type"`
+	Contents         []models.ContentRequest        `json:"contents"`
+	Links            []models.LinkRequest           `json:"links"`
+	Schedules        []models.ScheduleRequest       `json:"schedules"`
+	Achievements     []models.AchievementRequest    `json:"achievements"`
+	Images           []models.ImageRequest          `json:"images"`
+	Videos           []models.VideoRequest          `json:"videos"`
+	ActivityDetails  []models.ActivityDetailRequest `json:"activity_details"`
 }
 
 func (h *Handler) CreateClub() gin.HandlerFunc {
@@ -118,6 +119,7 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 	pageArgs := &repos.ClubPageCreateArgs{
 		Name:            pd.Name,
 		Desc:            pd.Description,
+		ShortDesc:       pd.ShortDescription,
 		Campus:          campus,
 		ClubType:        clubType,
 		Visible:         true,
@@ -162,14 +164,15 @@ func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) er
 }
 
 type UpdatePostData struct {
-	Description     string                         `json:"description"`
-	Contents        []models.ContentRequest        `json:"contents"`
-	Links           []models.LinkRequest           `json:"links"`
-	Schedules       []models.ScheduleRequest       `json:"schedules"`
-	Achievements    []models.AchievementRequest    `json:"achievements"`
-	Images          []models.ImageRequest          `json:"images"`
-	Videos          []models.VideoRequest          `json:"videos"`
-	ActivityDetails []models.ActivityDetailRequest `json:"activity_details"`
+	Description      string                         `json:"description"`
+	ShortDescription string                         `json:"short_description"`
+	Contents         []models.ContentRequest        `json:"contents"`
+	Links            []models.LinkRequest           `json:"links"`
+	Schedules        []models.ScheduleRequest       `json:"schedules"`
+	Achievements     []models.AchievementRequest    `json:"achievements"`
+	Images           []models.ImageRequest          `json:"images"`
+	Videos           []models.VideoRequest          `json:"videos"`
+	ActivityDetails  []models.ActivityDetailRequest `json:"activity_details"`
 }
 
 func (h *Handler) UpdateClub() gin.HandlerFunc {
@@ -201,6 +204,7 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 
 	pageArgs := &repos.ClubPageUpdateArgs{
 		Desc:            pd.Description,
+		ShortDesc:       pd.ShortDescription,
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
