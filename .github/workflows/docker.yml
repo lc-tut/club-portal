@@ -10,6 +10,7 @@ on:
       - .gitignore
       - LICENSE
       - README.md
+      - openapi.yaml
 
   release:
     types:
