@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - openapi.yaml
+  workflow_dispatch:
 
 jobs:
   redoc:
