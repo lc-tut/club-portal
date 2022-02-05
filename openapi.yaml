@@ -325,6 +325,8 @@ paths:
                   type: string
                 description:
                   type: string
+                short_description:
+                  type: string
                 campus:
                   $ref: '#/components/schemas/Campus'
                 club_type:
@@ -409,6 +411,8 @@ paths:
               type: object
               properties:
                 description:
+                  type: string
+                short_description:
                   type: string
                 contents:
                   type: array
