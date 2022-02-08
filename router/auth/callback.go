@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -10,6 +11,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/router/utils"
+	env "github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"net/http"
@@ -59,7 +61,11 @@ func (h *Handler) Callback() gin.HandlerFunc {
 			h.logger.Info("deleted cookie", zap.String("cookie_name", consts.RedirectURLCookieName))
 			utils.DeleteCookie(ctx, consts.AuthCSRFCookieName) // defer だと redirect 時に Cookie が削除されない
 			utils.DeleteCookie(ctx, consts.RedirectURLCookieName)
-			ctx.Redirect(http.StatusFound, redirectURL)
+			if env.IsLocal() {
+				ctx.Redirect(http.StatusFound, fmt.Sprintf("http://localhost:8000%s", redirectURL))
+			} else {
+				ctx.Redirect(http.StatusFound, redirectURL)
+			}
 		}
 	}
 }
