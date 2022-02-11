@@ -111,7 +111,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                oneOf:
+                  - $ref: '#/components/schemas/User'
+                  - $ref: '#/components/schemas/UserWithClubUUID'
         401:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
@@ -167,7 +169,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                oneOf:
+                  - $ref: '#/components/schemas/User'
+                  - $ref: '#/components/schemas/UserWithClubUUID'
         401:
           description: 認証していない状態でアクセスした場合に返されます。
         403:
@@ -372,34 +376,12 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
-  /v1/clubs/{clubSlug}:
-    get:
-      tags:
-        - club
-      summary: clubSlug のサークル情報を取得します。
-      parameters:
-        - in: path
-          name: clubSlug
-          schema:
-            type: string
-          required: true
-          description: サークルの個別 URL
-      responses:
-        200:
-          description: 正常に取得した場合に返されます。
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ClubPage-Internal'
-        500:
-          description: サーバ側でエラーが発生した場合に返されます。
-  /v1/clubs/{clubUUID}:
     put:
       tags:
         - club
       summary: clubUUID のサークル情報を編集します。 (General のみ)
       security:
-        - session: []
+        - session: [ ]
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       requestBody:
@@ -449,6 +431,45 @@ paths:
           description: リクエストが不正な場合に返されます。
         401:
           description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/slug/{clubSlug}:
+    get:
+      tags:
+        - club
+      summary: clubSlug のサークル情報を取得します。
+      parameters:
+        - in: path
+          name: clubSlug
+          schema:
+            type: string
+          required: true
+          description: サークルの個別 URL
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-Internal'
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/uuid/{clubUUID}:
+    get:
+      tags:
+        - club
+      summary: clubUUID のサークル情報を取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-Internal'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     delete:
@@ -734,7 +755,7 @@ paths:
                 user_uuid:
                   type: string
                   format: uuidv4
-                emial:
+                email:
                   type: string
                 name:
                   type: string
@@ -790,6 +811,24 @@ components:
             - "domain"
             - "general"
             - "admin"
+    UserWithClubUUID:
+      type: object
+      properties:
+        user_uuid:
+          type: string
+          format: uuidv4
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+            - "domain"
+            - "general"
+            - "admin"
+        club_uuid:
+          type: string
     ClubPage-External:
       type: object
       properties:

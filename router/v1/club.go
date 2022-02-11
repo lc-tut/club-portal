@@ -23,10 +23,23 @@ func (h *Handler) GetAllClub() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetClub() gin.HandlerFunc {
+func (h *Handler) GetClubFromSlug() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubSlug := ctx.GetString(consts.ClubSlugKeyName)
 		page, err := h.repo.GetPageByClubSlug(clubSlug)
+
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusOK, page)
+		}
+	}
+}
+
+func (h *Handler) GetClubFromUUID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
+		page, err := h.repo.GetPageByClubUUID(clubUUID)
 
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)

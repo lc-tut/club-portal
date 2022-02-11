@@ -93,6 +93,7 @@ func (u *GeneralUser) ToUserResponse() *UserResponse {
 		Email:    u.Email,
 		Name:     u.Name,
 		Role:     u.GetRole().ToPrimitive(),
+		ClubUUID: u.ClubUUID.String,
 	}
 
 	return res
@@ -140,6 +141,7 @@ type UserResponse struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Role     string `json:"role"`
+	ClubUUID string `json:"club_uuid,omitempty"`
 }
 
 type GeneralUserSlice []GeneralUser
