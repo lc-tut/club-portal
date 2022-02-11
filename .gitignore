@@ -145,6 +145,7 @@ fabric.properties
 
 .env
 .idea/
+.vscode/
 cfg/config.toml
 cfg/db_pass
 dist/
