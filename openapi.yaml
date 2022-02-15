@@ -795,6 +795,9 @@ components:
             - "domain"
             - "general"
             - "admin"
+        avatar:
+          type: string
+          format: URL
     User:
       type: object
       properties:
@@ -1038,6 +1041,7 @@ components:
         email: foo@example.com
         name: "John Joe"
         role: "domain"
+        avatar: "https://..."
   securitySchemes:
     session:
       type: apiKey
