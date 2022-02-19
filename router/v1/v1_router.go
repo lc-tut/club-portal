@@ -68,6 +68,8 @@ func (r *Router) AddRouter() {
 				personalClubGroup.PUT("/activity_detail", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubActivityDetails())
 				personalClubGroup.GET("/content", h.GetClubContent())
 				personalClubGroup.PUT("/content", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubContent())
+				personalClubGroup.GET("/description", h.GetClubDescription())
+				personalClubGroup.PUT("/description", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubDescription())
 				personalClubGroup.GET("/link", h.GetClubLinks())
 				personalClubGroup.PUT("/link", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubLinks())
 				personalClubGroup.GET("/schedule", h.GetClubSchedule())

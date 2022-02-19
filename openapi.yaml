@@ -631,6 +631,61 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/uuid/{clubUUID}/desciption:
+    get:
+      tags:
+        - club
+      summary: clubUUID の description を取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  desciption:
+                    type: string
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - club
+      summary: clubUUID の description を編集します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      requestBody:
+        description: 編集に必要な description 情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+      responses:
+        201:
+          description: 正常に編集できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  description:
+                    type: string
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/clubs/uuid/{clubUUID}/link:
     get:
       tags:
