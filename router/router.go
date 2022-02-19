@@ -64,6 +64,9 @@ func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logg
 	logger.Debug("initializing middleware")
 	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger, repo)
 
+	engine.Static("/thumbnails", "./thumbnails")
+	engine.Static("/images", "./images")
+
 	apiGroup := engine.Group("/api")
 
 	authRouter := auth.NewAuthRouter(apiGroup, config.ToAuthConfig(), logger, repo)
