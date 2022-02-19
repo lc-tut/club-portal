@@ -154,7 +154,6 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 }
 
 func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) error {
-	// FIXME: should return `page`
 	clubUUID, err := uuid.NewRandom()
 
 	if err != nil {

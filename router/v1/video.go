@@ -30,12 +30,11 @@ func (h *Handler) UpdateClubVideo() gin.HandlerFunc {
 		}
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		videos, err := h.repo.UpdateVideo(clubUUID, validateToVideoArgs(pd))
 
-		if err != nil {
+		if err := h.repo.UpdateVideo(clubUUID, validateToVideoArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, clubs.Videos(videos).ToVideoResponse())
+			ctx.JSON(http.StatusOK, pd)
 		}
 	}
 }

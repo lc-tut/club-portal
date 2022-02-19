@@ -11,11 +11,11 @@ type ClubContentRepo interface {
 
 	GetContentsByClubUUID(uuid string) ([]clubs.ClubContent, error)
 
-	CreateContent(clubUUID string, content []string) ([]clubs.ClubContent, error)
-	CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) ([]clubs.ClubContent, error)
+	CreateContent(clubUUID string, content []string) error
+	CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 
-	UpdateContent(clubUUID string, content []string) ([]clubs.ClubContent, error)
-	UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) ([]clubs.ClubContent, error)
+	UpdateContent(clubUUID string, content []string) error
+	UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error
 }
 
 func (r *ClubRepository) GetContentByID(contentID uint32) (*clubs.ClubContent, error) {
@@ -48,7 +48,7 @@ func (r *ClubRepository) GetContentsByClubUUID(uuid string) ([]clubs.ClubContent
 	return content, nil
 }
 
-func (r *ClubRepository) CreateContent(clubUUID string, contents []string) ([]clubs.ClubContent, error) {
+func (r *ClubRepository) CreateContent(clubUUID string, contents []string) error {
 	contModels := make([]clubs.ClubContent, len(contents))
 
 	for i, c := range contents {
@@ -63,13 +63,13 @@ func (r *ClubRepository) CreateContent(clubUUID string, contents []string) ([]cl
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return contModels, nil
+	return nil
 }
 
-func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) ([]clubs.ClubContent, error) {
+func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
 	contModels := make([]clubs.ClubContent, len(contents))
 
 	for i, c := range contents {
@@ -82,60 +82,56 @@ func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, conte
 
 	if err := tx.Create(&contModels).Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return contModels, nil
+	return nil
 }
 
-func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) ([]clubs.ClubContent, error) {
+func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error {
 	length := len(contents)
 
 	if length == 0 {
-		return []clubs.ClubContent{}, nil
+		return nil
 	}
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return nil, err
+		return err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	conts, err := r.CreateContent(clubUUID, contents)
-
-	if err != nil {
-		return nil, err
+	if err := r.CreateContent(clubUUID, contents); err != nil {
+		return err
 	}
 
-	return conts, nil
+	return nil
 }
 
-func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) ([]clubs.ClubContent, error) {
+func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
 	length := len(contents)
 
 	if length == 0 {
-		return []clubs.ClubContent{}, nil
+		return nil
 	}
 
 	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return nil, err
+		return err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	conts, err := r.CreateContentWithTx(tx, clubUUID, contents)
-
-	if err != nil {
-		return nil, err
+	if err := r.CreateContentWithTx(tx, clubUUID, contents); err != nil {
+		return err
 	}
 
-	return conts, nil
+	return nil
 }

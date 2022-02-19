@@ -33,12 +33,11 @@ func (h *Handler) UpdateClubDescription() gin.HandlerFunc {
 		}
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		desc, err := h.repo.UpdateClubDescription(clubUUID, pd.Description)
 
-		if err != nil {
+		if err := h.repo.UpdateClubDescription(clubUUID, pd.Description); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusCreated, desc)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

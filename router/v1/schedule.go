@@ -24,18 +24,17 @@ func (h *Handler) UpdateClubSchedule() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var pd []clubs.ScheduleRequest
 
-		if err := ctx.ShouldBindJSON(pd); err != nil {
+		if err := ctx.ShouldBindJSON(&pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		schedules, err := h.repo.UpdateSchedule(clubUUID, validateToScheduleArgs(pd))
 
-		if err != nil {
+		if err := h.repo.UpdateSchedule(clubUUID, validateToScheduleArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, clubs.Schedules(schedules).ToScheduleResponse())
+			ctx.JSON(http.StatusOK, pd)
 		}
 	}
 }

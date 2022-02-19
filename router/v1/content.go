@@ -24,18 +24,17 @@ func (h *Handler) UpdateClubContent() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var pd []clubs.ContentRequest
 
-		if err := ctx.ShouldBindJSON(pd); err != nil {
+		if err := ctx.ShouldBindJSON(&pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		conts, err := h.repo.UpdateContent(clubUUID, validateToContentArgs(pd))
 
-		if err != nil {
+		if err := h.repo.UpdateContent(clubUUID, validateToContentArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusCreated, clubs.Contents(conts).ToContentResponse())
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

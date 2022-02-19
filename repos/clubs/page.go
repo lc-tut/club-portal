@@ -180,27 +180,19 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		contents, err := r.CreateContentWithTx(tx, uuid, args.Contents)
-
-		if err != nil {
+		if err := r.CreateContentWithTx(tx, uuid, args.Contents); err != nil {
 			return err
 		}
 
-		links, err := r.CreateLinkWithTx(tx, uuid, args.Links)
-
-		if err != nil {
+		if err := r.CreateLinkWithTx(tx, uuid, args.Links); err != nil {
 			return err
 		}
 
-		schedules, err := r.CreateScheduleWithTx(tx, uuid, args.Schedules)
-
-		if err != nil {
+		if err := r.CreateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
 			return err
 		}
 
-		achievements, err := r.CreateAchievementWithTx(tx, uuid, args.Achievements)
-
-		if err != nil {
+		if err := r.CreateAchievementWithTx(tx, uuid, args.Achievements); err != nil {
 			return err
 		}
 
@@ -208,13 +200,9 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		videos, err := r.CreateVideoWithTx(tx, uuid, args.Videos)
-
-		if err != nil {
+		if err := r.CreateVideoWithTx(tx, uuid, args.Videos); err != nil {
 			return err
 		}
-
-		// FIXME: get return value and set to `page` struct
 
 		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
 			return err
@@ -224,22 +212,13 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		details, err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails)
-
-		if err != nil {
+		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
 			return err
 		}
 
 		if err := r.CreateTPRemarkWithTx(tx, uuid, args.TPRemark); err != nil {
 			return err
 		}
-
-		page.Contents = contents
-		page.Links = links
-		page.Schedules = schedules
-		page.Achievements = achievements
-		page.Videos = videos
-		page.ActivityDetails = details
 
 		return nil
 	})
@@ -263,27 +242,19 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		contents, err := r.UpdateContentWithTx(tx, uuid, args.Contents)
-
-		if err != nil {
+		if err := r.UpdateContentWithTx(tx, uuid, args.Contents); err != nil {
 			return err
 		}
 
-		links, err := r.UpdateLinkWithTx(tx, uuid, args.Links)
-
-		if err != nil {
+		if err := r.UpdateLinkWithTx(tx, uuid, args.Links); err != nil {
 			return err
 		}
 
-		schedules, err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules)
-
-		if err != nil {
+		if err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
 			return err
 		}
 
-		achievements, err := r.UpdateAchievementWithTx(tx, uuid, args.Achievements)
-
-		if err != nil {
+		if err := r.UpdateAchievementWithTx(tx, uuid, args.Achievements); err != nil {
 			return err
 		}
 
@@ -291,13 +262,9 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		videos, err := r.UpdateVideoWithTx(tx, uuid, args.Videos)
-
-		if err != nil {
+		if err := r.UpdateVideoWithTx(tx, uuid, args.Videos); err != nil {
 			return err
 		}
-
-		// FIXME: get return value and set to `page` struct
 
 		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
 			return err
@@ -307,22 +274,13 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		details, err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails)
-
-		if err != nil {
+		if err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
 			return err
 		}
 
 		if err := r.UpdateTPRemarkWithTx(tx, uuid, args.TPRemark); err != nil {
 			return err
 		}
-
-		page.Contents = contents
-		page.Links = links
-		page.Schedules = schedules
-		page.Achievements = achievements
-		page.Videos = videos
-		page.ActivityDetails = details
 
 		return nil
 	})

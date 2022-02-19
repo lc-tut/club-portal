@@ -11,11 +11,11 @@ type ClubVideoRepo interface {
 
 	GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, error)
 
-	CreateVideo(clubUUID string, path []string) ([]clubs.ClubVideo, error)
-	CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) ([]clubs.ClubVideo, error)
+	CreateVideo(clubUUID string, path []string) error
+	CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 
-	UpdateVideo(clubUUID string, path []string) ([]clubs.ClubVideo, error)
-	UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) ([]clubs.ClubVideo, error)
+	UpdateVideo(clubUUID string, path []string) error
+	UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error
 }
 
 func (r *ClubRepository) GetVideoByID(videoID uint32) (*clubs.ClubVideo, error) {
@@ -48,11 +48,11 @@ func (r *ClubRepository) GetVideosByClubUUID(uuid string) ([]clubs.ClubVideo, er
 	return video, nil
 }
 
-func (r *ClubRepository) CreateVideo(clubUUID string, path []string) ([]clubs.ClubVideo, error) {
+func (r *ClubRepository) CreateVideo(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
-		return []clubs.ClubVideo{}, nil
+		return nil
 	}
 
 	videos := make([]clubs.ClubVideo, length)
@@ -69,17 +69,17 @@ func (r *ClubRepository) CreateVideo(clubUUID string, path []string) ([]clubs.Cl
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return videos, nil
+	return nil
 }
 
-func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) ([]clubs.ClubVideo, error) {
+func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
-		return []clubs.ClubVideo{}, nil
+		return nil
 	}
 
 	videos := make([]clubs.ClubVideo, length)
@@ -94,60 +94,56 @@ func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 
 	if err := tx.Create(&videos).Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return videos, nil
+	return nil
 }
 
-func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) ([]clubs.ClubVideo, error) {
+func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
-		return []clubs.ClubVideo{}, nil
+		return nil
 	}
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubVideo{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return nil, err
+		return err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	videos, err := r.CreateVideo(clubUUID, path)
-
-	if err != nil {
-		return nil, err
+	if err := r.CreateVideo(clubUUID, path); err != nil {
+		return err
 	}
 
-	return videos, nil
+	return nil
 }
 
-func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) ([]clubs.ClubVideo, error) {
+func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
 	length := len(path)
 
 	if length == 0 {
-		return []clubs.ClubVideo{}, nil
+		return nil
 	}
 
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return nil, err
+		return err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	videos, err := r.CreateVideoWithTx(tx, clubUUID, path)
-
-	if err != nil {
-		return nil, err
+	if err := r.CreateVideoWithTx(tx, clubUUID, path); err != nil {
+		return err
 	}
 
-	return videos, nil
+	return nil
 }

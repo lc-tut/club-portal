@@ -36,7 +36,7 @@ func (h *Handler) UpdateClubActivityDetails() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var pd []clubs.ActivityDetailRequest
 
-		if err := ctx.ShouldBindJSON(pd); err != nil {
+		if err := ctx.ShouldBindJSON(&pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}

@@ -24,18 +24,17 @@ func (h *Handler) UpdateClubAchievement() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var pd []clubs.AchievementRequest
 
-		if err := ctx.ShouldBindJSON(pd); err != nil {
+		if err := ctx.ShouldBindJSON(&pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		achievements, err := h.repo.UpdateAchievement(clubUUID, validateToAchievementArgs(pd))
 
-		if err != nil {
+		if err := h.repo.UpdateAchievement(clubUUID, validateToAchievementArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, clubs.Achievements(achievements).ToAchievementResponse())
+			ctx.JSON(http.StatusOK, pd)
 		}
 	}
 }

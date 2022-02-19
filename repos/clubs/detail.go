@@ -16,10 +16,10 @@ type ClubActivityDetailRepo interface {
 
 	GetAllRelations(uuid string) ([]clubs.DetailRelations, error)
 
-	CreateActivityDetail(uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error)
-	CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error)
+	CreateActivityDetail(uuid string, args []ActivityDetailArgs) error
+	CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
 
-	UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error)
+	UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
 
 	UpdateAllRelations(uuid string, timeArgs []ClubTimeArgs, placeArgs []ClubPlaceArgs, detailArgs []ActivityDetailArgs, tpremarkArgs []ClubTPRemarkArgs) error
 }
@@ -66,7 +66,7 @@ func (r *ClubRepository) GetAllRelations(uuid string) ([]clubs.DetailRelations, 
 	return relations, nil
 }
 
-func (r *ClubRepository) CreateActivityDetail(uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error) {
+func (r *ClubRepository) CreateActivityDetail(uuid string, args []ActivityDetailArgs) error {
 	adModels := make([]clubs.ActivityDetail, len(args))
 
 	for i, arg := range args {
@@ -82,13 +82,13 @@ func (r *ClubRepository) CreateActivityDetail(uuid string, args []ActivityDetail
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return adModels, nil
+	return nil
 }
 
-func (r *ClubRepository) CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error) {
+func (r *ClubRepository) CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error {
 	adModels := make([]clubs.ActivityDetail, len(args))
 
 	for i, arg := range args {
@@ -102,38 +102,35 @@ func (r *ClubRepository) CreateActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 
 	if err := tx.Create(&adModels).Error; err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	return adModels, nil
+	return nil
 }
 
-func (r *ClubRepository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) ([]clubs.ActivityDetail, error) {
+func (r *ClubRepository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error {
 	if len(args) == 0 {
-		return []clubs.ActivityDetail{}, nil
+		return nil
 	}
 
 	tx = tx.Where("club_uuid = ?", uuid).Delete(&clubs.ActivityDetail{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return nil, err
+		return err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
 
-	ad, err := r.CreateActivityDetailWithTx(tx, uuid, args)
-
-	if err != nil {
-		return nil, err
+	if err := r.CreateActivityDetailWithTx(tx, uuid, args); err != nil {
+		return err
 	}
 
-	return ad, nil
+	return nil
 }
 
 func (r *ClubRepository) UpdateAllRelations(uuid string, timeArgs []ClubTimeArgs, placeArgs []ClubPlaceArgs, detailArgs []ActivityDetailArgs, tpremarkArgs []ClubTPRemarkArgs) error {
-	// FIXME: should return data
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		if err := r.CreateTimeWithTx(tx, timeArgs); err != nil {
 			return err
@@ -143,9 +140,7 @@ func (r *ClubRepository) UpdateAllRelations(uuid string, timeArgs []ClubTimeArgs
 			return err
 		}
 
-		_, err := r.UpdateActivityDetailWithTx(tx, uuid, detailArgs)
-
-		if err != nil {
+		if err := r.UpdateActivityDetailWithTx(tx, uuid, detailArgs); err != nil {
 			return err
 		}
 
