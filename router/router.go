@@ -62,7 +62,7 @@ func registerRouters(engine *gin.Engine, config config.IConfig, logger *zap.Logg
 	logger.Debug("initializing registerRouter")
 
 	logger.Debug("initializing middleware")
-	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger)
+	mw := middlewares.NewMiddleware(config.ToMiddlewareConfig(), logger, repo)
 
 	apiGroup := engine.Group("/api")
 

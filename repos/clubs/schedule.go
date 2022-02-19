@@ -18,11 +18,11 @@ type ClubScheduleRepo interface {
 
 	GetSchedulesByClubUUID(uuid string) ([]clubs.ClubSchedule, error)
 
-	CreateSchedule(clubUUID string, args []ClubScheduleArgs) error
-	CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error
+	CreateSchedule(clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error)
+	CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error)
 
-	UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error
-	UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error
+	UpdateSchedule(clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error)
+	UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error)
 }
 
 func (r *ClubRepository) GetScheduleByID(scheduleID uint32) (*clubs.ClubSchedule, error) {
@@ -55,7 +55,7 @@ func (r *ClubRepository) GetSchedulesByClubUUID(uuid string) ([]clubs.ClubSchedu
 	return schedule, nil
 }
 
-func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) error {
+func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error) {
 	schedules := make([]clubs.ClubSchedule, len(args))
 
 	for i, arg := range args {
@@ -72,13 +72,13 @@ func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return schedules, nil
 }
 
-func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error {
+func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error) {
 	schedules := make([]clubs.ClubSchedule, len(args))
 
 	for i, arg := range args {
@@ -93,56 +93,60 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 
 	if err := tx.Create(&schedules).Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return schedules, nil
 }
 
-func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
+func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error) {
 	length := len(args)
 
 	if length == 0 {
-		return nil
+		return []clubs.ClubSchedule{}, nil
 	}
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubSchedule{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return err
+		return nil, err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	if err := r.CreateSchedule(clubUUID, args); err != nil {
-		return err
+	sch, err := r.CreateSchedule(clubUUID, args)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return sch, nil
 }
 
-func (r *ClubRepository) UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error {
+func (r *ClubRepository) UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) ([]clubs.ClubSchedule, error) {
 	length := len(args)
 
 	if length == 0 {
-		return nil
+		return []clubs.ClubSchedule{}, nil
 	}
 
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubSchedule{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return err
+		return nil, err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	if err := r.CreateScheduleWithTx(tx, clubUUID, args); err != nil {
-		return err
+	sch, err := r.CreateScheduleWithTx(tx, clubUUID, args)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return sch, nil
 }
