@@ -2,6 +2,8 @@ name: redoc
 
 on:
   push:
+    branches:
+      - dev
     paths:
       - openapi.yaml
   workflow_dispatch:

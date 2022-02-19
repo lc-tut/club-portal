@@ -6,6 +6,7 @@ create table if not exists `club_pages` (
     `short_description` varchar(50) not null,
     `campus` tinyint unsigned not null,
     `club_type` tinyint unsigned not null,
+    `remark` text,
     `visible` tinyint(1) not null,
     `updated_at` datetime not null
 );

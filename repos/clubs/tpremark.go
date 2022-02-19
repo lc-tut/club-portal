@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ClubRemarkArgs struct {
+type ClubTPRemarkArgs struct {
 	TimeID       uint32
 	PlaceID      uint32
 	TimeRemarks  string
@@ -15,15 +15,15 @@ type ClubRemarkArgs struct {
 }
 
 type ClubRemarkRepo interface {
-	GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error)
+	GetTPRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error)
 
-	CreateRemark(uuid string, args []ClubRemarkArgs) error
-	CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
+	CreateTPRemark(uuid string, args []ClubTPRemarkArgs) error
+	CreateTPRemarkWithTx(tx *gorm.DB, uuid string, args []ClubTPRemarkArgs) error
 
-	UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error
+	UpdateTPRemarkWithTx(tx *gorm.DB, uuid string, args []ClubTPRemarkArgs) error
 }
 
-func (r *ClubRepository) GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error) {
+func (r *ClubRepository) GetTPRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, error) {
 	remarks := make([]clubs.ClubRemark, 0)
 
 	tx := r.db.Where("club_uuid = ?", uuid).Find(&remarks)
@@ -39,7 +39,7 @@ func (r *ClubRepository) GetRemarksByClubUUID(uuid string) ([]clubs.ClubRemark, 
 	return remarks, nil
 }
 
-func (r *ClubRepository) CreateRemark(uuid string, args []ClubRemarkArgs) error {
+func (r *ClubRepository) CreateTPRemark(uuid string, args []ClubTPRemarkArgs) error {
 	remarks := make([]clubs.ClubRemark, len(args))
 
 	for i, arg := range args {
@@ -63,7 +63,7 @@ func (r *ClubRepository) CreateRemark(uuid string, args []ClubRemarkArgs) error 
 	return nil
 }
 
-func (r *ClubRepository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+func (r *ClubRepository) CreateTPRemarkWithTx(tx *gorm.DB, uuid string, args []ClubTPRemarkArgs) error {
 	remarks := make([]clubs.ClubRemark, len(args))
 
 	for i, arg := range args {
@@ -85,7 +85,7 @@ func (r *ClubRepository) CreateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 	return nil
 }
 
-func (r *ClubRepository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []ClubRemarkArgs) error {
+func (r *ClubRepository) UpdateTPRemarkWithTx(tx *gorm.DB, uuid string, args []ClubTPRemarkArgs) error {
 	if len(args) == 0 {
 		return nil
 	}
@@ -100,7 +100,7 @@ func (r *ClubRepository) UpdateRemarkWithTx(tx *gorm.DB, uuid string, args []Clu
 		return err
 	}
 
-	if err := r.CreateRemarkWithTx(tx, uuid, args); err != nil {
+	if err := r.CreateTPRemarkWithTx(tx, uuid, args); err != nil {
 		return err
 	}
 

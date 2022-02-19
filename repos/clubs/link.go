@@ -17,11 +17,11 @@ type ClubLinkRepo interface {
 
 	GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, error)
 
-	CreateLink(clubUUID string, args []ClubLinkArgs) error
-	CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
+	CreateLink(clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error)
+	CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error)
 
-	UpdateLink(clubUUID string, args []ClubLinkArgs) error
-	UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error
+	UpdateLink(clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error)
+	UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error)
 }
 
 func (r *ClubRepository) GetAllLinks() ([]clubs.ClubLink, error) {
@@ -69,7 +69,7 @@ func (r *ClubRepository) GetLinksByClubUUID(uuid string) ([]clubs.ClubLink, erro
 	return link, nil
 }
 
-func (r *ClubRepository) CreateLink(clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) CreateLink(clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error) {
 	links := make([]clubs.ClubLink, len(args))
 
 	for i, arg := range args {
@@ -85,13 +85,13 @@ func (r *ClubRepository) CreateLink(clubUUID string, args []ClubLinkArgs) error 
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return links, nil
 }
 
-func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error) {
 	links := make([]clubs.ClubLink, len(args))
 
 	for i, arg := range args {
@@ -105,56 +105,60 @@ func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 
 	if err := tx.Create(&links).Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	return links, nil
 }
 
-func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error) {
 	length := len(args)
 
 	if length == 0 {
-		return nil
+		return []clubs.ClubLink{}, nil
 	}
 
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubLink{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return err
+		return nil, err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	if err := r.CreateLink(clubUUID, args); err != nil {
-		return err
+	links, err := r.CreateLink(clubUUID, args)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return links, nil
 }
 
-func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
+func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) ([]clubs.ClubLink, error) {
 	length := len(args)
 
 	if length == 0 {
-		return nil
+		return []clubs.ClubLink{}, nil
 	}
 
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubLink{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
-		return err
+		return nil, err
 	} else if err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	if err := r.CreateLinkWithTx(tx, clubUUID, args); err != nil {
-		return err
+	links, err := r.CreateLinkWithTx(tx, clubUUID, args)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return links, nil
 }

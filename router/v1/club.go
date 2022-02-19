@@ -55,6 +55,7 @@ type ClubCreatePostData struct {
 	ShortDescription string                         `json:"short_description"`
 	Campus           uint8                          `json:"campus"`
 	ClubType         uint8                          `json:"club_type"`
+	Remark           *string                        `json:"remark"`
 	Contents         []models.ContentRequest        `json:"contents"`
 	Links            []models.LinkRequest           `json:"links"`
 	Schedules        []models.ScheduleRequest       `json:"schedules"`
@@ -133,6 +134,7 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 		Name:            pd.Name,
 		Desc:            pd.Description,
 		ShortDesc:       pd.ShortDescription,
+		Remark:          utils.StringPToString(pd.Remark),
 		Campus:          campus,
 		ClubType:        clubType,
 		Visible:         true,
@@ -144,7 +146,7 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 		Videos:          validateToVideoArgs(pd.Videos),
 		Times:           validateToTimeArgs(pd.ActivityDetails),
 		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		Remarks:         validateToRemarkArgs(pd.ActivityDetails),
+		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
 		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
 	}
 
@@ -152,6 +154,7 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 }
 
 func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) error {
+	// FIXME: should return `page`
 	clubUUID, err := uuid.NewRandom()
 
 	if err != nil {
@@ -179,6 +182,7 @@ func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) er
 type UpdatePostData struct {
 	Description      string                         `json:"description"`
 	ShortDescription string                         `json:"short_description"`
+	Remark           *string                        `json:"remark"`
 	Contents         []models.ContentRequest        `json:"contents"`
 	Links            []models.LinkRequest           `json:"links"`
 	Schedules        []models.ScheduleRequest       `json:"schedules"`
@@ -218,6 +222,7 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 	pageArgs := &repos.ClubPageUpdateArgs{
 		Desc:            pd.Description,
 		ShortDesc:       pd.ShortDescription,
+		Remark:          utils.StringPToString(pd.Remark),
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
@@ -226,7 +231,7 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 		Videos:          validateToVideoArgs(pd.Videos),
 		Times:           validateToTimeArgs(pd.ActivityDetails),
 		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		Remarks:         validateToRemarkArgs(pd.ActivityDetails),
+		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
 		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
 	}
 

@@ -14,6 +14,7 @@ type ClubPageCreateArgs struct {
 	ShortDesc       string
 	Campus          consts.CampusType
 	ClubType        consts.ClubType
+	Remark          string
 	Visible         bool
 	Contents        []string
 	Links           []ClubLinkArgs
@@ -23,13 +24,14 @@ type ClubPageCreateArgs struct {
 	Videos          []string
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs
-	Remarks         []ClubRemarkArgs
+	TPRemark        []ClubTPRemarkArgs
 	ActivityDetails []ActivityDetailArgs
 }
 
 type ClubPageUpdateArgs struct {
 	Desc            string
 	ShortDesc       string
+	Remark          string
 	Contents        []string
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
@@ -38,7 +40,7 @@ type ClubPageUpdateArgs struct {
 	Videos          []string
 	Times           []ClubTimeArgs
 	Places          []ClubPlaceArgs
-	Remarks         []ClubRemarkArgs
+	TPRemark        []ClubTPRemarkArgs
 	ActivityDetails []ActivityDetailArgs
 }
 
@@ -144,6 +146,7 @@ func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalI
 		Campus:           page.Campus,
 		ClubType:         page.ClubType,
 		UpdatedAt:        page.UpdatedAt,
+		Remark:           utils.NullStringToStringP(page.Remark),
 		Contents:         page.Contents.ToContentResponse(),
 		Links:            page.Links.ToLinkResponse(),
 		Schedules:        page.Schedules.ToScheduleResponse(),
@@ -168,6 +171,7 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 		ShortDescription: args.ShortDesc,
 		Campus:           args.Campus.ToPrimitive(),
 		ClubType:         args.ClubType.ToPrimitive(),
+		Remark:           utils.StringToNullString(args.Remark),
 		Visible:          args.Visible,
 	}
 
@@ -176,19 +180,27 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		if err := r.CreateContentWithTx(tx, uuid, args.Contents); err != nil {
+		contents, err := r.CreateContentWithTx(tx, uuid, args.Contents)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.CreateLinkWithTx(tx, uuid, args.Links); err != nil {
+		links, err := r.CreateLinkWithTx(tx, uuid, args.Links)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.CreateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
+		schedules, err := r.CreateScheduleWithTx(tx, uuid, args.Schedules)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.CreateAchievementWithTx(tx, uuid, args.Achievements); err != nil {
+		achievements, err := r.CreateAchievementWithTx(tx, uuid, args.Achievements)
+
+		if err != nil {
 			return err
 		}
 
@@ -196,9 +208,13 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		if err := r.CreateVideoWithTx(tx, uuid, args.Videos); err != nil {
+		videos, err := r.CreateVideoWithTx(tx, uuid, args.Videos)
+
+		if err != nil {
 			return err
 		}
+
+		// FIXME: get return value and set to `page` struct
 
 		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
 			return err
@@ -208,13 +224,22 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 			return err
 		}
 
-		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+		details, err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.CreateRemarkWithTx(tx, uuid, args.Remarks); err != nil {
+		if err := r.CreateTPRemarkWithTx(tx, uuid, args.TPRemark); err != nil {
 			return err
 		}
+
+		page.Contents = contents
+		page.Links = links
+		page.Schedules = schedules
+		page.Achievements = achievements
+		page.Videos = videos
+		page.ActivityDetails = details
 
 		return nil
 	})
@@ -230,6 +255,7 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 	page := clubs.ClubPage{
 		Description:      args.Desc,
 		ShortDescription: args.ShortDesc,
+		Remark:           utils.StringToNullString(args.Remark),
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -237,15 +263,27 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		if err := r.UpdateContentWithTx(tx, uuid, args.Contents); err != nil {
+		contents, err := r.UpdateContentWithTx(tx, uuid, args.Contents)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.UpdateLinkWithTx(tx, uuid, args.Links); err != nil {
+		links, err := r.UpdateLinkWithTx(tx, uuid, args.Links)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules); err != nil {
+		schedules, err := r.UpdateScheduleWithTx(tx, uuid, args.Schedules)
+
+		if err != nil {
+			return err
+		}
+
+		achievements, err := r.UpdateAchievementWithTx(tx, uuid, args.Achievements)
+
+		if err != nil {
 			return err
 		}
 
@@ -253,9 +291,13 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		if err := r.UpdateVideoWithTx(tx, uuid, args.Videos); err != nil {
+		videos, err := r.UpdateVideoWithTx(tx, uuid, args.Videos)
+
+		if err != nil {
 			return err
 		}
+
+		// FIXME: get return value and set to `page` struct
 
 		if err := r.CreateTimeWithTx(tx, args.Times); err != nil {
 			return err
@@ -265,13 +307,22 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 			return err
 		}
 
-		if err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
+		details, err := r.UpdateActivityDetailWithTx(tx, uuid, args.ActivityDetails)
+
+		if err != nil {
 			return err
 		}
 
-		if err := r.UpdateRemarkWithTx(tx, uuid, args.Remarks); err != nil {
+		if err := r.UpdateTPRemarkWithTx(tx, uuid, args.TPRemark); err != nil {
 			return err
 		}
+
+		page.Contents = contents
+		page.Links = links
+		page.Schedules = schedules
+		page.Achievements = achievements
+		page.Videos = videos
+		page.ActivityDetails = details
 
 		return nil
 	})

@@ -104,11 +104,11 @@ func validateToPlaceArgs(models []models.ActivityDetailRequest) []repos.ClubPlac
 	return places
 }
 
-func validateToRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubRemarkArgs {
-	remarks := make([]repos.ClubRemarkArgs, len(models))
+func validateToTPRemarkArgs(models []models.ActivityDetailRequest) []repos.ClubTPRemarkArgs {
+	remarks := make([]repos.ClubTPRemarkArgs, len(models))
 
 	for i, m := range models {
-		remark := repos.ClubRemarkArgs{
+		remark := repos.ClubTPRemarkArgs{
 			TimeID:       m.TimeID,
 			PlaceID:      m.PlaceID,
 			TimeRemarks:  utils.StringPToString(m.TimeRemark),
