@@ -58,7 +58,7 @@ func (r *Router) AddRouter() {
 			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.CreateClub())
 			clubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClub())
 			clubGroup.GET("/slug/:clubslug", r.middleware.SetClubSlugKey(), h.GetClubFromSlug())
-			personalClubGroup := clubGroup.GET("/uuid/:clubuuid", r.middleware.SetClubUUIDKey())
+			personalClubGroup := clubGroup.Group("/uuid/:clubuuid", r.middleware.SetClubUUIDKey())
 			{
 				personalClubGroup.GET("/", h.GetClubFromUUID())
 				personalClubGroup.DELETE("/", r.middleware.CheckSession(), r.middleware.AdminOnly(), h.DeleteClub())
