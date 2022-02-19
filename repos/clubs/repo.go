@@ -8,6 +8,7 @@ import (
 type IClubRepository interface {
 	ClubAchievementRepo
 	ClubContentRepo
+	ClubDescriptionRepo
 	ClubImageRepo
 	ClubLinkRepo
 	ClubPageRepo
