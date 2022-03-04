@@ -14,7 +14,8 @@ type ClubPage struct {
 	ShortDescription string           `gorm:"type:varchar(50);not null"`
 	Campus           uint8            `gorm:"type:tinyint;not null"`
 	ClubType         uint8            `gorm:"type:tinyint;not null"`
-	Remark           sql.NullString   `gorm:"type:text"`
+	ClubRemark       sql.NullString   `gorm:"type:text"`
+	ScheduleRemark   sql.NullString   `gorm:"type:text"`
 	Visible          bool             `gorm:"type:tinyint(1);not null"`
 	UpdatedAt        time.Time        `gorm:"type:datetime;not null"`
 	Thumbnail        ClubThumbnail    `gorm:"foreignKey:ClubUUID;references:ClubUUID"`
@@ -79,7 +80,8 @@ type ClubPageInternalInfo struct {
 	ShortDescription string                `json:"short_description"`
 	Campus           uint8                 `json:"campus"`
 	ClubType         uint8                 `json:"club_type"`
-	Remark           *string               `json:"remark"`
+	ClubRemark       *string               `json:"club_remark"`
+	ScheduleRemark   *string               `json:"schedule_remark"`
 	UpdatedAt        time.Time             `json:"updated_at"`
 	Contents         []ContentResponse     `json:"contents"`
 	Links            []LinkResponse        `json:"links"`

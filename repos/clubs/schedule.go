@@ -3,14 +3,12 @@ package clubs
 import (
 	"errors"
 	"github.com/lc-tut/club-portal/models/clubs"
-	"github.com/lc-tut/club-portal/utils"
 	"gorm.io/gorm"
 )
 
 type ClubScheduleArgs struct {
 	Month    uint8
 	Schedule string
-	Remarks  string
 }
 
 type ClubScheduleRepo interface {
@@ -63,7 +61,6 @@ func (r *ClubRepository) CreateSchedule(clubUUID string, args []ClubScheduleArgs
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}
@@ -86,7 +83,6 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 			ClubUUID: clubUUID,
 			Month:    arg.Month,
 			Schedule: arg.Schedule,
-			Remarks:  utils.StringToNullString(arg.Remarks),
 		}
 		schedules[i] = sch
 	}

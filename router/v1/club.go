@@ -55,7 +55,8 @@ type ClubCreatePostData struct {
 	ShortDescription string                         `json:"short_description"`
 	Campus           uint8                          `json:"campus"`
 	ClubType         uint8                          `json:"club_type"`
-	Remark           *string                        `json:"remark"`
+	ClubRemark       *string                        `json:"club_remark"`
+	ScheduleRemark   *string                        `json:"schedule_remark"`
 	Contents         []models.ContentRequest        `json:"contents"`
 	Links            []models.LinkRequest           `json:"links"`
 	Schedules        []models.ScheduleRequest       `json:"schedules"`
@@ -134,7 +135,8 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 		Name:            pd.Name,
 		Desc:            pd.Description,
 		ShortDesc:       pd.ShortDescription,
-		Remark:          utils.StringPToString(pd.Remark),
+		ClubRemark:      utils.StringPToString(pd.ClubRemark),
+		ScheduleRemark:  utils.StringPToString(pd.ScheduleRemark),
 		Campus:          campus,
 		ClubType:        clubType,
 		Visible:         true,
@@ -181,7 +183,8 @@ func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) er
 type UpdatePostData struct {
 	Description      string                         `json:"description"`
 	ShortDescription string                         `json:"short_description"`
-	Remark           *string                        `json:"remark"`
+	ClubRemark       *string                        `json:"club_remark"`
+	ScheduleRemark   *string                        `json:"schedule_remark"`
 	Contents         []models.ContentRequest        `json:"contents"`
 	Links            []models.LinkRequest           `json:"links"`
 	Schedules        []models.ScheduleRequest       `json:"schedules"`
@@ -221,7 +224,8 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 	pageArgs := &repos.ClubPageUpdateArgs{
 		Desc:            pd.Description,
 		ShortDesc:       pd.ShortDescription,
-		Remark:          utils.StringPToString(pd.Remark),
+		ClubRemark:      utils.StringPToString(pd.ClubRemark),
+		ScheduleRemark:  utils.StringPToString(pd.ScheduleRemark),
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
