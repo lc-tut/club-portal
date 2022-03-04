@@ -31,7 +31,6 @@ create table if not exists `club_schedules` (
     `club_uuid` char(36) not null,
     `month` tinyint unsigned not null,
     `schedule` text not null,
-    `remarks` text,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict
 );
 
@@ -78,7 +77,7 @@ create table if not exists `club_remarks` (
 );
 
 create table if not exists `club_thumbnails` (
-    `thumbnail_id` int unsigned not null primary key auto_increment,
+    `thumbnail_id` int unsigned not null,
     `club_uuid` char(36) not null,
     foreign key (`thumbnail_id`) references `uploaded_thumbnails` (`thumbnail_id`) on delete restrict on update restrict,
     foreign key (`club_uuid`) references `club_pages` (`club_uuid`) on delete cascade on update restrict

@@ -14,7 +14,8 @@ type ClubPageCreateArgs struct {
 	ShortDesc       string
 	Campus          consts.CampusType
 	ClubType        consts.ClubType
-	Remark          string
+	ClubRemark      string
+	ScheduleRemark  string
 	Visible         bool
 	Contents        []string
 	Links           []ClubLinkArgs
@@ -31,7 +32,8 @@ type ClubPageCreateArgs struct {
 type ClubPageUpdateArgs struct {
 	Desc            string
 	ShortDesc       string
-	Remark          string
+	ClubRemark      string
+	ScheduleRemark  string
 	Contents        []string
 	Links           []ClubLinkArgs
 	Schedules       []ClubScheduleArgs
@@ -146,7 +148,8 @@ func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalI
 		Campus:           page.Campus,
 		ClubType:         page.ClubType,
 		UpdatedAt:        page.UpdatedAt,
-		Remark:           utils.NullStringToStringP(page.Remark),
+		ClubRemark:       utils.NullStringToStringP(page.ClubRemark),
+		ScheduleRemark:   utils.NullStringToStringP(page.ScheduleRemark),
 		Contents:         page.Contents.ToContentResponse(),
 		Links:            page.Links.ToLinkResponse(),
 		Schedules:        page.Schedules.ToScheduleResponse(),
@@ -171,7 +174,8 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 		ShortDescription: args.ShortDesc,
 		Campus:           args.Campus.ToPrimitive(),
 		ClubType:         args.ClubType.ToPrimitive(),
-		Remark:           utils.StringToNullString(args.Remark),
+		ClubRemark:       utils.StringToNullString(args.ClubRemark),
+		ScheduleRemark:   utils.StringToNullString(args.ScheduleRemark),
 		Visible:          args.Visible,
 	}
 
@@ -234,7 +238,8 @@ func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateAr
 	page := clubs.ClubPage{
 		Description:      args.Desc,
 		ShortDescription: args.ShortDesc,
-		Remark:           utils.StringToNullString(args.Remark),
+		ClubRemark:       utils.StringToNullString(args.ClubRemark),
+		ScheduleRemark:   utils.StringToNullString(args.ScheduleRemark),
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
