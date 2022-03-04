@@ -37,7 +37,6 @@ func validateToScheduleArgs(models []models.ScheduleRequest) []repos.ClubSchedul
 		schedule := repos.ClubScheduleArgs{
 			Month:    m.Month,
 			Schedule: m.Schedule,
-			Remarks:  utils.StringPToString(m.Remarks),
 		}
 		schedules[i] = schedule
 	}
