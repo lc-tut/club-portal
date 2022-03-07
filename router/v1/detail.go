@@ -7,11 +7,6 @@ import (
 	"net/http"
 )
 
-type response struct {
-	Times  []clubs.TimeResponse  `json:"times"`
-	Places []clubs.PlaceResponse `json:"places"`
-}
-
 func (h *Handler) GetClubActivityDetails() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
@@ -19,15 +14,10 @@ func (h *Handler) GetClubActivityDetails() gin.HandlerFunc {
 
 		rels := clubs.Relations(details)
 
-		res := &response{
-			Times:  clubs.Times(rels.ToClubTime()).ToTimeResponse(rels.ToClubRemark()),
-			Places: clubs.Places(rels.ToClubPlace()).ToPlaceResponse(rels.ToClubRemark()),
-		}
-
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, res)
+			ctx.JSON(http.StatusOK, rels.ToActivityDetailResponse())
 		}
 	}
 }

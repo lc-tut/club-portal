@@ -74,21 +74,20 @@ type ClubPageExternalInfo struct {
 }
 
 type ClubPageInternalInfo struct {
-	ClubUUID         string                `json:"club_uuid"`
-	Name             string                `json:"name"`
-	Description      string                `json:"description"`
-	ShortDescription string                `json:"short_description"`
-	Campus           uint8                 `json:"campus"`
-	ClubType         uint8                 `json:"club_type"`
-	ClubRemark       *string               `json:"club_remark"`
-	ScheduleRemark   *string               `json:"schedule_remark"`
-	UpdatedAt        time.Time             `json:"updated_at"`
-	Contents         []ContentResponse     `json:"contents"`
-	Links            []LinkResponse        `json:"links"`
-	Schedules        []ScheduleResponse    `json:"schedules"`
-	Achievements     []AchievementResponse `json:"achievements"`
-	Images           []ImageResponse       `json:"images"`
-	Videos           []VideoResponse       `json:"videos"`
-	Times            []TimeResponse        `json:"times"`
-	Places           []PlaceResponse       `json:"places"`
+	ClubUUID         string                   `json:"club_uuid"`
+	Name             string                   `json:"name"`
+	Description      string                   `json:"description"`
+	ShortDescription string                   `json:"short_description"`
+	Campus           uint8                    `json:"campus"`
+	ClubType         uint8                    `json:"club_type"`
+	ClubRemark       *string                  `json:"club_remark"`
+	ScheduleRemark   *string                  `json:"schedule_remark"`
+	UpdatedAt        time.Time                `json:"updated_at"`
+	Contents         []ContentResponse        `json:"contents"`
+	Links            []LinkResponse           `json:"links"`
+	Schedules        []ScheduleResponse       `json:"schedules"`
+	Achievements     []AchievementResponse    `json:"achievements"`
+	Images           []ImageResponse          `json:"images"`
+	Videos           []VideoResponse          `json:"videos"`
+	TimePlaces       []ActivityDetailResponse `json:"time_places"`
 }

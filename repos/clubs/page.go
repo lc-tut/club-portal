@@ -156,8 +156,7 @@ func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalI
 		Achievements:     page.Achievements.ToAchievementResponse(),
 		Images:           typedImages.ToImageResponse(),
 		Videos:           page.Videos.ToVideoResponse(),
-		Times:            clubs.Times(typedRels.ToClubTime()).ToTimeResponse(typedRels.ToClubRemark()),
-		Places:           clubs.Places(typedRels.ToClubPlace()).ToPlaceResponse(typedRels.ToClubRemark()),
+		TimePlaces:       typedRels.ToActivityDetailResponse(),
 	}
 
 	return info, nil
