@@ -521,7 +521,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/Achievement'
+                $ref: '#/components/schemas/Achievement'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
@@ -569,7 +569,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/ActivityDetail'
+                $ref: '#/components/schemas/ActivityDetail'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
@@ -617,7 +617,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/Content'
+                $ref: '#/components/schemas/Content'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
@@ -720,7 +720,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/Link'
+                $ref: '#/components/schemas/Link'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
@@ -768,7 +768,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/Schedule'
+                $ref: '#/components/schemas/Schedule'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
@@ -816,7 +816,7 @@ paths:
             schema:
               type: array
               items:
-                - $ref: '#/components/schemas/Video'
+                $ref: '#/components/schemas/Video'
       responses:
         201:
           description: 正常に編集できた場合に返されます。
