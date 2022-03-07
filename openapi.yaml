@@ -535,13 +535,13 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
-  /v1/clubs/uuid/{clubUUID}/activity_detail:
+  /v1/clubs/uuid/{clubUUID}/time_place:
     get:
       tags:
         - club
-      summary: clubUUID の activity detail を取得します。
+      summary: clubUUID の time_place/activity_detail を取得します。
       security:
-        - session: []
+        - session: [ ]
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       responses:
@@ -550,19 +550,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActivityDetail'
+                $ref: '#/components/schemas/TimePlace'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
       tags:
         - club
-      summary: clubUUID の activity detail を編集します。
+      summary: clubUUID の time_place/activity_detail を編集します。
       security:
         - session: []
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       requestBody:
-        description: 編集に必要な activity detail 情報
+        description: 編集に必要な time_place/activity_detail 情報
         required: true
         content:
           application/json:
@@ -707,7 +707,7 @@ paths:
     put:
       tags:
         - club
-      summary: clubUUID の achievement を編集します。
+      summary: clubUUID の link を編集します。
       security:
         - session: []
       parameters:
@@ -1241,14 +1241,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Video'
-        times:
+        time_places:
           type: array
           items:
-            $ref: '#/components/schemas/Time'
-        places:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
+            $ref: '#/components/schemas/ActivityDetail'
     Thumbnail:
       type: object
       properties:
@@ -1335,6 +1331,21 @@ components:
           format: uint32
         path:
           type: string
+    TimePlace:
+      type: object
+      properties:
+        date:
+          type: string
+        time:
+          type: string
+        time_remark:
+          type: string
+          nullable: true
+        place:
+          type: string
+        place_remark:
+          type: string
+          nullable: true
     ActivityDetail:
       type: object
       properties:
