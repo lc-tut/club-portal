@@ -381,7 +381,7 @@ paths:
         - club
       summary: clubUUID のサークル情報を編集します。 (General のみ)
       security:
-        - session: [ ]
+        - session: []
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       requestBody:
@@ -502,7 +502,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Achievement'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -528,7 +530,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Achievement'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -541,7 +545,7 @@ paths:
         - club
       summary: clubUUID の time_place/activity_detail を取得します。
       security:
-        - session: [ ]
+        - session: []
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       responses:
@@ -550,7 +554,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimePlace'
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimePlace'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -576,7 +582,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActivityDetail'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityDetail'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -598,7 +606,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Content'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Content'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -624,7 +634,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Content'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Content'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -701,7 +713,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Link'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Link'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -727,7 +741,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Link'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Link'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -749,7 +765,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Schedule'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -775,7 +793,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Schedule'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -797,7 +817,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Video'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
@@ -823,7 +845,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Video'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Video'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -843,7 +867,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ImageResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
         401:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
@@ -952,12 +978,32 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/upload/thumbnail/clubs/{clubUUID}:
+    get:
+      tags:
+        - upload
+      summary: clubUUID のサークルのサムネイルを取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thumbnail'
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
     put:
       tags:
         - upload
       summary: clubUUID のサークルのサムネイルを変更します。
       security:
         - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
       requestBody:
         description: アップロードするサムネイル
         required: true
@@ -977,24 +1023,6 @@ paths:
           description: リクエストが不正な場合に返されます。
         401:
           description: 認証していない状態でアクセスした場合に返されます。
-        500:
-          description: サーバ側でエラーが発生した場合に返されます。
-  /v1/upload/thumbnail/clubs/{clubUUID}:
-    get:
-      tags:
-        - upload
-      summary: clubUUID のサークルのサムネイルを取得します。
-      security:
-        - session: []
-      parameters:
-        - $ref: '#/components/parameters/ClubUUID'
-      responses:
-        200:
-          description: 正常に取得した場合に返されます。
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Thumbnail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     delete:
