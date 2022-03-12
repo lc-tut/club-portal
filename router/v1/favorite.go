@@ -19,6 +19,30 @@ func (h *Handler) GetFavoriteClubs() gin.HandlerFunc {
 	}
 }
 
+type IsFavResponse struct {
+	Status bool `json:"status"`
+}
+
+func (h *Handler) GetIsFavoriteClub() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userUUID := ctx.GetString(consts.UserUUIDKeyName)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
+		favs, err := h.repo.GetFavorites(userUUID)
+
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			for _, club := range favs {
+				if club.ClubUUID == clubUUID {
+					ctx.JSON(http.StatusOK, &IsFavResponse{Status: true})
+					return
+				}
+			}
+			ctx.JSON(http.StatusOK, &IsFavResponse{})
+		}
+	}
+}
+
 type FavPostData struct {
 	ClubUUID string `json:"club_uuid"`
 }
