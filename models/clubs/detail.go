@@ -78,9 +78,11 @@ func (r Relations) ToActivityDetailResponse() []ActivityDetailResponse {
 
 	for i, detail := range r {
 		detailRes := ActivityDetailResponse{
+			TimeID:      detail.TimeID,
 			Date:        detail.Date,
 			Time:        detail.Time,
 			TimeRemark:  utils.NullStringToStringP(detail.TimeRemark),
+			PlaceID:     detail.PlaceID,
 			Place:       detail.Place,
 			PlaceRemark: utils.NullStringToStringP(detail.PlaceRemark),
 		}
@@ -101,9 +103,11 @@ type ActivityDetailRequest struct {
 }
 
 type ActivityDetailResponse struct {
+	TimeID      uint32  `json:"time_id"`
 	Date        string  `json:"date"`
 	Time        string  `json:"time"`
 	TimeRemark  *string `json:"time_remark"`
+	PlaceID     uint32  `json:"place_id"`
 	Place       string  `json:"place"`
 	PlaceRemark *string `json:"place_remark"`
 }
