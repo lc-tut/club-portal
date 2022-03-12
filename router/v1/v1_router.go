@@ -48,6 +48,7 @@ func (r *Router) AddRouter() {
 				personalGroup.GET("/", h.GetUserUUID())
 				personalGroup.PUT("/", h.UpdateUser())
 				personalGroup.GET("/favs", h.GetFavoriteClubs())
+				personalGroup.GET("/favs/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetIsFavoriteClub())
 				personalGroup.POST("/favs", h.CreateFavoriteClub())
 				personalGroup.POST("/unfav", h.UnFavoriteClub())
 			}

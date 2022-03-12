@@ -180,9 +180,10 @@ func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (user
 	}
 }
 
-func (r *UserRepository) createUser(tx *gorm.DB, uuid string) error {
+func (r *UserRepository) createUser(tx *gorm.DB, uuid string, role string) error {
 	user := &users.User{
 		UserUUID: uuid,
+		Role:     role,
 	}
 
 	if err := tx.Create(user).Error; err != nil {
@@ -201,7 +202,7 @@ func (r *UserRepository) CreateDomainUser(uuid string, email string, name string
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.createUser(tx, uuid); err != nil {
+		if err := r.createUser(tx, uuid, "domain"); err != nil {
 			return err
 		}
 
@@ -229,7 +230,7 @@ func (r *UserRepository) CreateGeneralUser(uuid string, email string, name strin
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.createUser(tx, uuid); err != nil {
+		if err := r.createUser(tx, uuid, "general"); err != nil {
 			return err
 		}
 
@@ -256,7 +257,7 @@ func (r *UserRepository) CreateAdminUser(uuid string, email string, name string)
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := r.createUser(tx, uuid); err != nil {
+		if err := r.createUser(tx, uuid, "admin"); err != nil {
 			return err
 		}
 

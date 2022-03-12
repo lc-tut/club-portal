@@ -89,5 +89,5 @@ type ClubPageInternalInfo struct {
 	Achievements     []AchievementResponse    `json:"achievements"`
 	Images           []ImageResponse          `json:"images"`
 	Videos           []VideoResponse          `json:"videos"`
-	TimePlaces       []ActivityDetailResponse `json:"time_places"`
+	TimePlaces       []ActivityDetailResponse `json:"activity_details"`
 }
