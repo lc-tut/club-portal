@@ -539,11 +539,11 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
-  /v1/clubs/uuid/{clubUUID}/time_place:
+  /v1/clubs/uuid/{clubUUID}/activity_detail:
     get:
       tags:
         - club
-      summary: clubUUID の time_place/activity_detail を取得します。
+      summary: clubUUID の activity_detail を取得します。
       security:
         - session: []
       parameters:
@@ -556,19 +556,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TimePlace'
+                  $ref: '#/components/schemas/ActivityDetail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
     put:
       tags:
         - club
-      summary: clubUUID の time_place/activity_detail を編集します。
+      summary: clubUUID の activity_detail を編集します。
       security:
         - session: []
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       requestBody:
-        description: 編集に必要な time_place/activity_detail 情報
+        description: 編集に必要な activity_detail 情報
         required: true
         content:
           application/json:
@@ -692,6 +692,56 @@ paths:
                 properties:
                   description:
                     type: string
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/uuid/{clubUUID}/image:
+    get:
+      tags:
+        - club
+      summary: clubUUID の image を取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
+    put:
+      tags:
+        - club
+      summary: clubUUID の image を取得します。
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
+      requestBody:
+        description: 編集に必要な image 情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ImageRequest'
+      responses:
+        201:
+          description: 正常に編集できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -1269,7 +1319,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Video'
-        time_places:
+        activity_details:
           type: array
           items:
             $ref: '#/components/schemas/ActivityDetail'
@@ -1359,21 +1409,6 @@ components:
           format: uint32
         path:
           type: string
-    TimePlace:
-      type: object
-      properties:
-        date:
-          type: string
-        time:
-          type: string
-        time_remark:
-          type: string
-          nullable: true
-        place:
-          type: string
-        place_remark:
-          type: string
-          nullable: true
     ActivityDetail:
       type: object
       properties:
