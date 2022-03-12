@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
+	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ func (h *Handler) GetImages() gin.HandlerFunc {
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, im)
+			ctx.JSON(http.StatusOK, users.Images(im).ToImageResponse())
 		}
 	}
 }
@@ -61,7 +62,9 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 
 		userUUID := ctx.GetString(consts.SessionUserUUID)
 
-		for _, f := range files {
+		res := make([]users.ImageResponse, len(files))
+
+		for i, f := range files {
 			filename := filepath.Base(f.Filename)
 			h.logger.Info("uploaded image", zap.String("filename", filename), zap.String("user_uuid", userUUID))
 			newFn, err := utils.GenerateFileName(filename)
@@ -80,10 +83,17 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 				break
 			}
 
-			if err := h.repo.CreateUploadedImage(userUUID, dst); err != nil {
+			repoRes, err := h.repo.CreateUploadedImage(userUUID, dst)
+
+			if err != nil {
 				_ = h.deleteSavedImage(dst)
 				isError = true
 				break
+			}
+
+			res[i] = users.ImageResponse{
+				ImageID: repoRes.ImageID,
+				Path:    dst,
 			}
 
 			h.logger.Info("successfully saved image", zap.String("path", dst), zap.String("user_uuid", userUUID))
@@ -92,7 +102,7 @@ func (h *Handler) UploadImage() gin.HandlerFunc {
 		if isError {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusCreated)
+			ctx.JSON(http.StatusCreated, res)
 		}
 	}
 }

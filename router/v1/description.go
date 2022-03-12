@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+type ClubDescriptionResponse struct {
+	Description string `json:"description"`
+}
+
 func (h *Handler) GetClubDescription() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
@@ -14,7 +18,7 @@ func (h *Handler) GetClubDescription() gin.HandlerFunc {
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, desc)
+			ctx.JSON(http.StatusOK, &ClubDescriptionResponse{Description: desc})
 		}
 	}
 }
