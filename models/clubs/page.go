@@ -91,3 +91,16 @@ type ClubPageInternalInfo struct {
 	Videos           []VideoResponse          `json:"videos"`
 	TimePlaces       []ActivityDetailResponse `json:"activity_details"`
 }
+
+type ClubPageRestrictedInfo struct {
+	ClubUUID         string          `json:"club_uuid"`
+	Name             string          `json:"name"`
+	Description      string          `json:"description"`
+	ShortDescription string          `json:"short_description"`
+	Campus           uint8           `json:"campus"`
+	ClubType         uint8           `json:"club_type"`
+	UpdatedAt        time.Time       `json:"updated_at"`
+	Links            []LinkResponse  `json:"links"`
+	Images           []ImageResponse `json:"images"`
+	Videos           []VideoResponse `json:"videos"`
+}
