@@ -176,7 +176,7 @@ func (h *Handler) DeleteImage() gin.HandlerFunc {
 		if err := h.deleteSavedImage(im.Path); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }

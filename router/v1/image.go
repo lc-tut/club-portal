@@ -34,7 +34,7 @@ func (h *Handler) UpdateClubImages() gin.HandlerFunc {
 		if err := h.repo.UpdateImage(clubUUID, validateToImageArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

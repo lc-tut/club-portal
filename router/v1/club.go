@@ -227,7 +227,7 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 		if err := h.repo.UpdatePageByClubUUID(clubUUID, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
@@ -264,7 +264,7 @@ func (h *Handler) DeleteClub() gin.HandlerFunc {
 		if err := h.repo.DeletePageByClubUUID(clubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }

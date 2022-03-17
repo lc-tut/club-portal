@@ -24,7 +24,8 @@ func (h *Handler) UpdateClubVideo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var pd []clubs.VideoRequest
 
-		if err := ctx.ShouldBindJSON(pd); err != nil {
+		if err := ctx.ShouldBindJSON(&pd); err != nil {
+			h.logger.Error(err.Error())
 			ctx.Status(http.StatusBadRequest)
 			return
 		}
@@ -34,7 +35,7 @@ func (h *Handler) UpdateClubVideo() gin.HandlerFunc {
 		if err := h.repo.UpdateVideo(clubUUID, validateToVideoArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
