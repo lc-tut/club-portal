@@ -96,7 +96,7 @@ func (r *Router) AddRouter() {
 			{
 				thumbnailClubGroup := thumbnailGroup.Group("/clubs")
 				{
-					thumbnailClubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
+					thumbnailClubGroup.POST("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
 					thumbnailClubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
 					thumbnailClubGroup.GET("/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetClubThumbnail())
 					thumbnailClubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.DeleteClubThumbnail())
