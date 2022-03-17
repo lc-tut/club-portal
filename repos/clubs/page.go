@@ -49,7 +49,9 @@ type ClubPageUpdateArgs struct {
 type ClubPageRepo interface {
 	GetAllPages() ([]clubs.ClubPageExternalInfo, error)
 	GetPageByClubUUID(uuid string) (*clubs.ClubPageInternalInfo, error)
+	GetRestrictedPageByClubUUID(uuid string) (*clubs.ClubPageRestrictedInfo, error)
 	GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error)
+	GetRestrictedPageByClubSlug(clubSlug string) (*clubs.ClubPageRestrictedInfo, error)
 
 	CreatePage(uuid string, args ClubPageCreateArgs) (*clubs.ClubPage, error)
 
@@ -93,13 +95,34 @@ func (r *ClubRepository) GetPageByClubUUID(uuid string) (*clubs.ClubPageInternal
 		return nil, err
 	}
 
-	info, err := r.getPage(page)
+	info, err := r.getPageInternal(page)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return info, nil
+}
+
+func (r *ClubRepository) GetRestrictedPageByClubUUID(uuid string) (*clubs.ClubPageRestrictedInfo, error) {
+	page := &clubs.ClubPage{}
+	tx := r.db.Where("club_uuid = ? and visible is true", uuid).Preload("Links").Preload("Videos").Take(page)
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
+		r.logger.Error(err.Error())
+		return nil, err
+	}
+
+	info, err := r.getPageRestricted(page)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return info, err
 }
 
 func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInternalInfo, error) {
@@ -114,7 +137,7 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 		return nil, err
 	}
 
-	info, err := r.getPage(page)
+	info, err := r.getPageInternal(page)
 
 	if err != nil {
 		return nil, err
@@ -123,7 +146,28 @@ func (r *ClubRepository) GetPageByClubSlug(clubSlug string) (*clubs.ClubPageInte
 	return info, nil
 }
 
-func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalInfo, error) {
+func (r *ClubRepository) GetRestrictedPageByClubSlug(clubSlug string) (*clubs.ClubPageRestrictedInfo, error) {
+	page := &clubs.ClubPage{}
+	tx := r.db.Where("club_slug = ? and visible is true", clubSlug).Preload("Links").Preload("Videos").Take(page)
+
+	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		r.logger.Info(err.Error())
+		return nil, err
+	} else if err != nil {
+		r.logger.Error(err.Error())
+		return nil, err
+	}
+
+	info, err := r.getPageRestricted(page)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return info, err
+}
+
+func (r *ClubRepository) getPageInternal(page *clubs.ClubPage) (*clubs.ClubPageInternalInfo, error) {
 	rels, err := r.GetAllRelations(page.ClubUUID)
 
 	if err != nil {
@@ -157,6 +201,31 @@ func (r *ClubRepository) getPage(page *clubs.ClubPage) (*clubs.ClubPageInternalI
 		Images:           typedImages.ToImageResponse(),
 		Videos:           page.Videos.ToVideoResponse(),
 		TimePlaces:       typedRels.ToActivityDetailResponse(),
+	}
+
+	return info, nil
+}
+
+func (r *ClubRepository) getPageRestricted(page *clubs.ClubPage) (*clubs.ClubPageRestrictedInfo, error) {
+	images, err := r.GetImagesByClubUUID(page.ClubUUID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	typedImages := clubs.Images(images)
+
+	info := &clubs.ClubPageRestrictedInfo{
+		ClubUUID:         page.ClubUUID,
+		Name:             page.Name,
+		Description:      page.Description,
+		ShortDescription: page.ShortDescription,
+		Campus:           page.Campus,
+		ClubType:         page.ClubType,
+		UpdatedAt:        page.UpdatedAt,
+		Links:            page.Links.ToRestrictedLinkResponse(),
+		Images:           typedImages.ToImageResponse(),
+		Videos:           page.Videos.ToVideoResponse(),
 	}
 
 	return info, nil
