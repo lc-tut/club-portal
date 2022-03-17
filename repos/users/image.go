@@ -56,6 +56,8 @@ func (r *UserRepository) CreateUploadedImage(userUUID string, path string) (*use
 		return nil, err
 	}
 
+	tx.Last(image)
+
 	return image, nil
 }
 
