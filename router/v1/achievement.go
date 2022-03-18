@@ -34,7 +34,7 @@ func (h *Handler) UpdateClubAchievement() gin.HandlerFunc {
 		if err := h.repo.UpdateAchievement(clubUUID, validateToAchievementArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

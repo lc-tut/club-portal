@@ -34,7 +34,7 @@ func (h *Handler) UpdateClubSchedule() gin.HandlerFunc {
 		if err := h.repo.UpdateSchedule(clubUUID, validateToScheduleArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

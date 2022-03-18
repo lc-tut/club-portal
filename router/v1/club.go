@@ -26,12 +26,20 @@ func (h *Handler) GetAllClub() gin.HandlerFunc {
 func (h *Handler) GetClubFromSlug() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubSlug := ctx.GetString(consts.ClubSlugKeyName)
-		page, err := h.repo.GetPageByClubSlug(clubSlug)
-
-		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
+		if ctx.GetBool(consts.IsRestricted) {
+			page, err := h.repo.GetRestrictedPageByClubSlug(clubSlug)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		} else {
-			ctx.JSON(http.StatusOK, page)
+			page, err := h.repo.GetPageByClubSlug(clubSlug)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		}
 	}
 }
@@ -39,12 +47,20 @@ func (h *Handler) GetClubFromSlug() gin.HandlerFunc {
 func (h *Handler) GetClubFromUUID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-		page, err := h.repo.GetPageByClubUUID(clubUUID)
-
-		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
+		if ctx.GetBool(consts.IsRestricted) {
+			page, err := h.repo.GetRestrictedPageByClubUUID(clubUUID)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		} else {
-			ctx.JSON(http.StatusOK, page)
+			page, err := h.repo.GetPageByClubUUID(clubUUID)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		}
 	}
 }
@@ -211,7 +227,7 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 		if err := h.repo.UpdatePageByClubUUID(clubUUID, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
@@ -248,7 +264,7 @@ func (h *Handler) DeleteClub() gin.HandlerFunc {
 		if err := h.repo.DeletePageByClubUUID(clubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }

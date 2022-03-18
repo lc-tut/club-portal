@@ -39,22 +39,25 @@ func (mw *Middleware) AdminOnly() gin.HandlerFunc {
 func (mw *Middleware) IdentifyUUID(key string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		sessUUID := ctx.GetString(consts.SessionUserUUID)
-		var paramUUID string
+		paramUUID := ctx.GetString(key)
 		if key == consts.ClubUUIDKeyName {
 			res, err := mw.repo.GetGeneralUserByUUID(sessUUID)
 			if err != nil {
 				ctx.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
-			paramUUID = utils.StringPToString(utils.NullStringToStringP(res.ClubUUID))
+			clubUUID := utils.StringPToString(utils.NullStringToStringP(res.ClubUUID))
+			if clubUUID != paramUUID {
+				mw.logger.Warn("invalid user", zap.String("club_uuid", clubUUID), zap.String("param_uuid", paramUUID))
+				ctx.AbortWithStatus(http.StatusForbidden)
+				return
+			}
 		} else {
-			paramUUID = ctx.GetString(key)
-		}
-
-		if sessUUID != paramUUID {
-			mw.logger.Warn("invalid user", zap.String("session_user_uuid", sessUUID), zap.String("param_uuid", paramUUID))
-			ctx.AbortWithStatus(http.StatusForbidden)
-			return
+			if sessUUID != paramUUID {
+				mw.logger.Warn("invalid user", zap.String("session_user_uuid", sessUUID), zap.String("param_uuid", paramUUID))
+				ctx.AbortWithStatus(http.StatusForbidden)
+				return
+			}
 		}
 
 		ctx.Next()

@@ -58,10 +58,10 @@ func (r *Router) AddRouter() {
 			clubGroup.GET("/", h.GetAllClub())
 			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.CreateClub())
 			clubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClub())
-			clubGroup.GET("/slug/:clubslug", r.middleware.SetClubSlugKey(), h.GetClubFromSlug())
+			clubGroup.GET("/slug/:clubslug", r.middleware.SetClubSlugKey(), r.middleware.SetIsRestrictedSession(), h.GetClubFromSlug())
 			personalClubGroup := clubGroup.Group("/uuid/:clubuuid", r.middleware.SetClubUUIDKey())
 			{
-				personalClubGroup.GET("/", h.GetClubFromUUID())
+				personalClubGroup.GET("/", r.middleware.SetIsRestrictedSession(), h.GetClubFromUUID())
 				personalClubGroup.DELETE("/", r.middleware.CheckSession(), r.middleware.AdminOnly(), h.DeleteClub())
 				personalClubGroup.GET("/achievement", h.GetClubAchievement())
 				personalClubGroup.PUT("/achievement", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubAchievement())
@@ -73,9 +73,9 @@ func (r *Router) AddRouter() {
 				personalClubGroup.PUT("/description", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubDescription())
 				personalClubGroup.GET("/image", h.GetClubImages())
 				personalClubGroup.PUT("/image", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubImages())
-				personalClubGroup.GET("/link", h.GetClubLinks())
+				personalClubGroup.GET("/link", r.middleware.CheckSession(), h.GetClubLinks())
 				personalClubGroup.PUT("/link", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubLinks())
-				personalClubGroup.GET("/schedule", h.GetClubSchedule())
+				personalClubGroup.GET("/schedule", r.middleware.CheckSession(), h.GetClubSchedule())
 				personalClubGroup.PUT("/schedule", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubSchedule())
 				//personalClubGroup.GET("/tpremark")
 				//personalClubGroup.PUT("/tpremark", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName))
@@ -96,8 +96,8 @@ func (r *Router) AddRouter() {
 			{
 				thumbnailClubGroup := thumbnailGroup.Group("/clubs")
 				{
-					thumbnailClubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
-					thumbnailClubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
+					thumbnailClubGroup.POST("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
+					thumbnailClubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
 					thumbnailClubGroup.GET("/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetClubThumbnail())
 					thumbnailClubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.DeleteClubThumbnail())
 				}

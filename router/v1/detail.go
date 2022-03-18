@@ -42,7 +42,7 @@ func (h *Handler) UpdateClubActivityDetails() gin.HandlerFunc {
 		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

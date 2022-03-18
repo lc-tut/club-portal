@@ -13,6 +13,7 @@ const (
 	SessionUserUUID       = "sess_user_uuid"
 	SessionUserName       = "sess_user_name"
 	SessionUserRole       = "sess_user_role"
+	IsRestricted          = "is_restricted"
 	ClubSlugKeyName       = "club_slug_key"
 	UserUUIDKeyName       = "user_uuid_key"
 	ImageIDKeyName        = "image_id_key"
