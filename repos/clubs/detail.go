@@ -20,6 +20,8 @@ type ClubActivityDetailRepo interface {
 	CreateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
 
 	UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, args []ActivityDetailArgs) error
+
+	UpdateAllRelations(uuid string, timeArgs []ClubTimeArgs, placeArgs []ClubPlaceArgs, detailArgs []ActivityDetailArgs, tpremarkArgs []ClubTPRemarkArgs) error
 }
 
 func (r *ClubRepository) GetActivityDetail(uuid string) ([]clubs.ActivityDetail, error) {
@@ -122,6 +124,34 @@ func (r *ClubRepository) UpdateActivityDetailWithTx(tx *gorm.DB, uuid string, ar
 	}
 
 	if err := r.CreateActivityDetailWithTx(tx, uuid, args); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ClubRepository) UpdateAllRelations(uuid string, timeArgs []ClubTimeArgs, placeArgs []ClubPlaceArgs, detailArgs []ActivityDetailArgs, tpremarkArgs []ClubTPRemarkArgs) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.CreateTimeWithTx(tx, timeArgs); err != nil {
+			return err
+		}
+
+		if err := r.CreatePlaceWithTx(tx, placeArgs); err != nil {
+			return err
+		}
+
+		if err := r.UpdateActivityDetailWithTx(tx, uuid, detailArgs); err != nil {
+			return err
+		}
+
+		if err := r.UpdateTPRemarkWithTx(tx, uuid, tpremarkArgs); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 

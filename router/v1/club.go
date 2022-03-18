@@ -23,31 +23,63 @@ func (h *Handler) GetAllClub() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetClub() gin.HandlerFunc {
+func (h *Handler) GetClubFromSlug() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		clubSlug := ctx.GetString(consts.ClubSlugKeyName)
-		page, err := h.repo.GetPageByClubSlug(clubSlug)
-
-		if err != nil {
-			ctx.Status(http.StatusInternalServerError)
+		if ctx.GetBool(consts.IsRestricted) {
+			page, err := h.repo.GetRestrictedPageByClubSlug(clubSlug)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		} else {
-			ctx.JSON(http.StatusOK, page)
+			page, err := h.repo.GetPageByClubSlug(clubSlug)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
+		}
+	}
+}
+
+func (h *Handler) GetClubFromUUID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
+		if ctx.GetBool(consts.IsRestricted) {
+			page, err := h.repo.GetRestrictedPageByClubUUID(clubUUID)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
+		} else {
+			page, err := h.repo.GetPageByClubUUID(clubUUID)
+			if err != nil {
+				ctx.Status(http.StatusInternalServerError)
+			} else {
+				ctx.JSON(http.StatusOK, page)
+			}
 		}
 	}
 }
 
 type ClubCreatePostData struct {
-	Name            string                         `json:"name"`
-	Description     string                         `json:"description"`
-	Campus          uint8                          `json:"campus"`
-	ClubType        uint8                          `json:"club_type"`
-	Contents        []models.ContentRequest        `json:"contents"`
-	Links           []models.LinkRequest           `json:"links"`
-	Schedules       []models.ScheduleRequest       `json:"schedules"`
-	Achievements    []models.AchievementRequest    `json:"achievements"`
-	Images          []models.ImageRequest          `json:"images"`
-	Videos          []models.VideoRequest          `json:"videos"`
-	ActivityDetails []models.ActivityDetailRequest `json:"activity_details"`
+	Name             string                         `json:"name"`
+	Description      string                         `json:"description"`
+	ShortDescription string                         `json:"short_description"`
+	Campus           uint8                          `json:"campus"`
+	ClubType         uint8                          `json:"club_type"`
+	ClubRemark       *string                        `json:"club_remark"`
+	ScheduleRemark   *string                        `json:"schedule_remark"`
+	Contents         []models.ContentRequest        `json:"contents"`
+	Links            []models.LinkRequest           `json:"links"`
+	Schedules        []models.ScheduleRequest       `json:"schedules"`
+	Achievements     []models.AchievementRequest    `json:"achievements"`
+	Images           []models.ImageRequest          `json:"images"`
+	Videos           []models.VideoRequest          `json:"videos"`
+	ActivityDetails  []models.ActivityDetailRequest `json:"activity_details"`
 }
 
 func (h *Handler) CreateClub() gin.HandlerFunc {
@@ -118,6 +150,9 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 	pageArgs := &repos.ClubPageCreateArgs{
 		Name:            pd.Name,
 		Desc:            pd.Description,
+		ShortDesc:       pd.ShortDescription,
+		ClubRemark:      utils.StringPToString(pd.ClubRemark),
+		ScheduleRemark:  utils.StringPToString(pd.ScheduleRemark),
 		Campus:          campus,
 		ClubType:        clubType,
 		Visible:         true,
@@ -129,7 +164,7 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 		Videos:          validateToVideoArgs(pd.Videos),
 		Times:           validateToTimeArgs(pd.ActivityDetails),
 		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		Remarks:         validateToRemarkArgs(pd.ActivityDetails),
+		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
 		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
 	}
 
@@ -162,14 +197,17 @@ func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) er
 }
 
 type UpdatePostData struct {
-	Description     string                         `json:"description"`
-	Contents        []models.ContentRequest        `json:"contents"`
-	Links           []models.LinkRequest           `json:"links"`
-	Schedules       []models.ScheduleRequest       `json:"schedules"`
-	Achievements    []models.AchievementRequest    `json:"achievements"`
-	Images          []models.ImageRequest          `json:"images"`
-	Videos          []models.VideoRequest          `json:"videos"`
-	ActivityDetails []models.ActivityDetailRequest `json:"activity_details"`
+	Description      string                         `json:"description"`
+	ShortDescription string                         `json:"short_description"`
+	ClubRemark       *string                        `json:"club_remark"`
+	ScheduleRemark   *string                        `json:"schedule_remark"`
+	Contents         []models.ContentRequest        `json:"contents"`
+	Links            []models.LinkRequest           `json:"links"`
+	Schedules        []models.ScheduleRequest       `json:"schedules"`
+	Achievements     []models.AchievementRequest    `json:"achievements"`
+	Images           []models.ImageRequest          `json:"images"`
+	Videos           []models.VideoRequest          `json:"videos"`
+	ActivityDetails  []models.ActivityDetailRequest `json:"activity_details"`
 }
 
 func (h *Handler) UpdateClub() gin.HandlerFunc {
@@ -189,7 +227,7 @@ func (h *Handler) UpdateClub() gin.HandlerFunc {
 		if err := h.repo.UpdatePageByClubUUID(clubUUID, *pageArgs); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.JSON(http.StatusOK, pd)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
@@ -201,6 +239,9 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 
 	pageArgs := &repos.ClubPageUpdateArgs{
 		Desc:            pd.Description,
+		ShortDesc:       pd.ShortDescription,
+		ClubRemark:      utils.StringPToString(pd.ClubRemark),
+		ScheduleRemark:  utils.StringPToString(pd.ScheduleRemark),
 		Contents:        validateToContentArgs(pd.Contents),
 		Links:           validateToLinksArgs(pd.Links),
 		Schedules:       validateToScheduleArgs(pd.Schedules),
@@ -209,7 +250,7 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 		Videos:          validateToVideoArgs(pd.Videos),
 		Times:           validateToTimeArgs(pd.ActivityDetails),
 		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		Remarks:         validateToRemarkArgs(pd.ActivityDetails),
+		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
 		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
 	}
 
@@ -223,7 +264,7 @@ func (h *Handler) DeleteClub() gin.HandlerFunc {
 		if err := h.repo.DeletePageByClubUUID(clubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusOK)
+			ctx.Status(http.StatusCreated)
 		}
 	}
 }

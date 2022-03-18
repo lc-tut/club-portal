@@ -1,6 +1,9 @@
 package clubs
 
-import "database/sql"
+import (
+	"database/sql"
+	"github.com/lc-tut/club-portal/utils"
+)
 
 type ActivityDetail struct {
 	TimeID   uint32     `gorm:"type:int unsigned;not null;primaryKey"`
@@ -70,7 +73,36 @@ func (r Relations) ToClubRemark() []ClubRemark {
 	return remarks
 }
 
+func (r Relations) ToActivityDetailResponse() []ActivityDetailResponse {
+	res := make([]ActivityDetailResponse, len(r))
+
+	for i, detail := range r {
+		detailRes := ActivityDetailResponse{
+			TimeID:      detail.TimeID,
+			Date:        detail.Date,
+			Time:        detail.Time,
+			TimeRemark:  utils.NullStringToStringP(detail.TimeRemark),
+			PlaceID:     detail.PlaceID,
+			Place:       detail.Place,
+			PlaceRemark: utils.NullStringToStringP(detail.PlaceRemark),
+		}
+		res[i] = detailRes
+	}
+
+	return res
+}
+
 type ActivityDetailRequest struct {
+	TimeID      uint32  `json:"time_id"`
+	Date        string  `json:"date"`
+	Time        string  `json:"time"`
+	TimeRemark  *string `json:"time_remark"`
+	PlaceID     uint32  `json:"place_id"`
+	Place       string  `json:"place"`
+	PlaceRemark *string `json:"place_remark"`
+}
+
+type ActivityDetailResponse struct {
 	TimeID      uint32  `json:"time_id"`
 	Date        string  `json:"date"`
 	Time        string  `json:"time"`

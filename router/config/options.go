@@ -28,14 +28,13 @@ func NewCSRFCookieOption() *CSRFCookieOption {
 		Domain:   domain,
 		MaxAge:   consts.CookieCSRFMaxAge,
 		HttpOnly: consts.CookieHttpOnly,
+		SameSite: http.SameSiteLaxMode,
 	}
 
 	if utils.IsLocal() {
 		opt.Secure = false
-		opt.SameSite = http.SameSiteLaxMode
 	} else {
 		opt.Secure = true
-		opt.SameSite = http.SameSiteStrictMode
 	}
 
 	return opt

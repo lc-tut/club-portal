@@ -18,7 +18,11 @@ type UserFavoriteRepo interface {
 func (r *UserRepository) GetFavorites(userUUID string) ([]clubs.ClubPageExternalInfo, error) {
 	clubPage := make([]clubs.ClubPage, 0)
 	joinQuery := "inner join club_pages as cp using (club_uuid)"
-	tx := r.db.Table("favorite_clubs").Select("cp.*").Where("user_uuid = ? AND cp.visible is true", userUUID).Joins(joinQuery).Preload("Images").Find(&clubPage)
+	tx := r.db.Table("favorite_clubs").Select("cp.*").Where("user_uuid = ? AND cp.visible is true", userUUID).Joins(joinQuery).Preload("Thumbnail", func(db *gorm.DB) *gorm.DB {
+		selectQuery := "club_thumbnails.thumbnail_id, club_thumbnails.club_uuid, ut.path"
+		joinQuery := "inner join uploaded_thumbnails as ut using (thumbnail_id)"
+		return db.Joins(joinQuery).Select(selectQuery)
+	}).Find(&clubPage)
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())
@@ -53,7 +57,7 @@ func (r *UserRepository) DeleteFavorite(userUUID string, clubUUID string) error 
 		UserUUID: userUUID,
 		ClubUUID: clubUUID,
 	}
-	tx := r.db.Delete(&favorite)
+	tx := r.db.Where("user_uuid = ? AND club_uuid = ?", userUUID, clubUUID).Delete(&favorite)
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())

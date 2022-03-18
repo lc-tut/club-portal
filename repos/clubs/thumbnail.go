@@ -19,7 +19,7 @@ type ClubThumbnailRepo interface {
 
 func (r *ClubRepository) GetClubThumbnailByID(thumbnailID uint32) (*clubs.ClubThumbnail, error) {
 	thumbnail := &clubs.ClubThumbnail{}
-	selectQuery := "ct.thumbnail_id, ct.club_uuid, ut.path"
+	selectQuery := "club_thumbnails.thumbnail_id, club_thumbnails.club_uuid, ut.path"
 	joinQuery := "inner join uploaded_thumbnails as ut using (thumbnail_id)"
 	tx := r.db.Joins(joinQuery).Select(selectQuery).Where("thumbnail_id = ?", thumbnailID).Find(thumbnail)
 
@@ -38,7 +38,7 @@ func (r *ClubRepository) GetClubThumbnailByUUID(clubUUID string) (*clubs.ClubThu
 	thumbnail := &clubs.ClubThumbnail{}
 	selectQuery := "ct.thumbnail_id, ct.club_uuid, ut.path"
 	joinQuery := "inner join uploaded_thumbnails as ut using (thumbnail_id)"
-	tx := r.db.Joins(joinQuery).Select(selectQuery).Where("club_uuid = ?", clubUUID).Find(thumbnail)
+	tx := r.db.Table("club_thumbnails as ct").Joins(joinQuery).Select(selectQuery).Where("club_uuid = ?", clubUUID).Find(thumbnail)
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())

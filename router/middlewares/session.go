@@ -15,7 +15,7 @@ func (mw *Middleware) CheckSession() gin.HandlerFunc {
 		sessionData, ok := sess.Get(consts.SessionKey).([]byte)
 
 		if !ok {
-			mw.logger.Error("(session) failed type assert")
+			mw.logger.Error("(session/CheckSession()) failed type assert")
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -39,6 +39,22 @@ func (mw *Middleware) CheckSession() gin.HandlerFunc {
 			zap.String("name", s.Name),
 			zap.String("role", s.Role),
 		)
+
+		ctx.Next()
+	}
+}
+
+func (mw *Middleware) SetIsRestrictedSession() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		sess := sessions.Default(ctx)
+		_, ok := sess.Get(consts.SessionKey).([]byte)
+
+		if !ok {
+			mw.logger.Info("(session/SetRestrictedOrSession()) failed type assert")
+			ctx.Set(consts.IsRestricted, true)
+		} else {
+			ctx.Set(consts.IsRestricted, false)
+		}
 
 		ctx.Next()
 	}

@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
-	models "github.com/lc-tut/club-portal/models/users"
 	repos "github.com/lc-tut/club-portal/repos/users"
 	"net/http"
 )
@@ -12,18 +11,15 @@ import (
 func (h *Handler) GetUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userUUID := ctx.GetString(consts.SessionUserUUID)
-		email := ctx.GetString(consts.SessionUserEmail)
-		name := ctx.GetString(consts.SessionUserName)
 		role := ctx.GetString(consts.SessionUserRole)
 
-		res := &models.UserResponse{
-			UserUUID: userUUID,
-			Email:    email,
-			Name:     name,
-			Role:     role,
-		}
+		res, err := h.repo.GetUserByUUIDFromRole(userUUID, role)
 
-		ctx.JSON(http.StatusOK, res)
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusOK, res.ToUserResponse())
+		}
 	}
 }
 

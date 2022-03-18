@@ -11,7 +11,7 @@ type UploadedImageRepo interface {
 
 	GetImagesByUserUUID(userUUID string) ([]users.UploadedImage, error)
 
-	CreateUploadedImage(userUUID string, path string) error
+	CreateUploadedImage(userUUID string, path string) (*users.UploadedImage, error)
 
 	DeleteImageByID(imageID uint32) error
 }
@@ -44,7 +44,7 @@ func (r *UserRepository) GetImagesByUserUUID(userUUID string) ([]users.UploadedI
 	return images, nil
 }
 
-func (r *UserRepository) CreateUploadedImage(userUUID string, path string) error {
+func (r *UserRepository) CreateUploadedImage(userUUID string, path string) (*users.UploadedImage, error) {
 	image := &users.UploadedImage{
 		Owner: userUUID,
 		Path:  path,
@@ -53,10 +53,12 @@ func (r *UserRepository) CreateUploadedImage(userUUID string, path string) error
 
 	if err := tx.Error; err != nil {
 		r.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	tx.Last(image)
+
+	return image, nil
 }
 
 func (r *UserRepository) DeleteImageByID(imageID uint32) error {

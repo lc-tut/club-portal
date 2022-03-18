@@ -48,6 +48,7 @@ func (r *Router) AddRouter() {
 				personalGroup.GET("/", h.GetUserUUID())
 				personalGroup.PUT("/", h.UpdateUser())
 				personalGroup.GET("/favs", h.GetFavoriteClubs())
+				personalGroup.GET("/favs/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetIsFavoriteClub())
 				personalGroup.POST("/favs", h.CreateFavoriteClub())
 				personalGroup.POST("/unfav", h.UnFavoriteClub())
 			}
@@ -57,8 +58,30 @@ func (r *Router) AddRouter() {
 			clubGroup.GET("/", h.GetAllClub())
 			clubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.CreateClub())
 			clubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClub())
-			clubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.AdminOnly(), h.DeleteClub())
-			clubGroup.GET("/:clubslug", r.middleware.SetClubSlugKey(), h.GetClub())
+			clubGroup.GET("/slug/:clubslug", r.middleware.SetClubSlugKey(), r.middleware.SetIsRestrictedSession(), h.GetClubFromSlug())
+			personalClubGroup := clubGroup.Group("/uuid/:clubuuid", r.middleware.SetClubUUIDKey())
+			{
+				personalClubGroup.GET("/", r.middleware.SetIsRestrictedSession(), h.GetClubFromUUID())
+				personalClubGroup.DELETE("/", r.middleware.CheckSession(), r.middleware.AdminOnly(), h.DeleteClub())
+				personalClubGroup.GET("/achievement", h.GetClubAchievement())
+				personalClubGroup.PUT("/achievement", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubAchievement())
+				personalClubGroup.GET("/activity_detail", h.GetClubActivityDetails())
+				personalClubGroup.PUT("/activity_detail", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubActivityDetails())
+				personalClubGroup.GET("/content", h.GetClubContent())
+				personalClubGroup.PUT("/content", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubContent())
+				personalClubGroup.GET("/description", h.GetClubDescription())
+				personalClubGroup.PUT("/description", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubDescription())
+				personalClubGroup.GET("/image", h.GetClubImages())
+				personalClubGroup.PUT("/image", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubImages())
+				personalClubGroup.GET("/link", r.middleware.CheckSession(), h.GetClubLinks())
+				personalClubGroup.PUT("/link", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubLinks())
+				personalClubGroup.GET("/schedule", r.middleware.CheckSession(), h.GetClubSchedule())
+				personalClubGroup.PUT("/schedule", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubSchedule())
+				//personalClubGroup.GET("/tpremark")
+				//personalClubGroup.PUT("/tpremark", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName))
+				personalClubGroup.GET("/video", h.GetClubVideo())
+				personalClubGroup.PUT("/video", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubVideo())
+			}
 		}
 		uploadGroup := v1Group.Group("/upload")
 		{
@@ -73,8 +96,8 @@ func (r *Router) AddRouter() {
 			{
 				thumbnailClubGroup := thumbnailGroup.Group("/clubs")
 				{
-					thumbnailClubGroup.POST("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
-					thumbnailClubGroup.PUT("/", r.middleware.CheckSession(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
+					thumbnailClubGroup.POST("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UploadClubThumbnail())
+					thumbnailClubGroup.PUT("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), h.UpdateClubThumbnail())
 					thumbnailClubGroup.GET("/:clubuuid", r.middleware.SetClubUUIDKey(), h.GetClubThumbnail())
 					thumbnailClubGroup.DELETE("/:clubuuid", r.middleware.CheckSession(), r.middleware.SetClubUUIDKey(), r.middleware.GeneralOnly(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.DeleteClubThumbnail())
 				}

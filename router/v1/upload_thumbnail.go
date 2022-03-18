@@ -32,6 +32,7 @@ func (h *Handler) GetClubThumbnail() gin.HandlerFunc {
 	}
 }
 
+// XXX: unnecessary func
 func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		file, err := ctx.FormFile("file")
@@ -48,7 +49,7 @@ func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
 			return
 		}
 
-		clubUUID := ctx.GetString(consts.SessionUserUUID)
+		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
 		fn := filepath.Base(file.Filename)
 		h.logger.Info("uploaded image", zap.String("filename", fn), zap.String("club_uuid", clubUUID))
@@ -115,6 +116,10 @@ func (h *Handler) checkThumbnail(file *multipart.FileHeader) error {
 }
 
 func (h *Handler) deleteSavedThumbnail(file string) error {
+	if file == "thumbnails/default.png" {
+		return nil
+	}
+
 	if err := os.Remove(file); err != nil {
 		h.logger.Error(err.Error())
 		return err

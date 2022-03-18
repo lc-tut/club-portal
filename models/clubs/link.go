@@ -23,6 +23,23 @@ func (l Links) ToLinkResponse() []LinkResponse {
 	return res
 }
 
+func (l Links) ToRestrictedLinkResponse() []LinkResponse {
+	res := make([]LinkResponse, 0)
+
+	for _, link := range l {
+		if link.Label == "HP" || link.Label == "Email" {
+			continue
+		}
+		linkRes := LinkResponse{
+			Label: link.Label,
+			URL:   link.URL,
+		}
+		res = append(res, linkRes)
+	}
+
+	return res
+}
+
 type LinkRequest struct {
 	Label string `json:"label"`
 	URL   string `json:"url"`

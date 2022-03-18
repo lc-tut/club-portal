@@ -145,8 +145,10 @@ fabric.properties
 
 .env
 .idea/
+.vscode/
 cfg/config.toml
 cfg/db_pass
+cfg/mariadb/data/
 dist/
 images/
 thumbnails/

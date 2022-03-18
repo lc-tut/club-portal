@@ -34,7 +34,7 @@ func (r *ClubRepository) GetAchievementByID(achievementID uint32) (*clubs.ClubAc
 
 func (r *ClubRepository) GetAchievementsByClubUUID(uuid string) ([]clubs.ClubAchievement, error) {
 	achievement := make([]clubs.ClubAchievement, 0)
-	tx := r.db.Where("club_uuid = ?", uuid).Find(achievement)
+	tx := r.db.Where("club_uuid = ?", uuid).Find(&achievement)
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		r.logger.Info(err.Error())

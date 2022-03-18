@@ -6,7 +6,7 @@ services:
     image: club-portal
     container_name: club-portal
     ports:
-      - 8080:8080
+      - "8080:8080"
     volumes:
       - ./images:/root/images
       - ./thumbnails:/root/thumbnails
@@ -30,10 +30,11 @@ services:
     image: mariadb:latest
     container_name: mariadb
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       - ./cfg/mariadb/conf:/etc/mysql/conf.d
       - ./cfg/mariadb/sql:/docker-entrypoint-initdb.d
+      - ./cfg/mariadb/data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_pass
       MYSQL_DATABASE: club_portal
