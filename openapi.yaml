@@ -433,6 +433,29 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/clubs/search:
+    get:
+      tags:
+        - club
+      summary: サークルを検索します。
+      parameters:
+        - in: query
+          name: content
+          schema:
+            type: string
+          required: true
+          description: 検索ワード
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPage-External'
+        400:
+          description: リクエストが不正の場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/clubs/slug/{clubSlug}:
     get:
       tags:
