@@ -105,12 +105,6 @@ func (r *ClubRepository) CreateImageWithTx(tx *gorm.DB, clubUUID string, imageID
 }
 
 func (r *ClubRepository) UpdateImage(clubUUID string, imageIDs []uint32) error {
-	length := len(imageIDs)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -129,12 +123,6 @@ func (r *ClubRepository) UpdateImage(clubUUID string, imageIDs []uint32) error {
 }
 
 func (r *ClubRepository) UpdateImageWithTx(tx *gorm.DB, clubUUID string, imageIDs []uint32) error {
-	length := len(imageIDs)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubImage{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {

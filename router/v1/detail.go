@@ -31,6 +31,11 @@ func (h *Handler) UpdateClubActivityDetails() gin.HandlerFunc {
 			return
 		}
 
+		if len(pd) == 0 {
+			ctx.Status(http.StatusBadRequest)
+			return
+		}
+
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 		timeArgs := validateToTimeArgs(pd)
 		placeArgs := validateToPlaceArgs(pd)

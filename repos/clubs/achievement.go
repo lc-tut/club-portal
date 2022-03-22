@@ -99,12 +99,6 @@ func (r *ClubRepository) CreateAchievementWithTx(tx *gorm.DB, clubUUID string, a
 }
 
 func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []string) error {
-	length := len(achievements)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -123,12 +117,6 @@ func (r *ClubRepository) UpdateAchievement(clubUUID string, achievements []strin
 }
 
 func (r *ClubRepository) UpdateAchievementWithTx(tx *gorm.DB, clubUUID string, achievements []string) error {
-	length := len(achievements)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.Achievements{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
