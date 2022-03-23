@@ -89,12 +89,6 @@ func (r *ClubRepository) CreateContentWithTx(tx *gorm.DB, clubUUID string, conte
 }
 
 func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error {
-	length := len(contents)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -113,12 +107,6 @@ func (r *ClubRepository) UpdateContent(clubUUID string, contents []string) error
 }
 
 func (r *ClubRepository) UpdateContentWithTx(tx *gorm.DB, clubUUID string, contents []string) error {
-	length := len(contents)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubContent{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {

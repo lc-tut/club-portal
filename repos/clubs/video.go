@@ -101,12 +101,6 @@ func (r *ClubRepository) CreateVideoWithTx(tx *gorm.DB, clubUUID string, path []
 }
 
 func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
-	length := len(path)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubVideo{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -125,12 +119,6 @@ func (r *ClubRepository) UpdateVideo(clubUUID string, path []string) error {
 }
 
 func (r *ClubRepository) UpdateVideoWithTx(tx *gorm.DB, clubUUID string, path []string) error {
-	length := len(path)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubVideo{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {

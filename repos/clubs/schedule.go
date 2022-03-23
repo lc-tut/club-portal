@@ -96,12 +96,6 @@ func (r *ClubRepository) CreateScheduleWithTx(tx *gorm.DB, clubUUID string, args
 }
 
 func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs) error {
-	length := len(args)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubSchedule{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -120,12 +114,6 @@ func (r *ClubRepository) UpdateSchedule(clubUUID string, args []ClubScheduleArgs
 }
 
 func (r *ClubRepository) UpdateScheduleWithTx(tx *gorm.DB, clubUUID string, args []ClubScheduleArgs) error {
-	length := len(args)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubSchedule{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {

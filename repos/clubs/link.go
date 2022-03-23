@@ -112,12 +112,6 @@ func (r *ClubRepository) CreateLinkWithTx(tx *gorm.DB, clubUUID string, args []C
 }
 
 func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error {
-	length := len(args)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx := r.db.Where("club_uuid = ?", clubUUID).Delete(&clubs.ClubLink{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
@@ -136,12 +130,6 @@ func (r *ClubRepository) UpdateLink(clubUUID string, args []ClubLinkArgs) error 
 }
 
 func (r *ClubRepository) UpdateLinkWithTx(tx *gorm.DB, clubUUID string, args []ClubLinkArgs) error {
-	length := len(args)
-
-	if length == 0 {
-		return nil
-	}
-
 	tx = tx.Where("club_uuid", clubUUID).Delete(&clubs.ClubLink{})
 
 	if err := tx.Error; errors.Is(err, gorm.ErrRecordNotFound) {
