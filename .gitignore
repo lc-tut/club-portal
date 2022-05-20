@@ -144,11 +144,11 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 .env
-.idea/
 .vscode/
-cfg/config.toml
-cfg/db_pass
-cfg/mariadb/data/
-dist/
-images/
-thumbnails/
+/cfg/config.toml
+/cfg/db_pass
+/cfg/mariadb/data/
+/dist/
+/images/
+!thumbnails/default.png
+/thumbnails/*
