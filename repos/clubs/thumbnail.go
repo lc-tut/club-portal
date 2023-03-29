@@ -10,9 +10,6 @@ type ClubThumbnailRepo interface {
 	GetClubThumbnailByID(thumbnailID uint32) (*clubs.ClubThumbnail, error)
 	GetClubThumbnailByUUID(clubUUID string) (*clubs.ClubThumbnail, error)
 
-	CreateClubThumbnail(clubUUID string, thumbnailID uint32) error
-	CreateClubThumbnailWithTx(tx *gorm.DB, clubUUID string, thumbnailID uint32) error
-
 	UpdateClubThumbnail(clubUUID string, thumbnailID uint32) error
 	UpdateClubThumbnailWithTx(tx *gorm.DB, clubUUID string, thumbnailID uint32) error
 }
@@ -49,35 +46,6 @@ func (r *ClubRepository) GetClubThumbnailByUUID(clubUUID string) (*clubs.ClubThu
 	}
 
 	return thumbnail, nil
-}
-
-func (r *ClubRepository) CreateClubThumbnail(clubUUID string, thumbnailID uint32) error {
-	thumbnail := &clubs.ClubThumbnail{
-		ThumbnailID: thumbnailID,
-		ClubUUID:    clubUUID,
-	}
-	tx := r.db.Create(thumbnail)
-
-	if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
-		return err
-	}
-
-	return nil
-}
-
-func (r *ClubRepository) CreateClubThumbnailWithTx(tx *gorm.DB, clubUUID string, thumbnailID uint32) error {
-	thumbnail := &clubs.ClubThumbnail{
-		ThumbnailID: thumbnailID,
-		ClubUUID:    clubUUID,
-	}
-
-	if err := tx.Create(thumbnail).Error; err != nil {
-		r.logger.Error(err.Error())
-		return err
-	}
-
-	return nil
 }
 
 func (r *ClubRepository) UpdateClubThumbnail(clubUUID string, thumbnailID uint32) error {

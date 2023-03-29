@@ -11,8 +11,6 @@ type UploadedThumbnailRepo interface {
 
 	CreateThumbnail(path string) (*users.UploadedThumbnail, error)
 
-	UpdateThumbnail(thumbnailID uint32, path string) error
-
 	DeleteThumbnail(thumbnailID uint32) error
 }
 
@@ -43,21 +41,6 @@ func (r *UserRepository) CreateThumbnail(path string) (*users.UploadedThumbnail,
 	}
 
 	return thumbnail, nil
-}
-
-func (r *UserRepository) UpdateThumbnail(thumbnailID uint32, path string) error {
-	tx := r.db.Model(&users.UploadedThumbnail{}).Where("thumbnail_id = ?", thumbnailID).Update("path", path)
-
-	if rows := tx.RowsAffected; rows == 0 {
-		err := gorm.ErrRecordNotFound
-		r.logger.Info(err.Error())
-		return err
-	} else if err := tx.Error; err != nil {
-		r.logger.Error(err.Error())
-		return err
-	}
-
-	return nil
 }
 
 func (r *UserRepository) DeleteThumbnail(thumbnailID uint32) error {
