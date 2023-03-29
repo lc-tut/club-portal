@@ -266,6 +266,32 @@ paths:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/users/{userUUID}/favs/{clubUUID}:
+    get:
+      tags:
+        - user
+      summary: userUUID が clubUUID のサークルをお気に入り登録しているか確認します。 (自身の UUID のみ)
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/UserUUID'
+        - $ref: '#/components/parameters/ClubUUID'
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/users/{userUUID}/unfav:
     post:
       tags:
@@ -1017,34 +1043,6 @@ paths:
       responses:
         201:
           description: 削除に成功した場合に返されます。
-        400:
-          description: リクエストが不正の場合に返されます。
-        401:
-          description: 認証していない状態でアクセスした場合に返されます。
-        500:
-          description: サーバ側でエラーが発生した場合に返されます。
-  /v1/upload/thumbnail/clubs:
-    post:
-      tags:
-        - upload
-      summary: サークルのサムネイルをアップロードします。 (400*400px)
-      security:
-        - session: []
-      requestBody:
-        description: アップロードするサムネイル
-        required: true
-        content:
-          image/png:
-            schema:
-              type: string
-              format: binary
-          image/jpeg:
-            schema:
-              type: string
-              format: binary
-      responses:
-        201:
-          description: 正常にアップロードされた場合に返されます。
         400:
           description: リクエストが不正の場合に返されます。
         401:

@@ -32,63 +32,6 @@ func (h *Handler) GetClubThumbnail() gin.HandlerFunc {
 	}
 }
 
-// XXX: unnecessary func
-func (h *Handler) UploadClubThumbnail() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		file, err := ctx.FormFile("file")
-
-		if err != nil {
-			h.logger.Error(err.Error())
-			ctx.Status(http.StatusBadRequest)
-			return
-		}
-
-		if err := h.checkThumbnail(file); err != nil {
-			h.logger.Error(err.Error())
-			ctx.Status(http.StatusBadRequest)
-			return
-		}
-
-		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
-
-		fn := filepath.Base(file.Filename)
-		h.logger.Info("uploaded image", zap.String("filename", fn), zap.String("club_uuid", clubUUID))
-		newFn, err := utils.GenerateFileName(fn)
-
-		if err != nil {
-			h.logger.Error(err.Error())
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		dst := fmt.Sprintf("thumbnails/%s", newFn)
-
-		if err := ctx.SaveUploadedFile(file, dst); err != nil {
-			h.logger.Error(err.Error())
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		thumbnail, err := h.repo.CreateThumbnail(dst)
-
-		if err != nil {
-			_ = h.deleteSavedThumbnail(dst)
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		if err := h.repo.CreateClubThumbnail(clubUUID, thumbnail.ThumbnailID); err != nil {
-			_ = h.deleteSavedThumbnail(dst)
-			ctx.Status(http.StatusInternalServerError)
-			return
-		}
-
-		h.logger.Info("successfully saved image", zap.String("path", dst))
-
-		ctx.Status(http.StatusCreated)
-	}
-}
-
 func (h *Handler) checkThumbnail(file *multipart.FileHeader) error {
 	thumbnail, err := file.Open()
 
@@ -171,7 +114,17 @@ func (h *Handler) UpdateClubThumbnail() gin.HandlerFunc {
 			return
 		}
 
-		if err := h.repo.UpdateThumbnail(oldThumbnail.ThumbnailID, dst); err != nil {
+		thumbnail, err := h.repo.CreateThumbnail(dst)
+
+		if err != nil {
+			_ = h.deleteSavedThumbnail(dst)
+			ctx.Status(http.StatusInternalServerError)
+			return
+		}
+
+		h.logger.Info("successfully saved image", zap.String("path", dst))
+
+		if err := h.repo.UpdateClubThumbnail(clubUUID, thumbnail.ThumbnailID); err != nil {
 			_ = h.deleteSavedThumbnail(dst)
 			ctx.Status(http.StatusInternalServerError)
 			return
