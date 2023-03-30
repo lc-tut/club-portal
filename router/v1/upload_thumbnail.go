@@ -59,7 +59,7 @@ func (h *Handler) checkThumbnail(file *multipart.FileHeader) error {
 }
 
 func (h *Handler) deleteSavedThumbnail(file string) error {
-	if file == "thumbnails/default.png" {
+	if file == consts.DefaultThumbnailPath {
 		return nil
 	}
 
