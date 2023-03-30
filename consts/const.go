@@ -37,8 +37,8 @@ func (ct CampusType) ToPrimitive() uint8 {
 type ClubType uint8
 
 const (
-	CultureType ClubType = 0
-	SportsType  ClubType = 1
+	SportsType  ClubType = 0
+	CultureType ClubType = 1
 	KokasaiType ClubType = 2
 )
 
