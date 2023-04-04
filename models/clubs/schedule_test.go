@@ -1,26 +1,24 @@
 package clubs
 
 import (
-	"database/sql"
 	"github.com/google/go-cmp/cmp"
 	"github.com/lc-tut/club-portal/consts"
 	"testing"
 )
 
 var (
-	scheduleRemark = "schedule_remark"
-	sch            = []ClubSchedule{
-		{1, consts.DummyUUID, 1, "schedule1", sql.NullString{"", false}},
-		{2, consts.DummyUUID, 12, "schedule2", sql.NullString{"", false}},
-		{3, consts.DummyUUID, 10, "schedule3", sql.NullString{scheduleRemark, true}},
+	sch = []ClubSchedule{
+		{1, consts.DummyUUID, 1, "schedule1"},
+		{2, consts.DummyUUID, 12, "schedule2"},
+		{3, consts.DummyUUID, 10, "schedule3"},
 	}
 )
 
 func TestSchedules_ToScheduleResponse(t *testing.T) {
 	res := []ScheduleResponse{
-		{1, "schedule1", nil},
-		{12, "schedule2", nil},
-		{10, "schedule3", &scheduleRemark},
+		{1, "schedule1"},
+		{12, "schedule2"},
+		{10, "schedule3"},
 	}
 	tests := []struct {
 		name string

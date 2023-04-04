@@ -85,8 +85,8 @@ func TestToCampusType(t *testing.T) {
 		want    consts.CampusType
 		wantErr bool
 	}{
-		{"kamata", args{0}, consts.CampusKamata, false},
-		{"hachioji", args{1}, consts.CampusHachioji, false},
+		{"hachioji", args{0}, consts.CampusHachioji, false},
+		{"kamata", args{1}, consts.CampusKamata, false},
 		{"invalid value", args{42}, 0, true},
 	}
 	for _, tt := range tests {

@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	adminUser   = AdminUser{consts.DummyUUID, "admin@example.com", "admin example"}
-	generalUser = GeneralUser{consts.DummyUUID, "general@example.com", "general example", sql.NullString{}}
-	domainUser  = DomainUser{consts.DummyUUID, "domain@example.com", "domain example", nil}
+	adminUser              = AdminUser{consts.DummyUUID, "admin@example.com", "admin example"}
+	generalUser            = GeneralUser{consts.DummyUUID, "general@example.com", "general example", sql.NullString{String: consts.DummyUUID, Valid: true}}
+	generalUserNonClubUUID = GeneralUser{"bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb", "general.non.club.uuid@example.com", "general non-ClubUUID example", sql.NullString{}}
+	domainUser             = DomainUser{consts.DummyUUID, "domain@example.com", "domain example", nil}
 )
 
 func TestAdminUser_GetEmail(t *testing.T) {
@@ -136,7 +137,7 @@ func TestAdminUser_ToUserResponse(t *testing.T) {
 		fields fields
 		want   *UserResponse
 	}{
-		{"admin_response", fields(adminUser), &UserResponse{consts.DummyUUID, "admin@example.com", "admin example", "admin"}},
+		{"admin_response", fields(adminUser), &UserResponse{consts.DummyUUID, "admin@example.com", "admin example", "admin", ""}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -285,7 +286,7 @@ func TestDomainUser_ToUserResponse(t *testing.T) {
 		fields fields
 		want   *UserResponse
 	}{
-		{"domain_response", fields(domainUser), &UserResponse{consts.DummyUUID, "domain@example.com", "domain example", "domain"}},
+		{"domain_response", fields(domainUser), &UserResponse{consts.DummyUUID, "domain@example.com", "domain example", "domain", ""}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -306,7 +307,7 @@ func TestDomainUser_ToUserResponse(t *testing.T) {
 func TestGeneralUserSlice_GetEmails(t *testing.T) {
 	userSlice := GeneralUserSlice([]GeneralUser{
 		generalUser,
-		{"bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb", "general2@example.com", "general2", sql.NullString{}},
+		generalUserNonClubUUID,
 		{"cccccccc-cccc-4ccc-cccc-cccccccccccc", "general3@example.com", "general3", sql.NullString{}},
 	})
 	tests := []struct {
@@ -314,7 +315,7 @@ func TestGeneralUserSlice_GetEmails(t *testing.T) {
 		g    GeneralUserSlice
 		want []string
 	}{
-		{"general_slice_emails", userSlice, []string{"general@example.com", "general2@example.com", "general3@example.com"}},
+		{"general_slice_emails", userSlice, []string{"general@example.com", "general.non.club.uuid@example.com", "general3@example.com"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -458,7 +459,8 @@ func TestGeneralUser_ToUserResponse(t *testing.T) {
 		fields fields
 		want   *UserResponse
 	}{
-		{"general_response", fields(generalUser), &UserResponse{consts.DummyUUID, "general@example.com", "general example", "general"}},
+		{"general_response", fields(generalUser), &UserResponse{consts.DummyUUID, "general@example.com", "general example", "general", consts.DummyUUID}},
+		{"general_non_club_uuid_response", fields(generalUserNonClubUUID), &UserResponse{"bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb", "general.non.club.uuid@example.com", "general non-ClubUUID example", "general", ""}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
