@@ -23,7 +23,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Run go test with coverage
-        run: go test -v -coverprofile coverage.out -covermode atomic ./...
+        run: go test -v -coverpkg ./... -coverprofile coverage.out -covermode atomic ./...
 
       - name: Convert coverage to lcov
         uses: jandelgado/gcov2lcov-action@v1
