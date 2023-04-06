@@ -11,6 +11,8 @@ on:
       - LICENSE
       - README.md
       - openapi.yaml
+      - .github/*
+      - cfg/*
 
   release:
     types:
