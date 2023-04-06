@@ -6,13 +6,14 @@ on:
       - master
       - dev
     paths-ignore:
-      - examples/*
+      - examples/**
       - .gitignore
       - LICENSE
       - README.md
       - openapi.yaml
-      - .github/*
-      - cfg/*
+      - .github/**
+      - cfg/**
+      - thumbnails/**
 
   release:
     types:
