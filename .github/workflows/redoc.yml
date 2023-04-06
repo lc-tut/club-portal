@@ -10,15 +10,18 @@ on:
 
 jobs:
   redoc:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
+
       - name: npx redoc-cli
         run: npx redoc-cli bundle openapi.yaml -o redoc/index.html
+
       - name: deploy gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:

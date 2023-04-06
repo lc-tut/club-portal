@@ -1,0 +1,34 @@
+name: test
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '**.go'
+  pull_requests:
+    paths:
+      - '**.go'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+
+      - name: Run go test with coverage
+        run: go test -v -coverprofile coverage.out -covermode atomic ./...
+
+      - name: Convert coverage to lcov
+        uses: jandelgado/gcov2lcov-action@v1
+
+      - uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov
