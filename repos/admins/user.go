@@ -8,10 +8,61 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserArgs struct {
+	Email    string
+	Name     string
+	ClubUUID string
+}
+
 type AdminUserRepo interface {
+	GetAllUser() ([]models.UserInfo, error)
 	GetSpecifiedUser(userUUID string) (models.UserInfo, error)
 
 	UpdateSpecifiedDomainUser(userUUID string, name string) error
+	UpdateSpecifiedGeneralUser(userUUID string, args UserArgs) error
+}
+
+func (r *AdminRepository) GetAllUser() ([]models.UserInfo, error) {
+	domainUsers := make([]models.DomainUser, 0)
+	generalUsers := make([]models.GeneralUser, 0)
+	adminUsers := make([]models.AdminUser, 0)
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Find(&domainUsers).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Find(&generalUsers).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Find(&adminUsers).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	allUsers := make([]models.UserInfo, len(domainUsers)+len(generalUsers)+len(adminUsers))
+
+	for _, user := range domainUsers {
+		allUsers = append(allUsers, &user)
+	}
+
+	for _, user := range generalUsers {
+		allUsers = append(allUsers, &user)
+	}
+
+	for _, user := range adminUsers {
+		allUsers = append(allUsers, &user)
+	}
+
+	if err != nil {
+		r.logger.Error(err.Error())
+		return nil, err
+	}
+
+	return allUsers, nil
 }
 
 func (r *AdminRepository) GetSpecifiedUser(userUUID string) (models.UserInfo, error) {
@@ -89,6 +140,27 @@ func (r *AdminRepository) UpdateSpecifiedDomainUser(userUUID string, name string
 	user := models.DomainUser{
 		UserUUID: userUUID,
 		Name:     name,
+	}
+	tx := r.db.Model(&user).Where("user_uuid = ?", userUUID).Updates(user)
+
+	if err := tx.Error; err != nil {
+		r.logger.Error(err.Error())
+		return err
+	} else if tx.RowsAffected == 0 {
+		err := gorm.ErrRecordNotFound
+		r.logger.Info(err.Error())
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (r *AdminRepository) UpdateSpecifiedGeneralUser(userUUID string, args UserArgs) error {
+	user := models.GeneralUser{
+		UserUUID: userUUID,
+		Email:    args.Email,
+		Name:     args.Name,
+		ClubUUID: utils.StringToNullString(args.ClubUUID),
 	}
 	tx := r.db.Model(&user).Where("user_uuid = ?", userUUID).Updates(user)
 
