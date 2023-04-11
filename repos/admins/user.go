@@ -43,6 +43,11 @@ func (r *AdminRepository) GetAllUser() ([]models.UserInfo, error) {
 		return nil
 	})
 
+	if err != nil {
+		r.logger.Error(err.Error())
+		return nil, err
+	}
+
 	allUsers := make([]models.UserInfo, len(domainUsers)+len(generalUsers)+len(adminUsers))
 
 	for _, user := range domainUsers {
@@ -55,11 +60,6 @@ func (r *AdminRepository) GetAllUser() ([]models.UserInfo, error) {
 
 	for _, user := range adminUsers {
 		allUsers = append(allUsers, &user)
-	}
-
-	if err != nil {
-		r.logger.Error(err.Error())
-		return nil, err
 	}
 
 	return allUsers, nil

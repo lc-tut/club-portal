@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/clubs"
+	"github.com/lc-tut/club-portal/router/utils"
 	"net/http"
 )
 
@@ -31,7 +32,7 @@ func (h *Handler) UpdateClubSchedule() gin.HandlerFunc {
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.repo.UpdateSchedule(clubUUID, validateToScheduleArgs(pd)); err != nil {
+		if err := h.repo.UpdateSchedule(clubUUID, utils.ValidateToScheduleArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusCreated, pd)

@@ -117,7 +117,7 @@ func (r *Router) AddRouter() {
 			}
 			adminClubGroup := adminGroup.Group("/clubs")
 			{
-				adminClubGroup.PUT("/")
+				adminClubGroup.PUT("/:clubuuid", r.middleware.SetClubUUIDKey(), adminH.UpdateClubWithVisible())
 			}
 		}
 	}

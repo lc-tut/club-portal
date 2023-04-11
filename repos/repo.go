@@ -25,7 +25,7 @@ type Repository struct {
 func NewRepository(logger *zap.Logger, db *gorm.DB) *Repository {
 	clubRepository := clubs.NewClubRepository(logger, db)
 	userRepository := users.NewUserRepository(logger, db)
-	adminRepository := admins.NewAdminRepository(logger, db)
+	adminRepository := admins.NewAdminRepository(logger, db, clubRepository)
 	r := &Repository{
 		ClubRepository:  clubRepository,
 		UserRepository:  userRepository,

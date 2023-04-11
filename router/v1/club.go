@@ -7,6 +7,7 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 	models "github.com/lc-tut/club-portal/models/clubs"
 	repos "github.com/lc-tut/club-portal/repos/clubs"
+	routerutils "github.com/lc-tut/club-portal/router/utils"
 	"github.com/lc-tut/club-portal/utils"
 	"net/http"
 )
@@ -156,16 +157,16 @@ func (*Handler) makeCreateArgs(ctx *gin.Context, pd *ClubCreatePostData) (*repos
 		Campus:          campus,
 		ClubType:        clubType,
 		Visible:         true,
-		Contents:        validateToContentArgs(pd.Contents),
-		Links:           validateToLinksArgs(pd.Links),
-		Schedules:       validateToScheduleArgs(pd.Schedules),
-		Achievements:    validateToAchievementArgs(pd.Achievements),
-		Images:          validateToImageArgs(pd.Images),
-		Videos:          validateToVideoArgs(pd.Videos),
-		Times:           validateToTimeArgs(pd.ActivityDetails),
-		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
-		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
+		Contents:        routerutils.ValidateToContentArgs(pd.Contents),
+		Links:           routerutils.ValidateToLinksArgs(pd.Links),
+		Schedules:       routerutils.ValidateToScheduleArgs(pd.Schedules),
+		Achievements:    routerutils.ValidateToAchievementArgs(pd.Achievements),
+		Images:          routerutils.ValidateToImageArgs(pd.Images),
+		Videos:          routerutils.ValidateToVideoArgs(pd.Videos),
+		Times:           routerutils.ValidateToTimeArgs(pd.ActivityDetails),
+		Places:          routerutils.ValidateToPlaceArgs(pd.ActivityDetails),
+		TPRemark:        routerutils.ValidateToTPRemarkArgs(pd.ActivityDetails),
+		ActivityDetails: routerutils.ValidateToActivityDetailArgs(pd.ActivityDetails),
 	}
 
 	return pageArgs, nil
@@ -242,16 +243,16 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 		ShortDesc:       pd.ShortDescription,
 		ClubRemark:      utils.StringPToString(pd.ClubRemark),
 		ScheduleRemark:  utils.StringPToString(pd.ScheduleRemark),
-		Contents:        validateToContentArgs(pd.Contents),
-		Links:           validateToLinksArgs(pd.Links),
-		Schedules:       validateToScheduleArgs(pd.Schedules),
-		Achievements:    validateToAchievementArgs(pd.Achievements),
-		Images:          validateToImageArgs(pd.Images),
-		Videos:          validateToVideoArgs(pd.Videos),
-		Times:           validateToTimeArgs(pd.ActivityDetails),
-		Places:          validateToPlaceArgs(pd.ActivityDetails),
-		TPRemark:        validateToTPRemarkArgs(pd.ActivityDetails),
-		ActivityDetails: validateToActivityDetailArgs(pd.ActivityDetails),
+		Contents:        routerutils.ValidateToContentArgs(pd.Contents),
+		Links:           routerutils.ValidateToLinksArgs(pd.Links),
+		Schedules:       routerutils.ValidateToScheduleArgs(pd.Schedules),
+		Achievements:    routerutils.ValidateToAchievementArgs(pd.Achievements),
+		Images:          routerutils.ValidateToImageArgs(pd.Images),
+		Videos:          routerutils.ValidateToVideoArgs(pd.Videos),
+		Times:           routerutils.ValidateToTimeArgs(pd.ActivityDetails),
+		Places:          routerutils.ValidateToPlaceArgs(pd.ActivityDetails),
+		TPRemark:        routerutils.ValidateToTPRemarkArgs(pd.ActivityDetails),
+		ActivityDetails: routerutils.ValidateToActivityDetailArgs(pd.ActivityDetails),
 	}
 
 	return pageArgs, nil
