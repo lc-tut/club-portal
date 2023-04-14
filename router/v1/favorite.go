@@ -60,7 +60,7 @@ func (h *Handler) CreateFavoriteClub() gin.HandlerFunc {
 		if err := h.repo.CreateFavorite(userUUID, pd.ClubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusCreated)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
@@ -82,7 +82,7 @@ func (h *Handler) UnFavoriteClub() gin.HandlerFunc {
 		if err := h.repo.DeleteFavorite(userUUID, pd.ClubUUID); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusCreated)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }

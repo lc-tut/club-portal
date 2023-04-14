@@ -11,7 +11,7 @@ import (
 type UserArgs struct {
 	Email    string
 	Name     string
-	ClubUUID string
+	ClubUUID *string
 }
 
 type AdminUserRepo interface {
@@ -160,7 +160,7 @@ func (r *AdminRepository) UpdateSpecifiedGeneralUser(userUUID string, args UserA
 		UserUUID: userUUID,
 		Email:    args.Email,
 		Name:     args.Name,
-		ClubUUID: utils.StringToNullString(args.ClubUUID),
+		ClubUUID: utils.StringToNullString(utils.StringPToString(args.ClubUUID)),
 	}
 	tx := r.db.Model(&user).Where("user_uuid = ?", userUUID).Updates(user)
 

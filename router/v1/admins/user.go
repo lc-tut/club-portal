@@ -34,9 +34,9 @@ func (h *handler) GetUserFromAdmin() gin.HandlerFunc {
 }
 
 type UpdateUserPostData struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	ClubUUID string `json:"club_uuid,omitempty"`
+	Email    string  `json:"email"`
+	Name     string  `json:"name"`
+	ClubUUID *string `json:"club_uuid"`
 }
 
 func (h *handler) UpdateUserFromAdmin() gin.HandlerFunc {
@@ -60,7 +60,7 @@ func (h *handler) UpdateUserFromAdmin() gin.HandlerFunc {
 				if err := h.repo.UpdateSpecifiedDomainUser(userUUID, pd.Name); err != nil {
 					ctx.Status(http.StatusInternalServerError)
 				} else {
-					ctx.Status(http.StatusCreated)
+					ctx.JSON(http.StatusCreated, pd)
 				}
 			case consts.GeneralUser:
 				args := admins.UserArgs{
@@ -71,7 +71,7 @@ func (h *handler) UpdateUserFromAdmin() gin.HandlerFunc {
 				if err := h.repo.UpdateSpecifiedGeneralUser(userUUID, args); err != nil {
 					ctx.Status(http.StatusInternalServerError)
 				} else {
-					ctx.Status(http.StatusCreated)
+					ctx.JSON(http.StatusCreated, pd)
 				}
 			}
 		}

@@ -17,7 +17,7 @@ type AdminRepository struct {
 	clubs.IClubRepository
 }
 
-func NewAdminRepository(logger *zap.Logger, db *gorm.DB, clubRepo *clubs.ClubRepository) *AdminRepository {
+func NewAdminRepository(logger *zap.Logger, db *gorm.DB, clubRepo clubs.IClubRepository) *AdminRepository {
 	r := &AdminRepository{
 		logger:          logger,
 		db:              db,
