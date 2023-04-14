@@ -195,8 +195,10 @@ paths:
               type: object
               properties:
                 name:
+                  required: true
                   type: string
                 role:
+                  required: true
                   type: string
                 club_uuid:
                   type: string
@@ -204,6 +206,18 @@ paths:
       responses:
         201:
           description: 正常に編集できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  role:
+                    type: string
+                  club_uuid:
+                    type: string
+                    format: uuidv4
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -258,6 +272,14 @@ paths:
       responses:
         201:
           description: 正常に登録できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  club_uuid:
+                    type: string
+                    format: uuidv4
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -315,6 +337,14 @@ paths:
       responses:
         201:
           description: 正常に解除できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  club_uuid:
+                    type: string
+                    format: uuidv4
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -451,8 +481,45 @@ paths:
                   items:
                     $ref: '#/components/schemas/ActivityDetail'
       responses:
-        200:
+        201:
           description: 正常に編集できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  short_description:
+                    type: string
+                  contents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Content'
+                  links:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Link'
+                  schedules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Schedule'
+                  achievements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Achievement'
+                  images:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ImageRequest'
+                  videos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Video'
+                  activity_details:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityDetail'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -530,7 +597,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/ClubUUID'
       responses:
-        200:
+        201:
           description: 正常に非公開にした場合に返されます。
         401:
           description: 認証していない状態でアクセスした場合に返されます。
@@ -709,7 +776,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  desciption:
+                  description:
                     type: string
         500:
           description: サーバ側でエラーが発生した場合に返されます。
@@ -994,6 +1061,12 @@ paths:
       responses:
         201:
           description: 正常にアップロードされた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
         400:
           description: リクエストが不正の場合に返されます。
         401:
@@ -1090,6 +1163,10 @@ paths:
       responses:
         201:
           description: 正常に変更できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thumbnail'
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -1138,13 +1215,35 @@ paths:
                 $ref: '#/components/schemas/Thumbnail'
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/admin/users/:
+    get:
+      tags:
+        - admin
+      summary: 全てのユーザの情報を Admin User 権限で取得します。
+      security:
+        - session: [ ]
+      responses:
+        200:
+          description: 正常に取得した場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - $ref: '#/components/schemas/User'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/admin/users/{userUUID}:
     get:
       tags:
         - admin
       summary: userUUID のユーザの情報を Admin User 権限で取得します。
       security:
-        - session: []
+        - session: [ ]
       parameters:
         - $ref: '#/components/parameters/UserUUID'
       responses:
@@ -1165,12 +1264,41 @@ paths:
         - admin
       summary: userUUID のユーザ情報を Admin User 権限で変更します。
       security:
-        - session: []
+        - session: [ ]
       parameters:
         - $ref: '#/components/parameters/UserUUID'
+      requestBody:
+        description: 変更するユーザのユーザ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  required: true
+                  type: string
+                name:
+                  required: true
+                  type: string
+                club_uuid:
+                  type: string
+                  format: uuidv4
       responses:
         201:
           description: 正常に変更された場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  name:
+                    type: string
+                  club_uuid:
+                    type: string
+                    format: uuidv4
         400:
           description: リクエストが不正な場合に返されます。
         401:
@@ -1179,13 +1307,15 @@ paths:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
-  /v1/admin/clubs:
+  /v1/admin/clubs/{clubUUID}:
     put:
       tags:
         - admin
       summary: 特定のサークル情報を Admin User 権限で変更します。
       security:
-        - session: []
+        - session: [ ]
+      parameters:
+        - $ref: '#/components/parameters/ClubUUID'
       requestBody:
         description: 編集に必要なユーザ情報
         required: true
@@ -1194,19 +1324,82 @@ paths:
             schema:
               type: object
               properties:
-                user_uuid:
+                visible:
+                  type: boolean
+                description:
                   type: string
-                  format: uuidv4
-                email:
+                short_description:
                   type: string
-                name:
-                  type: string
-                club_uuid:
-                  type: string
-                  format: uuidv4
+                contents:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Content'
+                links:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Link'
+                schedules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Schedule'
+                achievements:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Achievement'
+                images:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ImageRequest'
+                videos:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Video'
+                activity_details:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ActivityDetail'
       responses:
         201:
           description: 正常に変更された場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visible:
+                    type: boolean
+                  description:
+                    type: string
+                  short_description:
+                    type: string
+                  contents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Content'
+                  links:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Link'
+                  schedules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Schedule'
+                  achievements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Achievement'
+                  images:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ImageRequest'
+                  videos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Video'
+                  activity_details:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ActivityDetail'
         400:
           description: リクエストが不正な場合に返されます。
         401:
