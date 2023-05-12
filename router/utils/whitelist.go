@@ -2,10 +2,13 @@ package utils
 
 import (
 	models "github.com/lc-tut/club-portal/models/users"
-	repos "github.com/lc-tut/club-portal/repos/users"
 	"github.com/spf13/viper"
 	"strings"
 )
+
+type IGeneralUserGetter interface {
+	GetAllGeneralUser() ([]models.GeneralUser, error)
+}
 
 type WhitelistInfo interface {
 	Users() []string
@@ -87,11 +90,11 @@ func (w *Whitelist) AddGeneralUser(email string) {
 	w.users = append(w.users, email)
 }
 
-func NewWhitelist(userRepo repos.UserRepo) (WhitelistInfo, error) {
+func NewWhitelist(getterFn IGeneralUserGetter) (WhitelistInfo, error) {
 	ed := viper.GetStringSlice("email_domains")
 	ae := viper.GetStringSlice("admin_emails")
 
-	generalUser, err := userRepo.GetAllGeneralUser()
+	generalUser, err := getterFn.GetAllGeneralUser()
 
 	if err != nil {
 		return nil, err

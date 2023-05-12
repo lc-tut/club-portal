@@ -135,7 +135,7 @@ func (h *Handler) UpdateClubThumbnail() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Status(http.StatusCreated)
+		ctx.JSON(http.StatusCreated, thumbnail.ToThumbnailResponse())
 	}
 }
 

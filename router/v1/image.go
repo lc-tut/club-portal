@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/clubs"
+	"github.com/lc-tut/club-portal/router/utils"
 	"net/http"
 )
 
@@ -31,7 +32,7 @@ func (h *Handler) UpdateClubImages() gin.HandlerFunc {
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.repo.UpdateImage(clubUUID, validateToImageArgs(pd)); err != nil {
+		if err := h.repo.UpdateImage(clubUUID, utils.ValidateToImageArgs(pd)); err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
 			ctx.JSON(http.StatusCreated, pd)

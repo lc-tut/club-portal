@@ -98,7 +98,7 @@ func (h *Handler) UpdateUser() gin.HandlerFunc {
 		if err := tx.Error; err != nil {
 			ctx.Status(http.StatusInternalServerError)
 		} else {
-			ctx.Status(http.StatusCreated)
+			ctx.JSON(http.StatusCreated, pd)
 		}
 	}
 }
