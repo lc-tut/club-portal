@@ -1,7 +1,9 @@
 package users
 
 import (
+	"github.com/lc-tut/club-portal/models/clubs"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"reflect"
 	"testing"
 )

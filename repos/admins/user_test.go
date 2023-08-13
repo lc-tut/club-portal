@@ -1,7 +1,7 @@
 package admins
 
 import (
-	"github.com/lc-tut/club-portal/models/users"
+	models "github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/repos/clubs"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -55,7 +55,7 @@ func TestAdminRepository_GetSpecifiedUser(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    users.UserInfo
+		want    models.UserInfo
 		wantErr bool
 	}{
 		// TODO: Add test cases.
