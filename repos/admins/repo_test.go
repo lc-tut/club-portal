@@ -1,12 +1,18 @@
 package admins
 
 import (
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/lc-tut/club-portal/repos/clubs"
+	"github.com/lc-tut/club-portal/testutil"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"reflect"
 	"testing"
 )
+
+var logger = testutil.NewTestZapLogger()
+var db, _ = testutil.NewUnitTestDB()
+var clubRepo = clubs.NewClubRepository(logger, db)
 
 func TestNewAdminRepository(t *testing.T) {
 	type args struct {
@@ -19,12 +25,26 @@ func TestNewAdminRepository(t *testing.T) {
 		args args
 		want *AdminRepository
 	}{
-		// TODO: Add test cases.
+		{"new_repo_admin", args{
+			logger:   logger,
+			db:       db,
+			clubRepo: clubRepo,
+		},
+			&AdminRepository{
+				logger:          logger,
+				db:              db,
+				IClubRepository: clubRepo,
+			},
+		},
+	}
+	opts := []cmp.Option{
+		cmpopts.IgnoreTypes(&zap.Logger{}, &gorm.DB{}),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewAdminRepository(tt.args.logger, tt.args.db, tt.args.clubRepo); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAdminRepository() = %v, want %v", got, tt.want)
+			got := NewAdminRepository(tt.args.logger, tt.args.db, tt.args.clubRepo)
+			if diff := cmp.Diff(got, tt.want, opts...); diff != "" {
+				t.Errorf("NewAdminRepository() = %v, want %v\n%v", got, tt.want, diff)
 			}
 		})
 	}
