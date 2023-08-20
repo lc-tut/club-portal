@@ -11,7 +11,7 @@ import (
 )
 
 var logger = testutil.NewTestZapLogger()
-var db, _ = testutil.NewUnitTestDB()
+var db, mock, _ = testutil.NewUnitTestMockDB()
 var clubRepo = clubs.NewClubRepository(logger, db)
 
 func TestNewAdminRepository(t *testing.T) {

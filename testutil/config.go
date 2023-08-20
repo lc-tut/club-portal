@@ -1,8 +1,9 @@
 package testutil
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
 	"go.uber.org/zap"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -10,32 +11,15 @@ func NewTestZapLogger() *zap.Logger {
 	return zap.NewExample()
 }
 
-func NewUnitTestDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
-		PrepareStmt:            false,
-		SkipDefaultTransaction: true,
-		DryRun:                 true,
-		DisableAutomaticPing:   true,
-	})
-
+func NewUnitTestMockDB() (*gorm.DB, sqlmock.Sqlmock, error) {
+	mockDB, mock, err := sqlmock.New()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return db, nil
-}
-
-func NewIntegrationTestDB() (*gorm.DB, error) {
-	// ? should use mysql driver?
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
-		PrepareStmt:            false,
-		SkipDefaultTransaction: true,
-		DisableAutomaticPing:   true,
-	})
-
+	db, err := gorm.Open(mysql.New(mysql.Config{Conn: mockDB}))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-
-	return db, nil
+	return db, mock, nil
 }
