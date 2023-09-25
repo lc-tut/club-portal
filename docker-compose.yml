@@ -16,9 +16,10 @@ services:
     secrets:
       - config
     depends_on:
-      - redis
-      - mariadb
-    restart: on-failure
+      redis:
+        condition: service_started
+      mariadb:
+        condition: service_healthy
 
   redis:
     image: redis:alpine
@@ -29,8 +30,6 @@ services:
   mariadb:
     image: mariadb:latest
     container_name: mariadb
-    ports:
-      - "3306:3306"
     volumes:
       - ./cfg/mariadb/conf:/etc/mysql/conf.d
       - ./cfg/mariadb/sql:/docker-entrypoint-initdb.d
@@ -42,6 +41,12 @@ services:
       - mariadb-network
     secrets:
       - db_pass
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   redis-network:
