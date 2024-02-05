@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye AS build
+FROM golang:1.21 AS build
 
 WORKDIR /root/app
 
@@ -9,7 +9,7 @@ RUN go mod download
 COPY . .
 RUN go build -o dist/ -ldflags "-s -w"
 
-FROM gcr.io/distroless/base
+FROM gcr.io/distroless/base-debian12
 
 WORKDIR /root/
 COPY --from=build /root/app/dist .

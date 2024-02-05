@@ -6,3 +6,8 @@ dist/
 cfg/
 images/
 thumbnails/
+docker-compose.yml
+Dockerfile
+LICENSE
+openapi.yaml
+README.md
