@@ -1,17 +1,18 @@
 package admins
 
 import (
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/lc-tut/club-portal/repos/clubs"
 	"github.com/lc-tut/club-portal/testutil"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"testing"
 )
 
 var logger = testutil.NewTestZapLogger()
-var db, mock, _ = testutil.NewUnitTestMockDB()
+var db, _, _ = testutil.NewUnitTestMockDB()
 var clubRepo = clubs.NewClubRepository(logger, db)
 
 func TestNewAdminRepository(t *testing.T) {

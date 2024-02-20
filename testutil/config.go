@@ -17,7 +17,7 @@ func NewUnitTestMockDB() (*gorm.DB, sqlmock.Sqlmock, error) {
 		return nil, nil, err
 	}
 
-	db, err := gorm.Open(mysql.New(mysql.Config{Conn: mockDB}))
+	db, err := gorm.Open(mysql.New(mysql.Config{Conn: mockDB, SkipInitializeWithVersion: true}))
 	if err != nil {
 		return nil, nil, err
 	}
