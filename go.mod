@@ -3,6 +3,7 @@ module github.com/lc-tut/club-portal
 go 1.21
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-contrib/zap v0.2.0
 	github.com/gin-gonic/gin v1.9.1
@@ -11,6 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/spf13/viper v1.18.2
+	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/oauth2 v0.16.0
 	gorm.io/driver/mysql v1.5.2
