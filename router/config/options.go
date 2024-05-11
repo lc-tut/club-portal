@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"net/http"
 )
 
 type CSRFCookieOption struct {

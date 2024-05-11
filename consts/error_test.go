@@ -1,8 +1,9 @@
 package consts
 
 import (
-	"github.com/google/go-cmp/cmp"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestValidateError_Error(t *testing.T) {

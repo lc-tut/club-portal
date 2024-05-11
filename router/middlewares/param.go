@@ -1,11 +1,12 @@
 package middlewares
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 func (mw *Middleware) SetClubSlugKey() gin.HandlerFunc {

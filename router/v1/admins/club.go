@@ -1,6 +1,8 @@
 package admins
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	models "github.com/lc-tut/club-portal/models/clubs"
@@ -8,7 +10,6 @@ import (
 	repos "github.com/lc-tut/club-portal/repos/clubs"
 	routerutils "github.com/lc-tut/club-portal/router/utils"
 	"github.com/lc-tut/club-portal/utils"
-	"net/http"
 )
 
 type UpdatePostData struct {

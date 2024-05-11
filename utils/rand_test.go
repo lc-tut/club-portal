@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"github.com/google/go-cmp/cmp"
-	"github.com/lc-tut/club-portal/consts"
 	"path/filepath"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/lc-tut/club-portal/consts"
 )
 
 func TestGenerateCSRFState(t *testing.T) {

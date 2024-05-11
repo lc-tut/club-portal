@@ -1,9 +1,10 @@
 package clubs
 
 import (
+	"testing"
+
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"testing"
 )
 
 func TestClubRepository_GetClubDescription(t *testing.T) {

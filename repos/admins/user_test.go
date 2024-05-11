@@ -1,12 +1,13 @@
 package admins
 
 import (
+	"reflect"
+	"testing"
+
 	models "github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/repos/clubs"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"reflect"
-	"testing"
 )
 
 func TestAdminRepository_GetAllUser(t *testing.T) {

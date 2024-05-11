@@ -4,6 +4,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -14,8 +17,6 @@ import (
 	env "github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"net/http"
-	"strings"
 )
 
 func (h *Handler) Callback() gin.HandlerFunc {

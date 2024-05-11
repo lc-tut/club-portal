@@ -1,10 +1,11 @@
 package clubs
 
 import (
-	"github.com/google/go-cmp/cmp"
-	"github.com/lc-tut/club-portal/consts"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/lc-tut/club-portal/consts"
 )
 
 var (

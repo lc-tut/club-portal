@@ -1,14 +1,15 @@
 package auth
 
 import (
+	"net/http"
+	"net/url"
+	"strings"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
-	"net/http"
-	"net/url"
-	"strings"
 )
 
 type signInQuery struct {

@@ -1,9 +1,10 @@
 package users
 
 import (
-	"github.com/google/go-cmp/cmp"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 var now = time.Now()

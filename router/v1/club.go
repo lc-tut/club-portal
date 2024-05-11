@@ -2,6 +2,8 @@ package v1
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
@@ -9,7 +11,6 @@ import (
 	repos "github.com/lc-tut/club-portal/repos/clubs"
 	routerutils "github.com/lc-tut/club-portal/router/utils"
 	"github.com/lc-tut/club-portal/utils"
-	"net/http"
 )
 
 func (h *Handler) GetAllClub() gin.HandlerFunc {

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router"
 	"github.com/lc-tut/club-portal/utils"
@@ -9,7 +11,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"time"
 )
 
 func loadConfig() error {

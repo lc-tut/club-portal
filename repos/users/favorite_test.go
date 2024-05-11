@@ -1,11 +1,12 @@
 package users
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/lc-tut/club-portal/models/clubs"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"reflect"
-	"testing"
 )
 
 func TestUserRepository_CreateFavorite(t *testing.T) {

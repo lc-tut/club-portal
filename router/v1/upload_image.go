@@ -3,21 +3,21 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/models/users"
 	"github.com/lc-tut/club-portal/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"image"
-	"mime/multipart"
-	"net/http"
-	"os"
-	"path/filepath"
-
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 )
 
 func (h *Handler) GetImages() gin.HandlerFunc {

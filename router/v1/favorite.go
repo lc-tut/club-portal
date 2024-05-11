@@ -1,9 +1,10 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
-	"net/http"
 )
 
 func (h *Handler) GetFavoriteClubs() gin.HandlerFunc {

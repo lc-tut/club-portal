@@ -1,10 +1,11 @@
 package main
 
 import (
+	"time"
+
 	"github.com/lc-tut/club-portal/consts"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"time"
 )
 
 func newZapProdConfig() (*zap.Logger, error) {

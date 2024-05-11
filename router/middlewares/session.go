@@ -1,12 +1,13 @@
 package middlewares
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/router/utils"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func (mw *Middleware) CheckSession() gin.HandlerFunc {

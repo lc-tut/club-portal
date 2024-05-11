@@ -1,11 +1,12 @@
 package admins
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"github.com/lc-tut/club-portal/repos/admins"
 	"github.com/lc-tut/club-portal/router/utils"
-	"net/http"
 )
 
 func (h *handler) GetAllUserFromAdmin() gin.HandlerFunc {

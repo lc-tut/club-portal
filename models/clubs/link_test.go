@@ -1,9 +1,10 @@
 package clubs
 
 import (
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/lc-tut/club-portal/consts"
-	"testing"
 )
 
 var links = []ClubLink{

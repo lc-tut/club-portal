@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+
 	"github.com/lc-tut/club-portal/consts"
 )
 

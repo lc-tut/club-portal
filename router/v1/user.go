@@ -1,11 +1,12 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lc-tut/club-portal/consts"
 	repos "github.com/lc-tut/club-portal/repos/users"
-	"net/http"
 )
 
 func (h *Handler) GetUser() gin.HandlerFunc {

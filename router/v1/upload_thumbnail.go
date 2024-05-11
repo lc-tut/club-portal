@@ -3,19 +3,19 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/lc-tut/club-portal/consts"
-	"github.com/lc-tut/club-portal/utils"
-	"go.uber.org/zap"
 	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
+	"github.com/gin-gonic/gin"
+	"github.com/lc-tut/club-portal/consts"
+	"github.com/lc-tut/club-portal/utils"
+	"go.uber.org/zap"
 )
 
 func (h *Handler) GetClubThumbnail() gin.HandlerFunc {

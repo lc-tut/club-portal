@@ -1,11 +1,12 @@
 package users
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/lc-tut/club-portal/models/users"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"reflect"
-	"testing"
 )
 
 func TestUserRepository_CreateUploadedImage(t *testing.T) {

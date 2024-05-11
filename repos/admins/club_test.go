@@ -1,10 +1,11 @@
 package admins
 
 import (
+	"testing"
+
 	"github.com/lc-tut/club-portal/repos/clubs"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"testing"
 )
 
 func TestAdminRepository_UpdatePageByClubUUIDWithAdmin(t *testing.T) {

@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"strings"
+
 	models "github.com/lc-tut/club-portal/models/users"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 type IGeneralUserGetter interface {

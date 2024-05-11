@@ -1,10 +1,11 @@
 package middlewares
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lc-tut/club-portal/consts"
 	"go.uber.org/zap"
-	"time"
 )
 
 // LoggerMiddleware アクセスごとにログを記録する.

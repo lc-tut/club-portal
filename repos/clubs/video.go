@@ -2,6 +2,7 @@ package clubs
 
 import (
 	"errors"
+
 	"github.com/lc-tut/club-portal/models/clubs"
 	"gorm.io/gorm"
 )
