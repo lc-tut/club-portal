@@ -29,6 +29,7 @@ const (
 	CampusKamata   CampusType = 1
 )
 
+// ToPrimitive CampusType を uint8 に変換
 func (ct CampusType) ToPrimitive() uint8 {
 	return uint8(ct)
 }
@@ -42,10 +43,12 @@ const (
 	KokasaiType ClubType = 2
 )
 
+// ToPrimitive ClubType を uint8 に変換
 func (ct ClubType) ToPrimitive() uint8 {
 	return uint8(ct)
 }
 
+// UserType ユーザの種類 (domain: 学内ユーザ, general: 一般ユーザ, admin: 管理者)
 type UserType string
 
 const (
@@ -54,12 +57,16 @@ const (
 	AdminUser   UserType = "admin"
 )
 
+// ToPrimitive UserType を string に変換
 func (ut UserType) ToPrimitive() string {
 	return string(ut)
 }
 
+// UploadSize アップロード可能なファイルの最大サイズ (2MiB)
 const UploadSize = 2 << 18 // 2MiB
 
+// DummyUUID ダミーのUUID
 const DummyUUID = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa"
 
+// DefaultThumbnailPath デフォルトのサムネイル画像のパス
 const DefaultThumbnailPath = "thumbnails/default.png"

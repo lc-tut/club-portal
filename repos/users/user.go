@@ -157,7 +157,7 @@ func (r *UserRepository) GetUserByUUIDFromRole(uuid string, role string) (users.
 	case consts.DomainUser:
 		return r.GetDomainUserByUUID(uuid)
 	default:
-		return nil, consts.UnreachableError
+		return nil, consts.ErrUnreachable
 	}
 }
 
@@ -177,7 +177,7 @@ func (r *UserRepository) GetUserByEmailFromRole(email string, role string) (user
 	case consts.DomainUser:
 		return r.GetDomainUserByEmail(email)
 	default:
-		return nil, consts.UnreachableError
+		return nil, consts.ErrUnreachable
 	}
 }
 
@@ -351,7 +351,7 @@ func (r *UserRepository) UpdateUserFromRole(uuid string, role string, args Updat
 	case consts.DomainUser:
 		err = r.UpdateDomainUser(uuid, args.Name)
 	default:
-		err = consts.UnreachableError
+		err = consts.ErrUnreachable
 	}
 
 	if err != nil {

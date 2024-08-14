@@ -88,7 +88,7 @@ func (r *AdminRepository) GetSpecifiedUser(userUUID string) (models.UserInfo, er
 	case consts.DomainUser:
 		return r.getDomainUser(userUUID)
 	default:
-		return nil, consts.UnreachableError
+		return nil, consts.ErrUnreachable
 	}
 }
 

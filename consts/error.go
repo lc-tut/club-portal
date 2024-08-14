@@ -14,4 +14,4 @@ func NewValidateError(text string) *ValidateError {
 	return &ValidateError{text: text}
 }
 
-var UnreachableError = errors.New("unreachable")
+var ErrUnreachable = errors.New("unreachable")
