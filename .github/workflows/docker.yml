@@ -5,15 +5,12 @@ on:
     branches:
       - master
       - dev
-    paths-ignore:
-      - examples/**
-      - .gitignore
-      - LICENSE
-      - README.md
-      - openapi.yaml
-      - .github/**
-      - cfg/**
-      - thumbnails/**
+    paths:
+      - '**.go'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'go.mod'
+      - 'go.sum'
 
   release:
     types:
