@@ -12,7 +12,7 @@ type ClubNameResponse struct {
 }
 
 func (h *Handler) UpdateClubName() gin.HandlerFunc {
-	return func(ctx *gin.Context)
+	return func(ctx *gin.Context) {
 		pd := &ClubCreatePostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
@@ -22,5 +22,10 @@ func (h *Handler) UpdateClubName() gin.HandlerFunc {
 
 		clubUUID := ctx.GetString(consts.ClubUUIDKeyName)
 
-		if err := h.repo.UpdateClubName(clubUUID, pd.Name)
+		if err := h.repo.UpdateClubName(clubUUID, pd.Name); err != nil {
+			ctx.Status(http.StatusInternalServerError)
+		} else {
+			ctx.JSON(http.StatusCreated, pd)
+		}
+	}
 }
