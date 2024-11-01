@@ -305,6 +305,7 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 
 func (r *ClubRepository) UpdatePageByClubUUID(uuid string, args ClubPageUpdateArgs) error {
 	page := clubs.ClubPage{
+		Name:             args.Name
 		Description:      args.Desc,
 		ShortDescription: args.ShortDesc,
 		ClubRemark:       utils.StringToNullString(args.ClubRemark),

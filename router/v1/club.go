@@ -199,6 +199,7 @@ func (h *Handler) createPage(ctx *gin.Context, args repos.ClubPageCreateArgs) er
 }
 
 type UpdatePostData struct {
+	Name             string                         `json:"name"`
 	Description      string                         `json:"description"`
 	ShortDescription string                         `json:"short_description"`
 	ClubRemark       *string                        `json:"club_remark"`
