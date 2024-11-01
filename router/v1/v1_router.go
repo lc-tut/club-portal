@@ -76,7 +76,7 @@ func (r *Router) AddRouter() {
 				personalClubGroup.PUT("/image", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubImages())
 				personalClubGroup.GET("/link", r.middleware.CheckSession(), h.GetClubLinks())
 				personalClubGroup.PUT("/link", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubLinks())
-				personalClubGroup.PUT("/name", p.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubName())
+				personalClubGroup.PUT("/name", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubName())
 				personalClubGroup.GET("/schedule", r.middleware.CheckSession(), h.GetClubSchedule())
 				personalClubGroup.PUT("/schedule", r.middleware.CheckSession(), r.middleware.IdentifyUUID(consts.ClubUUIDKeyName), h.UpdateClubSchedule())
 				//personalClubGroup.GET("/tpremark")
