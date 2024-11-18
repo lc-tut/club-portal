@@ -27,10 +27,10 @@ func TestClubRepository_UpdateClubName(t *testing.T){
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &ClubRepository{
-				logger: tt.fields.logger,
-				db:     tt.fields.db,
+				logger: tt.fieids.logger,
+				db:     tt.fieids.db,
 			}
-			if err := r.UpdateClubName(tt.args.uuid, tt.args.name); (err != nll) != tt.wantErr {
+			if err := r.UpdateClubName(tt.args.uuid, tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("UpdateClubName() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

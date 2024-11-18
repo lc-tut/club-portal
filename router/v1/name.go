@@ -7,13 +7,13 @@ import (
 	"github.com/lc-tut/club-portal/consts"
 )
 
-type ClubNameResponse struct {
+type ClubNamePostData struct {
 	Name string `json:"name"`
 }
 
 func (h *Handler) UpdateClubName() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pd := &ClubCreatePostData{}
+		pd := &ClubNamePostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
