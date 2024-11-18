@@ -241,6 +241,7 @@ func (*Handler) makeUpdateArgs(ctx *gin.Context, pd *UpdatePostData) (*repos.Clu
 	}
 
 	pageArgs := &repos.ClubPageUpdateArgs{
+		Name: 		  	 pd.Name,
 		Desc:            pd.Description,
 		ShortDesc:       pd.ShortDescription,
 		ClubRemark:      utils.StringPToString(pd.ClubRemark),
