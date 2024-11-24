@@ -21,7 +21,7 @@ const (
 	ThumbnailIDKeyName    = "thumbnail_id_key"
 )
 
-// CampusType サークルのキャンパスタイプ (0: 蒲田, 1: 八王子)
+// CampusType サークルのキャンパスタイプ (0: 八王子, 1: 蒲田)
 type CampusType uint8
 
 const (
