@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/lc-tut/club-portal/repos"
+	"github.com/lc-tut/club-portal/repos/users"
 	"github.com/lc-tut/club-portal/router/config"
 	"go.uber.org/zap"
 )
@@ -9,10 +9,10 @@ import (
 type Middleware struct {
 	config *config.MiddlewareConfig
 	logger *zap.Logger
-	repo   repos.IRepository
+	repo   users.UserRepo
 }
 
-func NewMiddleware(config *config.MiddlewareConfig, logger *zap.Logger, repo repos.IRepository) *Middleware {
+func NewMiddleware(config *config.MiddlewareConfig, logger *zap.Logger, repo users.UserRepo) *Middleware {
 	mw := &Middleware{
 		config: config,
 		logger: logger,
