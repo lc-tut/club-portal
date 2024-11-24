@@ -30,7 +30,7 @@ type ClubDescriptionPostData struct {
 
 func (h *Handler) UpdateClubDescription() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pd := &ClubCreatePostData{}
+		pd := &ClubDescriptionPostData{}
 
 		if err := ctx.ShouldBindJSON(pd); err != nil {
 			ctx.Status(http.StatusBadRequest)
