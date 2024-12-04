@@ -18,14 +18,12 @@ func ByteSliceToSessionData(b []byte) (*SessionData, error) {
 	return model, nil
 }
 
-func ToUserInfoResponse(users []usermodels.UserInfo) []usermodels.UserResponse {
-	res := make([]usermodels.UserResponse, len(users))
-
-	for i, user := range users {
-		res[i] = *user.ToUserResponse()
-	}
-
-	return res
+func ToUserInfoResponse(users []usermodels.UserInfo) []usermodels.UserResponse {    
+    res := make([]usermodels.UserResponse, len(users))
+    for i, user := range users {
+        res[i] = *user.ToUserResponse()
+    }
+    return res
 }
 
 func ValidateToContentArgs(models []clubmodels.ContentRequest) []string {
