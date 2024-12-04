@@ -49,7 +49,7 @@ func (r *AdminRepository) GetAllUser() ([]models.UserInfo, error) {
 		return nil, err
 	}
 
-	allUsers := make([]models.UserInfo, len(domainUsers)+len(generalUsers)+len(adminUsers))
+	allUsers := make([]models.UserInfo, 0, len(domainUsers)+len(generalUsers)+len(adminUsers))
 
 	for _, user := range domainUsers {
 		allUsers = append(allUsers, &user)
