@@ -21,6 +21,19 @@
 - `router` -> API 用 URL ルータ
 - `utils` -> 汎用関数など
 
+## 環境開発(2025/02/12追記)
+### 現在はClub-Portal-FrontendにあるWikiをご覧ください。
+リンクはこちら
+https://github.com/lc-tut/club-portal-frontend/wiki
+
+### データベースのセットアップ手順(LC部員向け)
+この方法は、実際に稼働しているclub-portalの情報を使用します。情報の取り扱いには十分注意してください。
+1. こちらから、dumps.sqlをダウンロードしてください(dumps{日付}となっているディレクトリ内にあります。)<br>
+    https://github.com/lc-tut/club-portal-dumps
+2. ダウンロードしたdumps.sqlを、手元環境のdumpsディレクトリへ格納してください。
+3. Linuxの方は`dev_db_setup.sh`を実行してください。尚、mariadbのパスワードを問われますので、db_passに設定したパスワードを入力してください。(一応Windows用のdev_db_setup.ps1も作っておきました)
+4. データベースがリストアされたことを確認してください。
+
 ## 開発
 基本的には, 以下のようにブランチを切って作業を行い, Pull Request (PR) を `dev` ブランチに送ってください.
 `dev` ブランチがメインブランチとなります.
