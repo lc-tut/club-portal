@@ -6,7 +6,7 @@ services:
     image: club-portal
     container_name: club-portal
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - ./images:/root/images
       - ./thumbnails:/root/thumbnails
@@ -28,10 +28,10 @@ services:
       - redis-network
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10
     container_name: mariadb
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - ./cfg/mariadb/conf:/etc/mysql/conf.d
       - ./cfg/mariadb/sql:/docker-entrypoint-initdb.d
