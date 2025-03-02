@@ -189,7 +189,8 @@ cfg/config.toml
 cfg/db_pass
 cfg/mariadb/data/
 dist/
-images/
+!images/default.png
+images/*
 !thumbnails/default.png
 thumbnails/*
 redoc/
