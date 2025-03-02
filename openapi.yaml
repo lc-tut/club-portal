@@ -353,6 +353,30 @@ paths:
           description: 不正なユーザがアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/users/{userUUID}/history:
+    get:
+      tags:
+        - user
+      summary: userUUID の閲覧履歴を取得します。 (自身の UUID のみ)
+      security:
+        - session: []
+      parameters:
+        - $ref: '#/components/parameters/UserUUID'
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClubPage-External'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        403:
+          description: 不正なユーザがアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
   /v1/clubs:
     get:
       tags:
@@ -1058,6 +1082,190 @@ paths:
           description: 認証していない状態でアクセスした場合に返されます。
         500:
           description: サーバ側でエラーが発生した場合に返されます。
+  /v1/notice:
+    get:
+      tags:
+        - notice
+      summary: 全てのお知らせを取得します。
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notice'
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    post:
+      tags:
+        - notice
+      summary: 新しくお知らせを作成します。 (General,Admin のみ)
+      security:
+        - session: []
+      requestBody:
+        description: 作成に必要なお知らせ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+      responses:
+        201:
+          description: 正常に作成した場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        400:
+          description: リクエストが不正な場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+
+  /v1/notice/{noticeID}:
+    get:
+      tags:
+        - notice
+      summary: noticeID のお知らせを取得します。
+      parameters:
+        $ref: '#/components/parameters/NoticeID'
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        400:
+          description: リクエストが不正の場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    put:
+      tags:
+        - notice
+      summary: noticeID のお知らせを編集します。 (General,Admin のみ)
+      parameters:
+        $ref: '#/components/parameters/NoticeID'
+      security:
+        - session: []
+      requestBody:
+        description: 編集に必要なお知らせ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+      responses:
+        201:
+          description: 正常に編集できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notice'
+        400:
+          description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    delete:
+      tags:
+        - notice
+      summary: noticeID のお知らせを削除します。 (General,Admin のみ)
+      parameters:
+        $ref: '#/components/parameters/NoticeID'
+      security:
+        - session: []
+      parameters:
+        - in: path
+          name: noticeID
+          schema
+  
+  /v1/notice/bookmark/:
+    get:
+      tags:
+        - notice
+      summary: 自身がブックマークしたお知らせを取得します。
+      security:
+        - session: []
+      responses:
+        200:
+          description: 正常に取得できた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notice'
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    post:
+      tags:
+        - notice
+      summary: お知らせをブックマークします。
+      security:
+        - session: []
+      requestBody:
+        description: ブックマークするお知らせ
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notice_id:
+                  type: integer
+      responses:
+        201:
+          description: 正常にブックマークできた場合に返されます。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notice_id:
+                    type: integer
+        400:
+          description: リクエストが不正の場合に返されます。
+        401:
+          description: 認証していない状態でアクセスした場合に返されます。
+        500:
+          description: サーバ側でエラーが発生した場合に返されます。
+    delete:
+      tags:
+        - notice
+      summary: お知らせのブックマークを解除します。
+      security:
+        - session: []
+      requestBody:
+        description: 解除に必要なお知らせ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notice_id:
+                  type: integer
+      responses:
+        201:
+          description: 正常に解除できた場合に返されます。
+
   /v1/upload/images:
     get:
       tags:
@@ -1682,6 +1890,23 @@ components:
         place_remark:
           type: string
           nullable: true
+    Notice:
+      type: object
+      properties:
+        notice_id:
+          type: integer
+          format: uint32
+        title:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+          format: RFC3339
+        updated_at:
+          type: string
+          format: RFC3339
+    
   parameters:
     ClubUUID:
       name: clubUUID
@@ -1699,6 +1924,14 @@ components:
         format: uuidv4
       required: true
       description: 登録しているユーザの UUID
+    NoticeUUID:
+      name: noticeUUID
+      in: path
+      schema:
+        type: integer
+        format: uint32
+      required: true
+      description: お知らせの ID
   examples:
     NullObject:
       value:
