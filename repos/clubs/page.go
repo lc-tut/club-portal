@@ -251,7 +251,7 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 
-		tx.SavePoint("CreatePage_1")
+		tx.SavePoint("CreatePage_init_point")
 
 		if err := tx.Create(page).Error; err != nil {
 			return err
@@ -290,16 +290,16 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 		}
 		
 		// 一度トランザクションをsave
-		tx.SavePoint("CreatePage_2")
+		tx.SavePoint("CreatePage_save")
 		
 
 		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
-			tx.RollbackTo("CreatePage")
+			tx.RollbackTo("CreatePage_init_point")
 			return err
 		}
 
 		if err := r.CreateTPRemarkWithTx(tx, uuid, args.TPRemark); err != nil {
-			tx.RollbackTo("CreatePage")
+			tx.RollbackTo("CreatePage_init_point")
 			return err
 		}
 
