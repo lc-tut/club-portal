@@ -250,6 +250,7 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
+
 		if err := tx.Create(page).Error; err != nil {
 			return err
 		}
@@ -284,7 +285,7 @@ func (r *ClubRepository) CreatePage(uuid string, args ClubPageCreateArgs) (*club
 
 		if err := r.CreatePlaceWithTx(tx, args.Places); err != nil {
 			return err
-		}
+		}		
 
 		if err := r.CreateActivityDetailWithTx(tx, uuid, args.ActivityDetails); err != nil {
 			return err
